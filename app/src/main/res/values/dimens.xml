@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_tab_height">@dimen/size_98</dimen>
+    <dimen name="line_height">1px</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+</resources>

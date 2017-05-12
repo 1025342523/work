@@ -3,4 +3,26 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="white">#fff</color>
+    <color name="transparent">#00000000</color>
+    <color name="black">#000</color>
+    <color name="light_gray">#E5E5E5</color>
+    <color name="main_blue">#1269c5</color>
+    <color name="light_blue">#3899ff</color>
+    <color name="main_green">#21D061</color>
+    <color name="main_green2">#27AF1B</color>
+    <color name="main_desc">#666</color>
+    <color name="text_desc">#888</color>
+    <color name="main_text">#333</color>
+    <color name="main_red">#f13626</color>
+    <color name="main_orange">#FC5319</color>
+    <!--<color name="content_bg">#e7e9ed</color>-->
+    <color name="content_bg">#E0E6EB</color>
+    <color name="line_color">#dfe1e5</color>
+    <color name="main_text2">#2c3643</color>
+    <color name="darker_gray">#333333</color>
+    <color name="dimgray">#696969</color><!--暗灰色 -->
+    <color name="whitesmoke">#F5F5F5</color><!--烟白色 -->
+    <color name="black90">#383431</color><!--黑色 -->
+
 </resources>
