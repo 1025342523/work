@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_100"
+                android:background="@drawable/selector_list_bg">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignParentBottom="true"
+        android:background="@color/line_color"/>
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="@dimen/size_160"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:gravity="end"
+        android:textColor="#b6c3ca"
+        android:textSize="@dimen/font_30"/>
+
+    <EditText
+        android:id="@+id/etContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/size_40"
+        android:layout_marginStart="@dimen/size_40"
+        android:layout_toEndOf="@id/tvName"
+        android:layout_toRightOf="@id/tvName"
+        android:background="@android:color/transparent"
+        android:imeOptions="actionDone"
+        android:textColor="#2c3643"
+        android:textSize="@dimen/font_28"/>
+
+    <View
+        android:id="@+id/coverView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"/>
+
+    <ImageView
+        android:id="@+id/ivMoreInfoIcon"
+        android:layout_width="@dimen/size_26"
+        android:layout_height="@dimen/size_26"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:padding="@dimen/size_4"
+        android:scaleType="fitXY"
+        android:src="@drawable/list_moreinfo"/>
+
+    <ImageView
+        android:id="@+id/ivMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/size_24"
+        android:layout_marginRight="@dimen/size_24"
+        android:src="@drawable/ic_list_more"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

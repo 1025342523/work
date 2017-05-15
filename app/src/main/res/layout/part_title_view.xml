@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_90"
+                android:background="@color/main_blue">
+
+
+    <ImageView
+        android:id="@+id/ivRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/size_20"
+        android:layout_marginRight="@dimen/size_20"
+        android:padding="@dimen/size_10"
+        android:scaleType="fitXY"/>
+
+    <ImageView
+        android:id="@+id/ivRightLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/size_16"
+        android:layout_marginRight="@dimen/size_16"
+        android:layout_toLeftOf="@id/ivRight"
+        android:layout_toStartOf="@id/ivRight"
+        android:padding="@dimen/size_10"
+        android:scaleType="fitXY"/>
+
+    <TextView
+        android:id="@+id/tvRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/size_20"
+        android:layout_marginRight="@dimen/size_20"
+        android:gravity="center"
+        android:maxLines="1"
+        android:padding="@dimen/size_10"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_28"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/ivTextRightLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/size_16"
+        android:layout_marginRight="@dimen/size_16"
+        android:layout_toLeftOf="@id/tvRight"
+        android:layout_toStartOf="@id/tvRight"
+        android:padding="@dimen/size_10"
+        android:scaleType="fitXY"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/ivLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/size_20"
+        android:layout_marginStart="@dimen/size_20"
+        android:padding="@dimen/size_10"
+        android:scaleType="fitXY"/>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_32"/>
+</RelativeLayout>

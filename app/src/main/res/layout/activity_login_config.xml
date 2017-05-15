@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/content_bg"
+              android:orientation="vertical">
+
+    <com.yifarj.yifadinghuobao.view.TitleView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon_left="@drawable/ic_title_back"
+        app:text_right="@string/title_text_save"
+        app:title_name="@string/server_configuration"/>
+
+    <com.yifarj.yifadinghuobao.view.CustomEditItem
+        android:id="@+id/ciMainServer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:name="@string/main_server"/>
+
+    <com.yifarj.yifadinghuobao.view.CustomEditItem
+        android:id="@+id/ciIp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:name="@string/ip_address"/>
+
+    <com.yifarj.yifadinghuobao.view.CustomEditItem
+        android:id="@+id/ciPort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:name="@string/port"/>
+
+    <com.yifarj.yifadinghuobao.view.CustomEditItem
+        android:id="@+id/ciKeyCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:name="@string/key_code"/>
+
+    <com.yifarj.yifadinghuobao.view.CustomEditItem
+        android:id="@+id/ciAccountNum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:name="@string/account_num"/>
+
+    <LinearLayout
+        android:id="@+id/llGetAccountIds"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_110"
+        android:layout_marginTop="@dimen/size_20"
+        android:background="@drawable/selector_list_bg"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_110"
+            android:drawableLeft="@drawable/ic_connect"
+            android:drawablePadding="@dimen/size_8"
+            android:drawableStart="@drawable/ic_connect"
+            android:gravity="center"
+            android:text="@string/get_account"
+            android:textColor="@color/main_red"
+            android:textSize="@dimen/font_32"/>
+    </LinearLayout>
+
+</LinearLayout>

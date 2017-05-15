@@ -8,4 +8,24 @@
     <string name="tab_goods">商品</string>
     <string name="tab_order">订单</string>
     <string name="tab_shopping">购物车</string>
+    <string name="tab_all">全部</string>
+    <string name="tab_name">品名</string>
+    <string name="tab_num">货号</string>
+    <string name="tab_price">价格</string>
+    <string name="title_text_save">保存</string>
+    <string name="server_configuration">服务器配置</string>
+    <string name="main_server">主服务器</string>
+    <string name="ip_address">IP地址</string>
+    <string name="port">端口</string>
+    <string name="key_code">唯一码</string>
+    <string name="account_num">账套号</string>
+    <string name="get_account">获取账套号</string>
+    <string name="select_account">选取账套号</string>
+    <string name="account_nothing">无账套号</string>
+    <string name="parm_none">参数为空</string>
+    <string name="get_account_none">未获取到账套</string>
+    <string name="url_is_error">url地址格式有误,请检查</string>
+    <string name="cancel">取消</string>
+    <string name="activity_finish">完成</string>
+    <string name="delete_dialog_title">提示</string>
 </resources>

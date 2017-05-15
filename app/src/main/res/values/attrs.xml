@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ProgressWheel">
+        <attr name="matProg_progressIndeterminate" format="boolean"/>
+        <attr name="matProg_barColor" format="color"/>
+        <attr name="matProg_rimColor" format="color"/>
+        <attr name="matProg_rimWidth" format="dimension"/>
+        <attr name="matProg_spinSpeed" format="float"/>
+        <attr name="matProg_barSpinCycleTime" format="integer"/>
+        <attr name="matProg_circleRadius" format="dimension"/>
+        <attr name="matProg_fillRadius" format="boolean"/>
+        <attr name="matProg_barWidth" format="dimension"/>
+        <attr name="matProg_linearProgress" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="CustomItem">
+        <attr name="cus_name" format="reference|string"/>
+        <attr name="cus_icon_left" format="reference"/>
+        <attr name="cus_icon_right" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="AccSubjectItem">
+        <attr name="acc_name" format="reference|string"/>
+        <attr name="acc_icon_left" format="reference"/>
+        <attr name="acc_title" format="reference|string"/>
+        <attr name="acc_content" format="reference|string"/>
+    </declare-styleable>
+
+    <declare-styleable name="DeleteItem">
+        <attr name="del_name" format="reference|string"/>
+    </declare-styleable>
+
+    <declare-styleable name="CustomEditItem">
+        <attr name="name" format="reference|string"/>
+        <attr name="editable" format="boolean"/>
+        <attr name="moreMode" format="boolean"/>
+        <attr name="default_content" format="reference|string"/>
+        <attr name="hint" format="reference|string"/>
+    </declare-styleable>
+
+    <declare-styleable name="TitleView">
+        <attr name="title_name" format="reference|string"/>
+        <attr name="text_right" format="reference|string"/>
+        <attr name="icon_left" format="reference"/>
+        <attr name="icon_right" format="reference"/>
+        <attr name="icon_right_left" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="SearchView">
+        <attr name="text_hint" format="reference|string"/>
+    </declare-styleable>
+</resources>

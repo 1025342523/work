@@ -24,5 +24,6 @@
     <color name="dimgray">#696969</color><!--暗灰色 -->
     <color name="whitesmoke">#F5F5F5</color><!--烟白色 -->
     <color name="black90">#383431</color><!--黑色 -->
-
+    <color name="black_alpha_45">#71000000</color>
+    <color name="bangumi_badge_gary">#e58B8B8C</color>
 </resources>
