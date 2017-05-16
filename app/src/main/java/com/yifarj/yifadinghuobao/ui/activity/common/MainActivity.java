@@ -17,9 +17,11 @@ import com.yifarj.yifadinghuobao.ui.fragment.shopping.TabShoppingFragment;
 
 import butterknife.BindView;
 
+import static com.yifarj.yifadinghuobao.R.id.tabHost;
+
 public class MainActivity extends BaseActivity {
 
-    @BindView(R.id.tabHost)
+    @BindView(tabHost)
     FragmentTabHost mFragmentTabHost;
 
 
@@ -30,8 +32,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
-        final FragmentTabHost tabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
-        assert tabHost != null;
+        assert mFragmentTabHost != null;
         mFragmentTabHost.setup(this, getSupportFragmentManager(), R.id.contentContainer);
         mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f1").setIndicator(getIndicatorView(0)), TabMainFragment.class, null);
         mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f2").setIndicator(getIndicatorView(1)), TabGoodsFragment.class, null);
@@ -40,7 +41,7 @@ public class MainActivity extends BaseActivity {
         TabWidget mTabWidget = (TabWidget) findViewById(android.R.id.tabs);
         assert mTabWidget != null;
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
-        tabHost.setCurrentTab(0);
+        mFragmentTabHost.setCurrentTab(1);
     }
 
     private static final int[] TAB_BUTTON_ICON_RES = {

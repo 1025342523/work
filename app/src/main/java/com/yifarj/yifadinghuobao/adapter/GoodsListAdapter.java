@@ -12,6 +12,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mcxtzhang.lib.AnimShopButton;
 import com.mcxtzhang.lib.IOnAddDelListener;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
@@ -47,14 +48,15 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         if (holder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             GoodsListEntity.ValueEntity goodsBean = data.get(position);
-
-            Glide.with(getContext())
-                    .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
-                    .centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.default_image)
-                    .dontAnimate()
-                    .into(itemViewHolder.itemImg);
+            if (goodsBean.ProductPictureList.size() > 0) {
+                Glide.with(getContext())
+                        .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.default_image)
+                        .dontAnimate()
+                        .into(itemViewHolder.itemImg);
+            }
 
             itemViewHolder.tvName.setText(goodsBean.Name);
             for (ProductUnitEntity.ValueEntity unit : goodsBean.ProductUnitList) {
@@ -62,9 +64,9 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                     itemViewHolder.tvUnit.setText(unit.Name);
                 }
             }
-
+            double productPrice = goodsBean.Price1;
             for (GoodsListEntity.ValueEntity.PriceSystemListEntity price : goodsBean.PriceSystemList) {
-                double productPrice = 0;
+
                 if (price.IsOrderMeetingPrice) {
                     switch (price.Id) {
                         case 0:

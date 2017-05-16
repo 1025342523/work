@@ -9,21 +9,21 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
- * AccountService
+ * 下单
  *
  * @auther Czech.Yuan
  * @date 2017/5/15 18:25
  */
-public interface AccountService {
+public interface CreateOrderService {
 
     /**
-     * 获取账套
+     * 下单
      */
     @FormUrlEncoded
-    @POST(ApiConstants.CUrl.GET_ACCOUNT_LIST)
-    Observable<AccountListEntity> getAccountList(
-            @Field("Host") String ip,
-            @Field("Port") String port,
-            @Field("KeyCode") String keyCode
+    @POST(ApiConstants.CUrl.CREATE)
+    Observable<AccountListEntity> createOrderInfo(
+            @Field("DataTypeName") String dataTypeName,
+            @Field("Param") String param,
+            @Field("Token") String token
     );
 }

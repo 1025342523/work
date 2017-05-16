@@ -67,58 +67,58 @@ public class ApiConstants {
         /**
          * 登录
          */
-        public static final String LOGIN = "/Login";
-        public static final String LOGIN_OTHER = "/Login2";
+        public static final String LOGIN = "Login";
+        public static final String LOGIN_OTHER = "Login2";
         /**
          * 退出登录
          */
-        public static final String EXIT = "/Exit";
+        public static final String EXIT = "Exit";
 
-        public static final String GET_ACCOUNT_LIST = "/GetAccountList";
+        public static final String GET_ACCOUNT_LIST = "GetAccountList";
 
         /**
          * 获取列表接口,包括客户列表等列表,与传过去的字段有关
          */
-        public static final String FETCH_LIST = "/FetchList";
+        public static final String FETCH_LIST = "FetchList";
 
         /**
          * 获取单条数据
          */
-        public static final String FETCH = "/Fetch";
+        public static final String FETCH = "Fetch";
 
         /**
          * 创建接口
          */
-        public static final String CREATE = "/Create";
+        public static final String CREATE = "Create";
 
         /**
          * 保存接口
          */
-        public static final String SAVE = "/Save";
+        public static final String SAVE = "Save";
 
         /**
          * 货品客户信息保存接口
          */
-        public static final String SAVE_LOAD = "/SaveLoad";
+        public static final String SAVE_LOAD = "SaveLoad";
 
         /**
          * 删除接口
          */
-        public static final String DELETE = "/Delete";
+        public static final String DELETE = "Delete";
         /**
          * 执行其它命令接口
          */
-        public static final String EXEC = "/Execute";
+        public static final String EXEC = "Execute";
 
         /**
          * 手机配置信息上传
          */
-        public static final String PHONEUSERINFO_UPLOAD = "/UploadPhoneUserInfo";
+        public static final String PHONEUSERINFO_UPLOAD = "UploadPhoneUserInfo";
 
         /**
          * 手机配置信息下载
          */
-        public static final String PHONEUSERINFO_DOWNLOAD = "/DownPhoneUserInfo";
+        public static final String PHONEUSERINFO_DOWNLOAD = "DownPhoneUserInfo";
     }
 
 }

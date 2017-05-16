@@ -4,7 +4,9 @@ import android.app.Application;
 
 import com.blankj.utilcode.util.Utils;
 import com.facebook.stetho.Stetho;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.squareup.leakcanary.LeakCanary;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 
 /**
  * YifaApplication
@@ -38,5 +40,9 @@ public class YifaApplication extends Application {
             return;
         }
         LeakCanary.install(this);
+        //初始化SharedPreferences
+        PreferencesUtil.init(this);
+        //初始化DBFlow
+        FlowManager.init(this);
     }
 }

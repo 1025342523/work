@@ -7,14 +7,14 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.LinearLayout;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.bumptech.glide.request.RequestListener;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.wx.wheelview.widget.WheelView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.model.entity.AccountListEntity;
-import com.yifarj.yifadinghuobao.network.ApiApiConstants;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
+import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
@@ -28,8 +28,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 登录配置页面
@@ -111,13 +115,13 @@ public class LoginConfigActivity extends BaseActivity {
         ciMainServer.getEditText().setImeOptions(EditorInfo.IME_ACTION_NEXT);
 
         if (PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN) == null) {
-                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, "http://192.168.1.10:8888/yifa.asmx");
+            PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, "http://192.168.1.10:8888/yifa.asmx");
         }
 
         ciMainServer.getEditText().setText(PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN, ""));
 
         if (PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_IP) == null) {
-                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, "127.0.0.1");
+            PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, "127.0.0.1");
         }
 
         String ip = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_IP, "");
@@ -131,7 +135,7 @@ public class LoginConfigActivity extends BaseActivity {
         ciPort.getEditText().setImeOptions(EditorInfo.IME_ACTION_NEXT);
 
         if (PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PORT) == null) {
-                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, "5218");
+            PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, "5218");
         }
 
         String port = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PORT, "");
@@ -195,7 +199,7 @@ public class LoginConfigActivity extends BaseActivity {
     }
 
     private void getAccountIdsClick() {
-        getAccountIdsClick(false);
+        getAccountIdsClick(true);
     }
 
     public void getAccountIdsClick(boolean showDialog) {
@@ -218,82 +222,70 @@ public class LoginConfigActivity extends BaseActivity {
     }
 
     private void getAccountIds(String port, String ip, String keycode, final boolean showDialog) {
-        try {
-            if (!CommonUtil.isNetworkAvailable(LoginConfigActivity.this)) {
-                ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
-                return;
-            }
-            AppInfoUtil.resetBaseUrl(ciMainServer.getEditText().getText().toString().trim(), true);
-            RequestParams params = new RequestParams();
-            params.put("Host", ip);
-            params.put("Port", port);
-            params.put("KeyCode", keycode);
-            Requester.post(ApiConstants.CUrl.BASE_URL + ApiConstants.CUrl.GET_ACCOUNT_LIST, params, AccountListEntity.class, new RequestListener<AccountListEntity>() {
-                @Override
-                public void onStart() {
-                    super.onStart();
-                    llGetAccountIds.setEnabled(false);
-                }
+        if (!CommonUtil.isNetworkAvailable(LoginConfigActivity.this)) {
+            ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
+            return;
+        }
+        AppInfoUtil.resetBaseUrl(ciMainServer.getEditText().getText().toString().trim(), true);
+        RetrofitHelper.getAccountAPI()
+                .getAccountList(ip, port, keycode)
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<AccountListEntity>() {
 
-                @Override
-                public void onSuccess(AccountListEntity entity) {
-                    super.onSuccess(entity);
-                    if (!entity.HasError) {
-                        mAccountList = new ArrayList<>();
-                        if (entity.Value != null && entity.Value.size() > 0) {
-                            for (AccountListEntity.ValueEntity entityItem :
-                                    entity.Value) {
-                                if (entityItem.Visible) {
-                                    mAccountList.add(entityItem);
+
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        LogUtils.e("onSubscribe", "订阅");
+                    }
+
+                    @Override
+                    public void onNext(AccountListEntity valueEntity) {
+                        LogUtils.e("onNext", valueEntity.toString());
+                        if (!valueEntity.HasError) {
+                            mAccountList = new ArrayList<>();
+                            if (valueEntity.Value != null && valueEntity.Value.size() > 0) {
+                                for (AccountListEntity.ValueEntity entityItem :
+                                        valueEntity.Value) {
+                                    if (entityItem.Visible) {
+                                        mAccountList.add(entityItem);
+                                    }
                                 }
-                            }
-                            if (mAccountList.size() > 0) {
-                                if (mAccountId == 0) {
-                                    ciAccountNum.getEditText().setText(mAccountList.get(0).Name);
-                                    mAccountId = mAccountList.get(0).Id;
-                                } else {
-                                    for (AccountListEntity.ValueEntity accountItem :
-                                            mAccountList) {
-                                        if (accountItem.Id == mAccountId) {
-                                            ciAccountNum.getEditText().setText(accountItem.Name);
+                                if (mAccountList.size() > 0) {
+                                    if (mAccountId == 0) {
+                                        ciAccountNum.getEditText().setText(mAccountList.get(0).Name);
+                                        mAccountId = mAccountList.get(0).Id;
+                                    } else {
+                                        for (AccountListEntity.ValueEntity accountItem :
+                                                mAccountList) {
+                                            if (accountItem.Id == mAccountId) {
+                                                ciAccountNum.getEditText().setText(accountItem.Name);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            if (showDialog) {
-                                showAccountNumDialog();
+                                if (showDialog) {
+                                    showAccountNumDialog();
+                                }
+                            } else {
+                                ToastUtils.showShortSafe(getString(R.string.get_account_none));
                             }
                         } else {
-                            ToastUtil.showToastShort(getString(R.string.get_account_none));
+                            ToastUtils.showShortSafe(getString(R.string.get_account_none) + ":" + valueEntity.Information);
                         }
-                    } else {
-                        ToastUtil.showToastShort(getString(R.string.get_account_none) + ":" + entity.Information);
                     }
-                }
 
-                @Override
-                public void onFailure(int errorCode, String errorMsg, Throwable throwable) {
-                    super.onFailure(errorCode, errorMsg, throwable);
-                    ToastUtil.showToastShort(getString(R.string.get_account_none));
-                    llGetAccountIds.setEnabled(true);
-                }
+                    @Override
+                    public void onError(Throwable t) {
+                        ToastUtils.showShortSafe("未获取到账套，请重试");
+                    }
 
-                @Override
-                public void onError(int errorCode, String errorMsg) {
-                    super.onError(errorCode, errorMsg);
-                    ToastUtil.showToastShort(getString(R.string.get_account_none));
-                    llGetAccountIds.setEnabled(true);
-                }
-
-                @Override
-                public void onFinish(boolean success) {
-                    super.onFinish(success);
-                    llGetAccountIds.setEnabled(true);
-                }
-            });
-        } catch (Exception e) {
-            ToastUtil.showToastShort(getString(R.string.url_is_error));
-        }
+                    @Override
+                    public void onComplete() {
+                        LogUtils.e("onComplete", "完成");
+                    }
+                });
     }
 
     public void onSave() {

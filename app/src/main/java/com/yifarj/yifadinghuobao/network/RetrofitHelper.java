@@ -3,6 +3,9 @@ package com.yifarj.yifadinghuobao.network;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.yifarj.yifadinghuobao.app.YifaApplication;
 import com.yifarj.yifadinghuobao.network.api.AccountService;
+import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
+import com.yifarj.yifadinghuobao.network.api.GoodsListService;
+import com.yifarj.yifadinghuobao.network.api.LoginService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 
 import java.io.File;
@@ -18,7 +21,6 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * RetrofitHelper
@@ -30,12 +32,11 @@ public class RetrofitHelper {
 
     private static OkHttpClient mOkHttpClient;
 
-
     static {
         initOkHttpClient();
     }
 
-//
+    //
 //    public static LiveService getLiveAPI() {
 //
 //        return createApi(LiveService.class, ApiConstants.LIVE_BASE_URL);
@@ -78,17 +79,17 @@ public class RetrofitHelper {
 //    }
 //
 //
-//    public static BangumiService getBangumiAPI() {
-//
-//        return createApi(BangumiService.class, ApiConstants.BANGUMI_BASE_URL);
-//    }
-//
-//
-//    public static SearchService getSearchAPI() {
-//
-//        return createApi(SearchService.class, ApiConstants.SEARCH_BASE_URL);
-//    }
-//
+    public static CreateOrderService getCreateOrderInfo() {
+
+        return createApi(CreateOrderService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
+    public static GoodsListService getGoodsListAPI() {
+
+        return createApi(GoodsListService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
 
     public static AccountService getAccountAPI() {
 
@@ -96,22 +97,26 @@ public class RetrofitHelper {
     }
 
 
-//    public static Im9Service getIm9API() {
-//
-//        return createApi(Im9Service.class, ApiConstants.IM9_BASE_URL);
-//    }
+    public static LoginService getLoginApi() {
+
+        return createApi(LoginService.class, ApiConstants.CUrl.BASE_URL);
+    }
 
 
     /**
      * 根据传入的baseUrl，和api创建retrofit
      */
     private static <T> T createApi(Class<T> clazz, String baseUrl) {
+        String url = baseUrl.substring(0, baseUrl.length() - 1);
+        if (!url.equals("/")) {
+            baseUrl += "/";
+        }
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(mOkHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(YifaConverterFactory.create())
                 .build();
 
         return retrofit.create(clazz);
@@ -150,7 +155,7 @@ public class RetrofitHelper {
 
 
     /**
-     * 添加UA拦截器，B站请求API需要加上UA才能正常使用
+     * 添加UA拦截器
      */
     private static class UserAgentInterceptor implements Interceptor {
 

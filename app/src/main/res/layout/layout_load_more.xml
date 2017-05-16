@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/foot_load_layout"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/size_100"
+              android:gravity="center"
+              android:orientation="horizontal">
+
+    <com.yifarj.yifadinghuobao.view.CircleProgressView
+        android:id="@+id/load_pro"
+        android:layout_width="@dimen/size_40"
+        android:layout_height="@dimen/size_40"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        app:matProg_barColor="@color/light_blue"
+        app:matProg_barWidth="@dimen/size_4"
+        app:matProg_progressIndeterminate="true"/>
+
+    <TextView
+        android:id="@+id/load_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/size_20"
+        android:layout_marginStart="@dimen/size_20"
+        android:gravity="center"
+        android:text="@string/load_more"
+        android:textColor="@color/black_alpha_45"
+        android:textSize="@dimen/size_28"/>
+
+</LinearLayout>
+

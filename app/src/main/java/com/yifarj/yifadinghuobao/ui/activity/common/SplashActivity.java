@@ -3,6 +3,7 @@ package com.yifarj.yifadinghuobao.ui.activity.common;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.trello.rxlifecycle2.components.RxActivity;
 import com.yifarj.yifadinghuobao.R;
@@ -40,7 +41,7 @@ public class SplashActivity extends RxActivity {
     }
 
     private void finishTask() {
-        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
         finish();
     }
 }
