@@ -3,6 +3,9 @@ package com.yifarj.yifadinghuobao.model.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
+import com.google.gson.annotations.Expose;
+
 import java.util.List;
 
 /**
@@ -23,11 +26,14 @@ public class SaleGoodsItem {
         /**
          * 价格系数,用于本地状态保存,不做json序列化
          */
+        @Expose(serialize = false, deserialize = false)
         public int priceFactor = 1;
         /**
          * 原始价格,用于本地状态保存,不做json序列化
          */
+        @Expose(serialize = false, deserialize = false)
         public double rawActualPrice;
+
         public int Id;
         public int BillId;
         public int SalesType;

@@ -1,6 +1,7 @@
 package com.yifarj.yifadinghuobao.database.model;
 
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.rx2.structure.BaseRXModel;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
@@ -11,7 +12,7 @@ import com.yifarj.yifadinghuobao.database.AppDatabase;
 @Table(database = AppDatabase.class)
 public class GoodsUnitModel extends BaseRXModel {
 
-    @Column
+    @PrimaryKey
     public int Id;
 
     @Column

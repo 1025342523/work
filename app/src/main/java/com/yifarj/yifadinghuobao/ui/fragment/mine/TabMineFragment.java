@@ -1,4 +1,4 @@
-package com.yifarj.yifadinghuobao.ui.fragment.shopping;
+package com.yifarj.yifadinghuobao.ui.fragment.mine;
 
 import android.os.Bundle;
 
@@ -6,12 +6,12 @@ import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 
 /**
- * TabShoppingFragment
+ * TabMineFragment
  *
  * @auther Czech.Yuan
- * @date 2017/5/12 15:06
+ * @date 2017/5/12 15:07
  */
-public class TabShoppingFragment extends BaseFragment {
+public class TabMineFragment extends BaseFragment {
 
 
     @Override

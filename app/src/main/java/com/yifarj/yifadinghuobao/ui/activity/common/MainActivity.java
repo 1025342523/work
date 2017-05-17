@@ -12,8 +12,8 @@ import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.goods.TabGoodsFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.main.TabMainFragment;
+import com.yifarj.yifadinghuobao.ui.fragment.mine.TabMineFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.order.TabOrderFragment;
-import com.yifarj.yifadinghuobao.ui.fragment.shopping.TabShoppingFragment;
 
 import butterknife.BindView;
 
@@ -37,7 +37,7 @@ public class MainActivity extends BaseActivity {
         mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f1").setIndicator(getIndicatorView(0)), TabMainFragment.class, null);
         mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f2").setIndicator(getIndicatorView(1)), TabGoodsFragment.class, null);
         mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f3").setIndicator(getIndicatorView(2)), TabOrderFragment.class, null);
-        mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f4").setIndicator(getIndicatorView(3)), TabShoppingFragment.class, null);
+        mFragmentTabHost.addTab(mFragmentTabHost.newTabSpec("f4").setIndicator(getIndicatorView(3)), TabMineFragment.class, null);
         TabWidget mTabWidget = (TabWidget) findViewById(android.R.id.tabs);
         assert mTabWidget != null;
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
@@ -48,13 +48,13 @@ public class MainActivity extends BaseActivity {
             R.drawable.selector_bottom_bar_main,
             R.drawable.selector_bottom_bar_goods,
             R.drawable.selector_bottom_bar_order,
-            R.drawable.selector_bottom_bar_shopping,
+            R.drawable.selector_bottom_bar_mine,
     };
     private static final int[] TAB_BUTTON_NAME_RES = {
             R.string.tab_main,
             R.string.tab_goods,
             R.string.tab_order,
-            R.string.tab_shopping,
+            R.string.tab_mine,
     };
 
     private View getIndicatorView(int position) {

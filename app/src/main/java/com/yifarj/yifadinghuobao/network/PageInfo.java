@@ -5,7 +5,7 @@ package com.yifarj.yifadinghuobao.network;
  */
 public class PageInfo {
 
-    public int PageIndex = -1;//page 从0开始,但是用分页的时候会先自增
+    public int PageIndex = 0;//page 从0开始,但是用分页的时候会先自增
     public int TotalCount;
     public int PageLength = 10;
     public String SortedColumn = "Id";

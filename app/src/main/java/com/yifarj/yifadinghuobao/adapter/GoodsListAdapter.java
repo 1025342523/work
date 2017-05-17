@@ -11,13 +11,21 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mcxtzhang.lib.AnimShopButton;
 import com.mcxtzhang.lib.IOnAddDelListener;
+import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
+import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
+import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 
 import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
 
 /**
@@ -28,6 +36,8 @@ import java.util.List;
  */
 public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     public List<GoodsListEntity.ValueEntity> data;
+    private String unitName;
+    private double productPrice;
 
     public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data) {
         super(recyclerView);
@@ -62,9 +72,10 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             for (ProductUnitEntity.ValueEntity unit : goodsBean.ProductUnitList) {
                 if (unit.IsBasic) {
                     itemViewHolder.tvUnit.setText(unit.Name);
+                    unitName = unit.Name;
                 }
             }
-            double productPrice = goodsBean.Price1;
+            productPrice = goodsBean.Price1;
             for (GoodsListEntity.ValueEntity.PriceSystemListEntity price : goodsBean.PriceSystemList) {
 
                 if (price.IsOrderMeetingPrice) {
@@ -110,6 +121,27 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             itemViewHolder.btnEle.setOnAddDelListener(new IOnAddDelListener() {
                 @Override
                 public void onAddSuccess(int i) {
+//                    RXSQLite.rx(SQLite.select()
+//                            .from(SaleGoodsItemModel.class))
+//                            .queryList()
+//                            .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+//                                @Override
+//                                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+//                                    if (saleGoodsItemModels.)
+//                                }
+//                            });
+                    RXSQLite.rx(SQLite.select()
+                            .from(SaleGoodsItemModel.class))
+                            .queryStreamResults()
+                            .subscribe(new Consumer<SaleGoodsItemModel>() {
+                                @Override
+                                public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
+                                    if (saleGoodsItemModel.ProductId == goodsBean.Id) {
+                                        return;
+                                    }
+                                    add(goodsBean);
+                                }
+                            });
 
                 }
 
@@ -131,6 +163,52 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         }
 
         super.onBindViewHolder(holder, position);
+    }
+
+    private void add(GoodsListEntity.ValueEntity goodsBean) {
+        SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
+        itemModel.CurrentPrice = productPrice;
+        itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
+        itemModel.UnitName = unitName;
+        itemModel.Discount = 1.0f;
+        itemModel.SalesType = 1;
+        itemModel.TaxRate = 1.0;
+        itemModel.WarehouseId = goodsBean.DefaultWarehouseId;
+        itemModel.ProductId = goodsBean.Id;
+        itemModel.LocationId = goodsBean.DefaultLocationId;
+        itemModel.PackSpec = goodsBean.PackSpec;
+        itemModel.Price0 = goodsBean.Price0;
+        itemModel.Price1 = goodsBean.Price1;
+        itemModel.Price2 = goodsBean.Price2;
+        itemModel.Price3 = goodsBean.Price3;
+        itemModel.Price4 = goodsBean.Price4;
+        itemModel.Price5 = goodsBean.Price5;
+        itemModel.Price6 = goodsBean.Price6;
+        itemModel.Price7 = goodsBean.Price7;
+        itemModel.Price8 = goodsBean.Price8;
+        itemModel.Price9 = goodsBean.Price9;
+        itemModel.Price10 = goodsBean.Price10;
+        itemModel.MinSalesQuantity = goodsBean.MinSalesQuantity;
+        itemModel.MaxSalesQuantity = goodsBean.MaxSalesQuantity;
+        itemModel.MinSalesPrice = goodsBean.MinSalesPrice;
+        itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
+        itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
+        itemModel.OweRemark = goodsBean.Remark;
+        itemModel.save();
+        Flowable.fromIterable(goodsBean.ProductUnitList)
+                .forEach(valueEntity -> {
+                    GoodsUnitModel goodsUnitModel = new GoodsUnitModel();
+                    goodsUnitModel.Id = valueEntity.Id;
+                    goodsUnitModel.ProductId = valueEntity.ProductId;
+                    goodsUnitModel.Name = valueEntity.Name;
+                    goodsUnitModel.Factor = valueEntity.Factor;
+                    goodsUnitModel.BasicFactor = valueEntity.BasicFactor;
+                    goodsUnitModel.IsBasic = valueEntity.IsBasic;
+                    goodsUnitModel.IsDefault = valueEntity.IsDefault;
+                    goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
+                    goodsUnitModel.Ordinal = valueEntity.Ordinal;
+                    goodsUnitModel.save();
+                });
     }
 
 

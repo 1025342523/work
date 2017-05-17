@@ -2,6 +2,7 @@ package com.yifarj.yifadinghuobao.database.model;
 
 
 import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.rx2.structure.BaseRXModel;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
@@ -16,12 +17,15 @@ import com.yifarj.yifadinghuobao.database.AppDatabase;
 public class SaleGoodsItemModel extends BaseRXModel {
 
     @Column
-    public int priceFactor = 1;
+    public double CurrentPrice;
 
     @Column
-    public double rawActualPrice;
+    public String UnitName;
 
     @Column
+    public String Path;
+
+    @PrimaryKey
     public int Id;
 
     @Column
@@ -63,14 +67,10 @@ public class SaleGoodsItemModel extends BaseRXModel {
     @Column
     public double BasicUnitPrice;
 
-    @Column
-    public double ActualUnitPrice;
 
     @Column
     public double UnitPrice;
 
-    @Column
-    public double ActualPrice;
 
     @Column
     public float Discount;

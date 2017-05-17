@@ -7,7 +7,7 @@
     <string name="tab_main">首页</string>
     <string name="tab_goods">商品</string>
     <string name="tab_order">订单</string>
-    <string name="tab_shopping">购物车</string>
+    <string name="tab_mine">我的</string>
     <string name="tab_all">全部</string>
     <string name="tab_name">品名</string>
     <string name="tab_num">货号</string>
@@ -32,4 +32,8 @@
     <string name="log_in">登录中&#8230;</string>
     <string name="login_failure">登录失败,</string>
     <string name="load_more">加载中…</string>
+    <string name="clear_all">清空</string>
+    <string name="shopping_cart">购物车</string>
+    <string name="create_order">下单</string>
+    <string name="total_amount">金额：</string>
 </resources>

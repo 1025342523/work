@@ -1,5 +1,6 @@
 package com.yifarj.yifadinghuobao.ui.fragment.goods;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -17,9 +18,12 @@ import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
+import com.yifarj.yifadinghuobao.view.TitleView;
+import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +53,14 @@ public class TabGoodsFragment extends BaseFragment {
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
+    @BindView(R.id.titleView)
+    TitleView titleView;
+
+    private boolean mIsRefreshing = false;
+
     private int pageSize = 10;
+    private int pageNum = 0;
+    private int totalPage = 1;
 
     private View loadMoreView;
 
@@ -73,6 +84,12 @@ public class TabGoodsFragment extends BaseFragment {
         pageInfo.PageIndex = 1;
         isPrepared = true;
         lazyLoad();
+        titleView.setRightIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getActivity(), ShoppingCartActivity.class));
+            }
+        });
     }
 
     @Override
@@ -90,10 +107,16 @@ public class TabGoodsFragment extends BaseFragment {
     protected void initRefreshLayout() {
         mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
 //        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
-        mSwipeRefreshLayout.setOnRefreshListener(this::loadData);
         mSwipeRefreshLayout.post(() -> {
 
             mSwipeRefreshLayout.setRefreshing(true);
+            mIsRefreshing = true;
+            loadData();
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            mIsRefreshing = true;
+            goodsList.clear();
             loadData();
         });
     }
@@ -103,18 +126,23 @@ public class TabGoodsFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        GoodsListAdapter mAdapter = new GoodsListAdapter(mRecyclerView, goodsList);
-        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mAdapter);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList);
+        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
+        setRecycleNoScroll();
         createHeadView();
         createLoadMoreView();
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLinearLayoutManager) {
 
             @Override
             public void onLoadMore(int i) {
-                pageInfo.PageIndex++;
-                loadData();
-                loadMoreView.setVisibility(View.VISIBLE);
+                if (pageNum <= totalPage) {
+                    pageNum++;
+                    pageInfo.PageIndex = pageNum;
+                    loadData();
+                    loadMoreView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -128,7 +156,7 @@ public class TabGoodsFragment extends BaseFragment {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(goodsListEntity -> {
-                    if (goodsListEntity.PageInfo.PageLength < pageSize) {
+                    if (goodsListEntity.PageInfo.TotalCount < pageSize) {
                         loadMoreView.setVisibility(View.GONE);
                         mHeaderViewRecyclerAdapter.removeFootView();
                     }
@@ -143,6 +171,7 @@ public class TabGoodsFragment extends BaseFragment {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             goodsList.addAll(goodsListEntity.Value);
+                            totalPage = goodsListEntity.PageInfo.TotalCount;
                             finishTask();
                         }
                     }
@@ -163,7 +192,10 @@ public class TabGoodsFragment extends BaseFragment {
 
     @Override
     protected void finishTask() {
-        mSwipeRefreshLayout.setRefreshing(false);
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+        mIsRefreshing = false;
         if (goodsList != null) {
             if (goodsList.size() == 0) {
                 showEmptyView();
@@ -173,25 +205,19 @@ public class TabGoodsFragment extends BaseFragment {
         }
         loadMoreView.setVisibility(View.GONE);
         mGoodsListAdapter.notifyDataSetChanged();
-        if (pageInfo.PageIndex * pageSize - pageSize - 1 > 0) {
-            mHeaderViewRecyclerAdapter.notifyItemRangeChanged(pageInfo.PageIndex * pageSize - pageSize - 1,
-                    pageSize);
-        } else {
-            mHeaderViewRecyclerAdapter.notifyDataSetChanged();
-        }
     }
 
     private void createHeadView() {
 
         View headView = LayoutInflater.from(getActivity())
                 .inflate(R.layout.layout_search_archive_head_view, mRecyclerView, false);
-        RecyclerView mHeadRecycler = (RecyclerView) headView.findViewById(
-                R.id.search_archive_bangumi_head_recycler);
-        mHeadRecycler.setHasFixedSize(false);
-        mHeadRecycler.setNestedScrollingEnabled(false);
-        mHeadRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
-        mHeadRecycler.setAdapter(mGoodsListAdapter);
+//        RecyclerView mHeadRecycler = (RecyclerView) headView.findViewById(
+//                R.id.search_archive_bangumi_head_recycler);
+//        mHeadRecycler.setHasFixedSize(false);
+//        mHeadRecycler.setNestedScrollingEnabled(false);
+//        mHeadRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+//        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
+//        mHeadRecycler.setAdapter(mGoodsListAdapter);
 
         mHeaderViewRecyclerAdapter.addHeaderView(headView);
     }
@@ -216,5 +242,10 @@ public class TabGoodsFragment extends BaseFragment {
                 .inflate(R.layout.layout_load_more, mRecyclerView, false);
         mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
         loadMoreView.setVisibility(View.GONE);
+    }
+
+    private void setRecycleNoScroll() {
+
+        mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
     }
 }
