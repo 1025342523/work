@@ -6,6 +6,7 @@ import com.yifarj.yifadinghuobao.network.api.AccountService;
 import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
 import com.yifarj.yifadinghuobao.network.api.GoodsListService;
 import com.yifarj.yifadinghuobao.network.api.LoginService;
+import com.yifarj.yifadinghuobao.network.api.LogoutService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 
 import java.io.File;
@@ -73,12 +74,12 @@ public class RetrofitHelper {
 //    }
 //
 //
-//    public static VipService getVipAPI() {
-//
-//        return createApi(VipService.class, ApiConstants.VIP_BASE_URL);
-//    }
-//
-//
+    public static LogoutService getLogoutApi() {
+
+        return createApi(LogoutService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
     public static CreateOrderService getCreateOrderInfo() {
 
         return createApi(CreateOrderService.class, ApiConstants.CUrl.BASE_URL);
