@@ -26,6 +26,6 @@
     <color name="black90">#383431</color><!--黑色 -->
     <color name="black_alpha_45">#71000000</color>
     <color name="bangumi_badge_gary">#e58B8B8C</color>
-    <color name="recycle_view_divider">#cdcdcd</color>
+    <color name="recycle_view_divider">#dfe1e5</color>
     <color name="common_gary">#8a8a8a</color>
 </resources>

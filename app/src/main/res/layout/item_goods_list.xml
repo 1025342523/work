@@ -5,6 +5,7 @@
               android:layout_height="@dimen/size_200"
               android:layout_marginEnd="@dimen/size_10"
               android:layout_marginStart="@dimen/size_10"
+              android:background="@color/white"
               android:clickable="true"
               android:foreground="?attr/selectableItemBackground"
               android:orientation="horizontal">
@@ -84,7 +85,7 @@
                 app:hintBgColor="@color/main_blue"
                 app:hintBgRoundValue="15dp"
                 app:hintFgColor="#ffffff"
-                app:maxCount="99"/>
+                app:maxCount="99999"/>
 
         </RelativeLayout>
 

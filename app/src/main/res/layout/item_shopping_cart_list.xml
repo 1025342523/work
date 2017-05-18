@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:stepper="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:background="@color/white"
               android:clickable="true"
               android:foreground="?attr/selectableItemBackground"
               android:orientation="vertical">
@@ -89,8 +89,7 @@
         android:id="@+id/ll_flowLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/size_40"
-        android:padding="20dp"
+        android:padding="@dimen/size_30"
         app:max_select="1">
     </com.zhy.view.flowlayout.TagFlowLayout>
 
@@ -100,6 +99,7 @@
         android:layout_margin="@dimen/size_10">
 
         <ImageView
+            android:id="@+id/iv_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -109,20 +109,17 @@
             android:layout_marginStart="@dimen/size_40"
             android:src="@drawable/ic_delete"/>
 
-        <com.bigkoo.snappingstepper.SnappingStepper
-            android:id="@+id/stepperCustom"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
+        <com.yifarj.yifadinghuobao.view.NumberAddSubView
+            android:id="@+id/num_control"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            stepper:max="200"
-            stepper:min="50"
-            stepper:step="5"
-            stepper:stepper_background="@null"
-            stepper:stepper_contentBackground="@color/light_blue"
-            stepper:stepper_contentTextColor="#0099ff"
-            stepper:stepper_contentTextSize="18"
-            />
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/size_20"
+            android:layout_marginEnd="@dimen/size_20"
+            android:layout_marginRight="@dimen/size_20"
+            app:minValue="1"/>
 
     </RelativeLayout>
 

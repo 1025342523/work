@@ -53,6 +53,9 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        String name = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME);
+        etName.setText(name);
+        etName.setSelection(0, name.length());
         RxView.clicks(btnLogin)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)

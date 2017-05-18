@@ -16,6 +16,9 @@ import com.yifarj.yifadinghuobao.database.AppDatabase;
 @Table(database = AppDatabase.class)
 public class SaleGoodsItemModel extends BaseRXModel {
 
+    @PrimaryKey(autoincrement = true)
+    public int Id;
+
     @Column
     public double CurrentPrice;
 
@@ -24,9 +27,6 @@ public class SaleGoodsItemModel extends BaseRXModel {
 
     @Column
     public String Path;
-
-    @PrimaryKey
-    public int Id;
 
     @Column
     public int BillId;

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mcxtzhang.lib.AnimShopButton;
@@ -17,9 +18,11 @@ import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
+import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.DateUtil;
 
 import java.util.List;
 
@@ -118,61 +121,105 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                 itemViewHolder.tvPrice.setText(String.valueOf(productPrice));
             }
 
+            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                    .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                    .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                @Override
+                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                    LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+                    if (saleGoodsItemModels.size() > 0) {
+                        SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                        mItem.update().subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(@NonNull Boolean aBean) throws Exception {
+                                LogUtils.e(mItem.ProductName + "设置AnimShopButton的当前Count：" + mItem.Quantity);
+                                itemViewHolder.btnEle.setCount(mItem.Quantity);
+                            }
+                        });
+                    }
+
+                }
+            });
             itemViewHolder.btnEle.setOnAddDelListener(new IOnAddDelListener() {
                 @Override
                 public void onAddSuccess(int i) {
-//                    RXSQLite.rx(SQLite.select()
-//                            .from(SaleGoodsItemModel.class))
-//                            .queryList()
-//                            .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-//                                @Override
-//                                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-//                                    if (saleGoodsItemModels.)
-//                                }
-//                            });
-                    RXSQLite.rx(SQLite.select()
-                            .from(SaleGoodsItemModel.class))
-                            .queryStreamResults()
-                            .subscribe(new Consumer<SaleGoodsItemModel>() {
-                                @Override
-                                public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
-                                    if (saleGoodsItemModel.ProductId == goodsBean.Id) {
-                                        return;
+                    RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                            .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                            .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                            LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+                            if (saleGoodsItemModels.size() > 0) {
+                                SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                                mItem.Quantity = i;
+                                mItem.update().subscribe(new Consumer<Boolean>() {
+                                    @Override
+                                    public void accept(@NonNull Boolean aBean) throws Exception {
+                                        LogUtils.e(mItem.ProductName + "：数量修改为" + i);
                                     }
-                                    add(goodsBean);
-                                }
-                            });
+                                });
+                            } else {
+                                add(goodsBean, i);
+                            }
 
+                        }
+                    });
                 }
 
                 @Override
                 public void onAddFailed(int i, FailType failType) {
-
+                    LogUtils.e(goodsBean.Name + "添加失败" + i + "\nFailType" + failType);
                 }
 
                 @Override
                 public void onDelSuccess(int i) {
+                    RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                            .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                            .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                            LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+                            if (saleGoodsItemModels.size() > 0) {
+                                SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                                mItem.Quantity = i;
+                                mItem.update().subscribe(new Consumer<Boolean>() {
+                                    @Override
+                                    public void accept(@NonNull Boolean aBean) throws Exception {
+                                        LogUtils.e(mItem.ProductName + "：数量修改为" + i);
+                                    }
+                                });
+                            } else {
+                                add(goodsBean, i);
+                            }
 
+                        }
+                    });
                 }
 
                 @Override
                 public void onDelFaild(int i, FailType failType) {
-
+                    LogUtils.e(goodsBean.Name + "减少失败" + i + "\nFailType" + failType);
                 }
             });
+
         }
 
         super.onBindViewHolder(holder, position);
     }
 
-    private void add(GoodsListEntity.ValueEntity goodsBean) {
+    private void add(GoodsListEntity.ValueEntity goodsBean, int count) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = productPrice;
-        itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
+        if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
+            itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
+        }
+        itemModel.ProductName = goodsBean.Name;
         itemModel.UnitName = unitName;
         itemModel.Discount = 1.0f;
         itemModel.SalesType = 1;
         itemModel.TaxRate = 1.0;
+
+        itemModel.Quantity = count;
         itemModel.WarehouseId = goodsBean.DefaultWarehouseId;
         itemModel.ProductId = goodsBean.Id;
         itemModel.LocationId = goodsBean.DefaultLocationId;
@@ -194,7 +241,19 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
         itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
         itemModel.OweRemark = goodsBean.Remark;
-        itemModel.save();
+        itemModel.insert()
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(@NonNull Long aLong) throws Exception {
+                        LogUtils.e("Item插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                    }
+                });
+        itemModel.save().subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(@NonNull Boolean aBoolean) throws Exception {
+                LogUtils.e("Item保存数据成功");
+            }
+        });
         Flowable.fromIterable(goodsBean.ProductUnitList)
                 .forEach(valueEntity -> {
                     GoodsUnitModel goodsUnitModel = new GoodsUnitModel();
@@ -207,7 +266,13 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                     goodsUnitModel.IsDefault = valueEntity.IsDefault;
                     goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
                     goodsUnitModel.Ordinal = valueEntity.Ordinal;
-                    goodsUnitModel.save();
+                    goodsUnitModel.insert().subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(@NonNull Long aLong) throws Exception {
+                            LogUtils.e("Unit插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                        }
+                    });
+
                 });
     }
 

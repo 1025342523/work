@@ -12,7 +12,10 @@ import com.yifarj.yifadinghuobao.database.AppDatabase;
 @Table(database = AppDatabase.class)
 public class GoodsUnitModel extends BaseRXModel {
 
-    @PrimaryKey
+    @PrimaryKey(autoincrement = true)
+    public int LocalId;
+
+    @Column
     public int Id;
 
     @Column

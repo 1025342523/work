@@ -149,6 +149,7 @@ public class TabGoodsFragment extends BaseFragment {
 
     @Override
     protected void loadData() {
+
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "", AppInfoUtil.getToken())
