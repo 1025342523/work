@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity {
             ToastUtils.showShortSafe("再按一次退出");
             exitTime = System.currentTimeMillis();
         } else {
-            logout();
+            finish();
         }
     }
 

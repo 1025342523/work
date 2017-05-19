@@ -35,6 +35,8 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * TabGoodsFragment
  *
@@ -42,7 +44,7 @@ import io.reactivex.schedulers.Schedulers;
  * @date 2017/5/12 15:07
  */
 public class TabGoodsFragment extends BaseFragment {
-
+    private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.recycle)
     RecyclerView mRecyclerView;
@@ -58,9 +60,6 @@ public class TabGoodsFragment extends BaseFragment {
 
     private boolean mIsRefreshing = false;
 
-    private int pageSize = 10;
-    private int pageNum = 0;
-    private int totalPage = 1;
 
     private View loadMoreView;
 
@@ -81,13 +80,12 @@ public class TabGoodsFragment extends BaseFragment {
     @Override
     protected void finishCreateView(Bundle savedInstanceState) {
         LogUtils.e("TabGoodsFragment", "finishCreateView");
-        pageInfo.PageIndex = 1;
         isPrepared = true;
         lazyLoad();
         titleView.setRightIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity(), ShoppingCartActivity.class));
+                startActivityForResult(new Intent(getActivity(), ShoppingCartActivity.class), REQUEST_REFRESH);
             }
         });
     }
@@ -115,7 +113,8 @@ public class TabGoodsFragment extends BaseFragment {
         });
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            mIsRefreshing = true;
+            pageInfo.PageIndex = 0;
+//            mIsRefreshing = true;
             goodsList.clear();
             loadData();
         });
@@ -137,12 +136,9 @@ public class TabGoodsFragment extends BaseFragment {
 
             @Override
             public void onLoadMore(int i) {
-                if (pageNum <= totalPage) {
-                    pageNum++;
-                    pageInfo.PageIndex = pageNum;
-                    loadData();
-                    loadMoreView.setVisibility(View.VISIBLE);
-                }
+                pageInfo.PageIndex++;
+                loadData();
+                loadMoreView.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -157,7 +153,7 @@ public class TabGoodsFragment extends BaseFragment {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(goodsListEntity -> {
-                    if (goodsListEntity.PageInfo.TotalCount < pageSize) {
+                    if (goodsListEntity.PageInfo.PageIndex * goodsListEntity.PageInfo.PageLength >= goodsListEntity.PageInfo.TotalCount) {
                         loadMoreView.setVisibility(View.GONE);
                         mHeaderViewRecyclerAdapter.removeFootView();
                     }
@@ -172,7 +168,6 @@ public class TabGoodsFragment extends BaseFragment {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             goodsList.addAll(goodsListEntity.Value);
-                            totalPage = goodsListEntity.PageInfo.TotalCount;
                             finishTask();
                         }
                     }
@@ -181,6 +176,7 @@ public class TabGoodsFragment extends BaseFragment {
                     public void onError(@NonNull Throwable e) {
                         showEmptyView();
                         loadMoreView.setVisibility(View.GONE);
+                        --pageInfo.PageIndex;
                     }
 
                     @Override
@@ -238,15 +234,24 @@ public class TabGoodsFragment extends BaseFragment {
     }
 
     private void createLoadMoreView() {
-
         loadMoreView = LayoutInflater.from(getActivity())
                 .inflate(R.layout.layout_load_more, mRecyclerView, false);
         mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
         loadMoreView.setVisibility(View.GONE);
     }
 
+
     private void setRecycleNoScroll() {
 
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_REFRESH) {
+            goodsList.clear();
+            pageInfo.PageIndex = 0;
+            loadData();
+        }
     }
 }

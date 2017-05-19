@@ -79,6 +79,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/size_26"
             android:layout_marginRight="@dimen/size_26"
+            android:gravity="center"
             android:layout_toLeftOf="@id/btn_submit"
             android:layout_toStartOf="@id/btn_submit"
             android:text="0.00"

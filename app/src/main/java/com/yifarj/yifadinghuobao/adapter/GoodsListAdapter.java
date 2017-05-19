@@ -214,7 +214,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
         }
         itemModel.ProductName = goodsBean.Name;
-        itemModel.UnitName = unitName;
+        itemModel.ProductUnitName = unitName;
         itemModel.Discount = 1.0f;
         itemModel.SalesType = 1;
         itemModel.TaxRate = 1.0;

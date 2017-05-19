@@ -7,6 +7,8 @@ import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
 import com.yifarj.yifadinghuobao.network.api.GoodsListService;
 import com.yifarj.yifadinghuobao.network.api.LoginService;
 import com.yifarj.yifadinghuobao.network.api.LogoutService;
+import com.yifarj.yifadinghuobao.network.api.MettingCodeService;
+import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 
 import java.io.File;
@@ -62,18 +64,18 @@ public class RetrofitHelper {
 //    }
 //
 //
-//    public static RankService getRankAPI() {
-//
-//        return createApi(RankService.class, ApiConstants.RANK_BASE_URL);
-//    }
-//
-//
-//    public static UserService getUserAPI() {
-//
-//        return createApi(UserService.class, ApiConstants.USER_BASE_URL);
-//    }
-//
-//
+    public static MettingLoginService getMettingLoginApi() {
+
+        return createApi(MettingLoginService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
+    public static MettingCodeService getMettingCodeApi() {
+
+        return createApi(MettingCodeService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
     public static LogoutService getLogoutApi() {
 
         return createApi(LogoutService.class, ApiConstants.CUrl.BASE_URL);

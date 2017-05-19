@@ -23,9 +23,6 @@ public class SaleGoodsItemModel extends BaseRXModel {
     public double CurrentPrice;
 
     @Column
-    public String UnitName;
-
-    @Column
     public String Path;
 
     @Column

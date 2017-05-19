@@ -33,6 +33,7 @@
     <string name="logout">注销中&#8230;</string>
     <string name="login_failure">登录失败,</string>
     <string name="load_more">加载中…</string>
+    <string name="load_all">已全部加载完毕</string>
     <string name="clear_all">清空</string>
     <string name="shopping_cart">购物车</string>
     <string name="create_order">下单</string>

@@ -65,10 +65,15 @@ public class ApiConstants {
         public static final String EXPERIENCE_URL = "http://14.215.120.120:8884/yifa.asmx";
         public static final String PHONE_USER_INFO_URL = "http://duokaile.6655.la:6666/yifa.asmx";
         /**
+         * 获取验证码
+         */
+        public static final String METTINGCODE = "MettingCode";
+        /**
          * 登录
          */
         public static final String LOGIN = "Login";
         public static final String LOGIN_OTHER = "Login2";
+        public static final String METTINGLOGIN = "MettingLogin";
         /**
          * 退出登录
          */
