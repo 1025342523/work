@@ -114,7 +114,7 @@ public class TabGoodsFragment extends BaseFragment {
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             pageInfo.PageIndex = 0;
-//            mIsRefreshing = true;
+            mIsRefreshing = false;
             goodsList.clear();
             loadData();
         });
@@ -249,8 +249,9 @@ public class TabGoodsFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_REFRESH) {
-            goodsList.clear();
             pageInfo.PageIndex = 0;
+            mIsRefreshing = false;
+            goodsList.clear();
             loadData();
         }
     }

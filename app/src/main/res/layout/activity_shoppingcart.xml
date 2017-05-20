@@ -17,6 +17,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/size_90"
         android:layout_below="@id/titleView">
 
         <android.support.v7.widget.RecyclerView
@@ -36,11 +37,11 @@
     </FrameLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent"
         android:id="@+id/rl_bottom"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/size_90"
         android:layout_alignParentBottom="true"
-        android:background="@color/white">
+        android:background="@color/whitesmoke">
 
         <TextView
             android:id="@+id/tvGoodsTotal"
@@ -79,9 +80,9 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/size_26"
             android:layout_marginRight="@dimen/size_26"
-            android:gravity="center"
             android:layout_toLeftOf="@id/btn_submit"
             android:layout_toStartOf="@id/btn_submit"
+            android:gravity="center"
             android:text="0.00"
             android:textColor="@color/main_orange"
             android:textSize="@dimen/font_30"/>

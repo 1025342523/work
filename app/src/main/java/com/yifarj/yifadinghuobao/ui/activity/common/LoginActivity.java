@@ -79,11 +79,21 @@ public class LoginActivity extends BaseActivity {
         clicks(btnLogin)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
-                .subscribe(o -> login());
+                .subscribe(new Consumer<Object>() {
+
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        if (mDisposable != null && !mDisposable.isDisposed()) {
+                            //停止倒计时
+                            mDisposable.dispose();
+                        }
+                        login();
+                    }
+                });
         clicks(ivConfigure)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
-                .subscribe(o -> startActivity(new Intent(LoginActivity.this, LoginConfigActivity.class)));
+                .subscribe(o -> startActivity(new Intent(LoginActivity.this, ConnectServerActivity.class)));
 
 
         mConsumerCountTime = new Consumer<Long>() {
@@ -106,7 +116,7 @@ public class LoginActivity extends BaseActivity {
                     @Override
                     public ObservableSource<Long> apply(@NonNull Object o) throws Exception {
                         String phoneNumber = etName.getText().toString().trim();
-                        String accountId = String.valueOf(PreferencesUtil.getInt(ApiConstants.CPreference.ACCOUNT_ID));
+                        String accountId = PreferencesUtil.getString(ApiConstants.CPreference.ACCOUNT_ID);
                         String port = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PORT);
                         String ip = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_IP);
                         String domain = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN);
@@ -128,7 +138,7 @@ public class LoginActivity extends BaseActivity {
                                             public void onNext(@NonNull MettingCodeEntity mettingCodeEntityEntity) {
                                                 if (!mettingCodeEntityEntity.HasError && mettingCodeEntityEntity.Tag != null) {
                                                     ToastUtils.showShortSafe("验证码已发送");
-                                                    mettingCode = mettingCodeEntityEntity.Tag.substring(0, 7);
+                                                    mettingCode = mettingCodeEntityEntity.Tag.substring(7, mettingCodeEntityEntity.Tag.length());
                                                     LogUtils.e("mettingCode：" + mettingCode);
 
                                                     AppInfoUtil.restoreToken(mettingCodeEntityEntity.Value);
@@ -274,7 +284,8 @@ public class LoginActivity extends BaseActivity {
 
 
     private void onConfigureClicked() {
-        Intent intent = new Intent(this, LoginConfigActivity.class);
+        ToastUtils.showShortSafe("请先获取服务器信息");
+        Intent intent = new Intent(this, ConnectServerActivity.class);
         startActivity(intent);
     }
 }

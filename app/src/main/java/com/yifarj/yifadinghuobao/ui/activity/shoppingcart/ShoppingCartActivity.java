@@ -66,8 +66,10 @@ public class ShoppingCartActivity extends BaseActivity {
     private List<GoodsUnitModel> mUnitData = new ArrayList<>();
     private FlowContentObserver mObserver = new FlowContentObserver();
 
-    private int totalCount;
-    private double totalPrice;
+
+    private int totalCount = 0;
+    private double totalPrice = 0;
+    private boolean refresh;
 
     @Override
     public int getLayoutId() {
@@ -81,41 +83,60 @@ public class ShoppingCartActivity extends BaseActivity {
         mObserver.addModelChangeListener(modelChangeListener);
     }
 
+
     FlowContentObserver.OnModelStateChangedListener modelChangeListener = new FlowContentObserver.OnModelStateChangedListener() {
         @Override
         public void onModelStateChanged(@Nullable Class<?> table, BaseModel.Action action, @android.support.annotation.NonNull SQLOperator[] primaryKeyValues) {
-
+            refresh = true;
+            List<SaleGoodsItemModel> currentItem = new ArrayList<>();
+            RXSQLite.rx(SQLite.select()
+                    .from(SaleGoodsItemModel.class))
+                    .queryList()
+                    .subscribe(saleGoodsItemModels -> {
+                        if (saleGoodsItemModels != null) {
+                            currentItem.addAll(saleGoodsItemModels);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showTotalPrice(getTotalPrice(currentItem));
+                                    showTotalCount(currentItem.size(), getTotalCount(currentItem));
+                                }
+                            });
+                        }
+                    });
         }
     };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mObserver.removeModelChangeListener(modelChangeListener);
         mObserver.unregisterForContentChanges(this);
     }
 
     @Override
     public void initViews(Bundle savedInstanceState) {
-        showTotalPrice(getTotalPrice());
-        showTotalCount(mItemData.size(), getTotalCount());
-        titleView.setRightTextClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CzechYuanDialog mDialog = new CzechYuanDialog(ShoppingCartActivity.this, R.style.CzechYuanDialog);
-                mDialog.setContent("确定清空购物车？");
-                mDialog.setConfirmClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        FlowManager.getDatabase(AppDatabase.class).reset(ShoppingCartActivity.this);
+
+        titleView.setRightTextClickListener(view -> {
+            CzechYuanDialog mDialog = new CzechYuanDialog(ShoppingCartActivity.this, R.style.CzechYuanDialog);
+            mDialog.setContent("确定清空购物车？");
+            mDialog.setConfirmClickListener(view1 -> {
+                FlowManager.getDatabase(AppDatabase.class).reset(ShoppingCartActivity.this);
 //                        Delete.table(GoodsUnitModel.class);
-                        ToastUtils.showShortSafe("购物车已清空");
-                        showEmptyView();
-                        setResult(RESULT_OK);
-                    }
-                });
-            }
+                ToastUtils.showShortSafe("购物车已清空");
+                showEmptyView();
+                setResult(RESULT_OK);
+                refresh = true;
+            });
         });
-        titleView.setLeftIconClickListener(view -> finish());
+        titleView.setLeftIconClickListener(view -> {
+            if (refresh) {
+                setResult(RESULT_OK);
+            }
+            finish();
+        });
+
+
         loadData();
 
         RxView.clicks(btnSubmit)
@@ -128,6 +149,10 @@ public class ShoppingCartActivity extends BaseActivity {
 
                     }
                 });
+    }
+
+    private void createOrder() {
+
     }
 
 
@@ -157,6 +182,8 @@ public class ShoppingCartActivity extends BaseActivity {
                 });
         initRecyclerView();
         finishTask();
+        showTotalPrice(getTotalPrice(mItemData));
+        showTotalCount(mItemData.size(), getTotalCount(mItemData));
     }
 
     @Override
@@ -200,14 +227,18 @@ public class ShoppingCartActivity extends BaseActivity {
         tvTotalAmount.setText(String.valueOf(totalPrice));
     }
 
-    public double getTotalPrice() {
-        Flowable.fromIterable(mItemData)
-                .forEach(new Consumer<SaleGoodsItemModel>() {
-                    @Override
-                    public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
-                        totalPrice += saleGoodsItemModel.CurrentPrice * saleGoodsItemModel.Quantity;
-                    }
-                });
+    public double getTotalPrice(List<SaleGoodsItemModel> itemData) {
+        if (itemData != null) {
+            totalPrice = 0;
+            Flowable.fromIterable(itemData)
+                    .forEach(new Consumer<SaleGoodsItemModel>() {
+                        @Override
+                        public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
+                            totalPrice += saleGoodsItemModel.CurrentPrice * saleGoodsItemModel.Quantity;
+                        }
+                    });
+            return totalPrice;
+        }
         return totalPrice;
     }
 
@@ -215,14 +246,18 @@ public class ShoppingCartActivity extends BaseActivity {
         tvGoodsTotal.setText("共" + String.valueOf(goodsCount) + "款，总数" + String.valueOf(totalCount));
     }
 
-    private int getTotalCount() {
-        Flowable.fromIterable(mItemData)
-                .forEach(new Consumer<SaleGoodsItemModel>() {
-                    @Override
-                    public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
-                        totalCount += saleGoodsItemModel.Quantity;
-                    }
-                });
+    private int getTotalCount(List<SaleGoodsItemModel> itemData) {
+        if (itemData != null) {
+            totalCount = 0;
+            Flowable.fromIterable(itemData)
+                    .forEach(new Consumer<SaleGoodsItemModel>() {
+                        @Override
+                        public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
+                            totalCount += saleGoodsItemModel.Quantity;
+                        }
+                    });
+            return totalCount;
+        }
         return totalCount;
     }
 }

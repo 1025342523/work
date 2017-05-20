@@ -23,7 +23,7 @@ public class AppInfoUtil {
     private static String deviceID;
 
     public static String genPicUrl(String picName) {
-        String accountId = String.valueOf(PreferencesUtil.getInt(ApiConstants.CPreference.ACCOUNT_ID, 0));
+        String accountId = PreferencesUtil.getString(ApiConstants.CPreference.ACCOUNT_ID);
         String filterStr = ApiConstants.CUrl.BASE_URL.substring(7);
         String tail = accountId + "/product/" + picName;
         String tempFilterStr = filterStr.substring(0, filterStr.indexOf("/"));

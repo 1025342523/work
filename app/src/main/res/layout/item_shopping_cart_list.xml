@@ -89,14 +89,14 @@
         android:id="@+id/ll_flowLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/size_30"
+        android:padding="@dimen/size_20"
         app:max_select="1">
     </com.zhy.view.flowlayout.TagFlowLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/size_10">
+        android:layout_margin="@dimen/size_8">
 
         <ImageView
             android:id="@+id/iv_delete"

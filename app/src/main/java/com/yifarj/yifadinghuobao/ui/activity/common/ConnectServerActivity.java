@@ -1,0 +1,186 @@
+package com.yifarj.yifadinghuobao.ui.activity.common;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
+import com.jakewharton.rxbinding2.view.RxView;
+import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.model.entity.AccountListEntity;
+import com.yifarj.yifadinghuobao.network.ApiConstants;
+import com.yifarj.yifadinghuobao.network.RetrofitHelper;
+import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
+import com.yifarj.yifadinghuobao.utils.CommonUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
+import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
+import com.yifarj.yifadinghuobao.view.TitleView;
+
+import java.util.concurrent.TimeUnit;
+
+import butterknife.BindView;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+public class ConnectServerActivity extends BaseActivity {
+
+    private static final int REQUEST_BARCODE = 10;
+
+    @BindView(R.id.titleView)
+    TitleView titleView;
+    @BindView(R.id.llGetAccountIds)
+    LinearLayout llGetAccountIds;
+    @BindView(R.id.tvName)
+    TextView tvName;
+    @BindView(R.id.llTest)
+    LinearLayout llTest;
+    @BindView(R.id.tvTestName)
+    TextView tvTestName;
+
+    private String mAccountId;
+    private String mIp, mPort, mUrl;
+
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_connect_server;
+    }
+
+    @Override
+    public void initViews(Bundle savedInstanceState) {
+        titleView.setLeftIconClickListener(view -> finish());
+        RxView.clicks(llGetAccountIds)
+                .compose(bindToLifecycle())
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Object>() {
+
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        Intent intent = new Intent(ConnectServerActivity.this, ScanQrcodeActivity.class);
+                        startActivityForResult(intent, REQUEST_BARCODE);
+                        overridePendingTransition(R.anim.slide_in_up, R.anim.fake_fade_out);
+                    }
+                });
+        RxView.clicks(llTest)
+                .compose(bindToLifecycle())
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Object>() {
+
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        getAccountIds(mPort, mIp, "");
+                    }
+                });
+    }
+
+    private void getAccountIds(String port, String ip, String keycode) {
+        if (!CommonUtil.isNetworkAvailable(ConnectServerActivity.this)) {
+            ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
+            return;
+        }
+        if (ip == null || port == null || mUrl == null) {
+            ToastUtils.showShortSafe("请先获取服务器信息");
+            return;
+        }
+        RetrofitHelper.getAccountAPI()
+                .getAccountList(ip, port, keycode)
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<AccountListEntity>() {
+
+
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        LogUtils.e("onSubscribe", "订阅");
+                    }
+
+                    @Override
+                    public void onNext(AccountListEntity valueEntity) {
+                        LogUtils.e("onNext", valueEntity.toString());
+                        if (!valueEntity.HasError) {
+//                            ToastUtils.showShortSafe("测试连接成功");
+                            CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
+                            mDialog.setContent("恭喜您，测试连接成功，去登录吧");
+                            mDialog.setConfirmClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    onSave();
+                                    finish();
+                                }
+                            });
+                        } else {
+                            ToastUtils.showShortSafe("测试连接失败");
+                        }
+
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        ToastUtils.showShortSafe("测试连接失败");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.e("onComplete", "完成");
+                    }
+                });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_BARCODE) {
+                if (data != null) {
+                    try {
+                        String serverInfo = data.getStringExtra("barcode");
+                        String tempServerInfo = serverInfo.substring(7, serverInfo.length());
+                        LogUtils.e(tempServerInfo);
+                        String[] strArray = tempServerInfo.split("\\/");
+                        String server1 = strArray[0];
+                        mUrl = "http://" + server1 + "/yifa.asmx";
+                        LogUtils.e(mUrl);
+                        String connectInfo = strArray[1];
+                        String connectInfo2 = connectInfo.substring(14, connectInfo.length());
+                        String[] connectInfo3 = connectInfo2.split("&");
+                        mIp = connectInfo3[0];
+                        LogUtils.e(mIp);
+                        mPort = connectInfo3[1].substring(5, connectInfo3[1].length());
+                        LogUtils.e(mPort);
+                        mAccountId = connectInfo3[2].substring(9, connectInfo3[2].length());
+                        LogUtils.e(mAccountId);
+                        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
+
+                        CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
+                        mDialog.setContent("获取服务器信息成功，是否测试连接？");
+                        mDialog.setConfirmClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                getAccountIds(mPort, mIp, "");
+                            }
+                        });
+                    } catch (Exception e) {
+                        ToastUtils.showShortSafe("获取服务器信息失败，请重新获取");
+                    }
+                } else {
+                    ToastUtils.showShortSafe("未获取到服务器信息，请重新获取");
+                }
+            }
+        }
+    }
+
+    public void onSave() {
+        PreferencesUtil.putString(ApiConstants.CPreference.ACCOUNT_ID, mAccountId);
+        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, mIp);
+        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, mPort);
+        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
+    }
+}

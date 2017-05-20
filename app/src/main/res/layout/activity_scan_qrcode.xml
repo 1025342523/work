@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/content_bg">
+
+    <cn.bingoogolapple.qrcode.zxing.ZXingView
+        android:id="@+id/zxingview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:qrcv_animTime="1000"
+        app:qrcv_borderColor="@android:color/white"
+        app:qrcv_borderSize="1dp"
+        app:qrcv_cornerColor="@color/white"
+        app:qrcv_cornerLength="20dp"
+        app:qrcv_cornerSize="3dp"
+        app:qrcv_customScanLineDrawable="@drawable/barcode_lightray"
+        app:qrcv_maskColor="#a1000000"
+        app:qrcv_rectWidth="250dp"
+        app:qrcv_scanLineColor="@color/main_blue"
+        app:qrcv_scanLineSize="1dp"
+        app:qrcv_topOffset="130dp"/>
+
+    <com.yifarj.yifadinghuobao.view.TitleView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:text_right="@string/close"
+        app:title_name="@string/barcode_scanning"/>
+
+    <Button
+        android:id="@+id/btnFlashLight"
+        android:layout_width="@dimen/size_140"
+        android:layout_height="@dimen/size_80"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/size_160"
+        android:background="#22ffffff"
+        android:text="闪光灯"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_30"/>
+
+</RelativeLayout>

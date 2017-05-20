@@ -39,8 +39,6 @@ import io.reactivex.functions.Consumer;
  */
 public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     public List<GoodsListEntity.ValueEntity> data;
-    private String unitName;
-    private double productPrice;
 
     public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data) {
         super(recyclerView);
@@ -61,6 +59,9 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         if (holder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             GoodsListEntity.ValueEntity goodsBean = data.get(position);
+            String unitName = null;
+            int unitId = 0;
+            double productPrice;
             if (goodsBean.ProductPictureList.size() > 0) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
@@ -76,6 +77,8 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                 if (unit.IsBasic) {
                     itemViewHolder.tvUnit.setText(unit.Name);
                     unitName = unit.Name;
+                    unitId = unit.Id;
+                    LogUtils.e(goodsBean.Name + "：" + unitName);
                 }
             }
             productPrice = goodsBean.Price1;
@@ -120,7 +123,9 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                 }
                 itemViewHolder.tvPrice.setText(String.valueOf(productPrice));
             }
-
+            String tempUnitName = unitName;
+            double tempProductPrice = productPrice;
+            int tempUnitId = unitId;
             RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
                     .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
                     .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
@@ -159,7 +164,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                     }
                                 });
                             } else {
-                                add(goodsBean, i);
+                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId);
                             }
 
                         }
@@ -189,7 +194,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                     }
                                 });
                             } else {
-                                add(goodsBean, i);
+                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId);
                             }
 
                         }
@@ -207,7 +212,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         super.onBindViewHolder(holder, position);
     }
 
-    private void add(GoodsListEntity.ValueEntity goodsBean, int count) {
+    private void add(GoodsListEntity.ValueEntity goodsBean, int count, double productPrice, String unitName, int unitId) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = productPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
@@ -215,10 +220,12 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         }
         itemModel.ProductName = goodsBean.Name;
         itemModel.ProductUnitName = unitName;
+        itemModel.BasicUnitPrice = productPrice;
+        itemModel.UnitPrice = productPrice;
         itemModel.Discount = 1.0f;
         itemModel.SalesType = 1;
         itemModel.TaxRate = 1.0;
-
+        itemModel.UnitId = unitId;
         itemModel.Quantity = count;
         itemModel.WarehouseId = goodsBean.DefaultWarehouseId;
         itemModel.ProductId = goodsBean.Id;

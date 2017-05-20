@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/content_bg"
+                android:orientation="vertical">
+
+    <com.yifarj.yifadinghuobao.view.TitleView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon_left="@drawable/ic_title_back"
+        app:title_name="@string/connect_server"/>
+
+
+    <LinearLayout
+        android:id="@+id/llGetAccountIds"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_110"
+        android:layout_below="@id/titleView"
+        android:layout_marginTop="@dimen/size_200"
+        android:background="@drawable/selector_list_bg"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_110"
+            android:drawableLeft="@drawable/ic_connect"
+            android:drawablePadding="@dimen/size_8"
+            android:drawableStart="@drawable/ic_connect"
+            android:gravity="center"
+            android:text="@string/get_service_info"
+            android:textColor="@color/main_red"
+            android:textSize="@dimen/font_32"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llTest"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_110"
+        android:layout_below="@id/llGetAccountIds"
+        android:layout_marginTop="@dimen/size_30"
+        android:background="@drawable/selector_list_bg"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvTestName"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_110"
+            android:drawableLeft="@drawable/ic_connect"
+            android:drawablePadding="@dimen/size_8"
+            android:drawableStart="@drawable/ic_connect"
+            android:gravity="center"
+            android:text="@string/test_connect"
+            android:textColor="@color/main_red"
+            android:textSize="@dimen/font_32"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

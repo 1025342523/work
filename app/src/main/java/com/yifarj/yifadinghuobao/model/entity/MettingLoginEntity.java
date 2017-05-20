@@ -10,7 +10,7 @@ public class MettingLoginEntity {
 
 
     /**
-     * Value : {"Id":105,"TraderId":105,"ContactName":"邓付红","Phone":null,"Mobile":"15399981540","Email":null,"Address":"湘潭","Fax":null,"ModifiedTime":1495176996,"modify_date":1495176996,"oper_date":1488772237,"vip_start_date":1488772237,"vip_end_date":3066609037,"birthday":1488772237,"CreatedTime":1488772237,"card_id":0,"card_flowno":null,"card_type":null,"vip_sex":0,"card_status":0,"oper_id":0,"acc_num":0,"dec_num":0,"res_num":0,"memo":null,"homeplace":null,"marriage":null,"photo_file":null,"nation":null,"height":0,"weight":0,"blood_type":null,"favor":null,"social_id":null,"use_num":0,"consum_amt":0,"degree":null,"CardSerialNumbe":null,"DepartmentId":0,"CreatedUserId":0,"CreatedDevice":null,"ModifiedUserId":1,"VerifyCode":null,"FailureTime":null,"CodeSendTimes":0}
+     * Value : {"Id":112,"TraderId":122,"ContactName":"15111311956","Phone":null,"Mobile":"15111311956","Email":null,"Address":null,"Fax":null,"ModifiedTime":1495183300,"modify_date":-2209017600,"oper_date":1495183300,"vip_start_date":-2209017600,"vip_end_date":-2209017600,"birthday":-2209017600,"CreatedTime":1495183300,"card_id":0,"card_flowno":null,"card_type":null,"vip_sex":0,"card_status":0,"oper_id":0,"acc_num":0,"dec_num":0,"res_num":0,"memo":null,"homeplace":null,"marriage":null,"photo_file":null,"nation":null,"height":0,"weight":0,"blood_type":null,"favor":null,"social_id":null,"use_num":0,"consum_amt":0,"degree":null,"CardSerialNumbe":null,"DepartmentId":0,"CreatedUserId":0,"CreatedDevice":null,"ModifiedUserId":0,"VerifyCode":null,"FailureTime":null,"CodeSendTimes":0}
      * HasError : false
      * Information :
      * PageInfo : null
@@ -29,58 +29,58 @@ public class MettingLoginEntity {
 
     public static class ValueEntity {
         /**
-         * Id : 105
-         * TraderId : 105
-         * ContactName : 邓付红
+         * Id : 112
+         * TraderId : 122
+         * ContactName : 15111311956
          * Phone : null
-         * Mobile : 15399981540
+         * Mobile : 15111311956
          * Email : null
-         * Address : 湘潭
+         * Address : null
          * Fax : null
-         * ModifiedTime : 1495176996
-         * modify_date : 1495176996
-         * oper_date : 1488772237
-         * vip_start_date : 1488772237
-         * vip_end_date : 3066609037
-         * birthday : 1488772237
-         * CreatedTime : 1488772237
+         * ModifiedTime : 1495183300
+         * modify_date : -2209017600
+         * oper_date : 1495183300
+         * vip_start_date : -2209017600
+         * vip_end_date : -2209017600
+         * birthday : -2209017600
+         * CreatedTime : 1495183300
          * card_id : 0
          * card_flowno : null
          * card_type : null
          * vip_sex : 0
          * card_status : 0
          * oper_id : 0
-         * acc_num : 0
-         * dec_num : 0
-         * res_num : 0
+         * acc_num : 0.0
+         * dec_num : 0.0
+         * res_num : 0.0
          * memo : null
          * homeplace : null
          * marriage : null
          * photo_file : null
          * nation : null
-         * height : 0
-         * weight : 0
+         * height : 0.0
+         * weight : 0.0
          * blood_type : null
          * favor : null
          * social_id : null
          * use_num : 0
-         * consum_amt : 0
+         * consum_amt : 0.0
          * degree : null
          * CardSerialNumbe : null
          * DepartmentId : 0
          * CreatedUserId : 0
          * CreatedDevice : null
-         * ModifiedUserId : 1
+         * ModifiedUserId : 0
          * VerifyCode : null
          * FailureTime : null
          * CodeSendTimes : 0
          */
 
-        public int Id;
-        public int TraderId;
-        public String ContactName;
-        public String Phone;
-        public String Mobile;
+        public int Id;//编号
+        public int TraderId;//往来单位id
+        public String ContactName;//联系人
+        public String Phone;//电话
+        public String Mobile;//手机
         public String Email;
         public String Address;
         public String Fax;
@@ -105,21 +105,21 @@ public class MettingLoginEntity {
         public String marriage;
         public String photo_file;
         public String nation;
-        public int height;
-        public int weight;
+        public double height;
+        public double weight;
         public String blood_type;
         public String favor;
         public String social_id;
         public int use_num;
-        public int consum_amt;
+        public double consum_amt;
         public String degree;
         public String CardSerialNumbe;
-        public int DepartmentId;
-        public int CreatedUserId;
-        public String CreatedDevice;
-        public int ModifiedUserId;
-        public String VerifyCode;
-        public long FailureTime;
-        public long CodeSendTimes;
+        public int DepartmentId;//经办部门
+        public int CreatedUserId;//创建人id
+        public String CreatedDevice;//创建设备
+        public int ModifiedUserId;//修改人id
+        public String VerifyCode;//手机验证码
+        public long FailureTime;//验证码失效时间
+        public int CodeSendTimes;//失效时间内发送次数
     }
 }
