@@ -271,103 +271,108 @@ public class MettingOrderActivity extends BaseActivity {
                 finish();
             }
         });
-
-        ciRemark.getEditText().addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (orderInfo != null) {
-                    orderInfo.Remark = s.toString();
-                }
-            }
-        });
-
-        ciDeliveryDate.setOnItemClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatePickerPopWin pickerPopWin = new DatePickerPopWin.Builder(MettingOrderActivity.this, new DatePickerPopWin.OnDatePickedListener() {
-                    @Override
-                    public void onDatePickCompleted(int year, int month, int day, String dateDesc) {
-                        Calendar c = Calendar.getInstance(Locale.CHINA);
-                        c.set(year, month, day);
-                        ciDate.getEditText().setText(DateUtil.getFormatDate(c.getTimeInMillis()));
-                        orderInfo.DeliveryDate = c.getTimeInMillis() / 1000;
-                        orderInfo.ReceiveTime = orderInfo.DeliveryDate;
+        if (isCreate) {
+            ciRemark.getEditText().addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (orderInfo != null) {
+                        orderInfo.Remark = s.toString();
                     }
-                }).textConfirm("确定") //text of confirm button
-                        .textCancel("取消") //text of cancel button
-                        .btnTextSize(16) // button text size
-                        .viewTextSize(26) // pick view text size
-                        .colorCancel(Color.parseColor("#999999")) //color of cancel button
-                        .colorConfirm(Color.parseColor("#1269c5"))//color of confirm button
-                        .minYear(2010) //min year in loop
-                        .maxYear(2550) // max year in loop
-                        .showDayMonthYear(true) // shows like dd mm yyyy (default is false)
-                        .dateChose("2017-5-20") // date chose when init popwindow
-                        .build();
-                pickerPopWin.showPopWin(MettingOrderActivity.this);
-            }
-        });
-        ciAddress.getEditText().addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (orderInfo != null) {
-                    orderInfo.DeliveryAddress = s.toString();
                 }
-            }
-        });
+            });
 
-        ciReceiveMethod.getEditText().addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (orderInfo != null) {
-                    orderInfo.ReceiveMethod = s.toString();
+            ciDeliveryDate.setOnItemClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DatePickerPopWin pickerPopWin = new DatePickerPopWin.Builder(MettingOrderActivity.this, new DatePickerPopWin.OnDatePickedListener() {
+                        @Override
+                        public void onDatePickCompleted(int year, int month, int day, String dateDesc) {
+                            Calendar c = Calendar.getInstance(Locale.CHINA);
+                            c.set(year, month, day);
+                            ciDate.getEditText().setText(DateUtil.getFormatDate(c.getTimeInMillis()));
+                            orderInfo.DeliveryDate = c.getTimeInMillis() / 1000;
+                            orderInfo.ReceiveTime = orderInfo.DeliveryDate;
+                        }
+                    }).textConfirm("确定") //text of confirm button
+                            .textCancel("取消") //text of cancel button
+                            .btnTextSize(16) // button text size
+                            .viewTextSize(26) // pick view text size
+                            .colorCancel(Color.parseColor("#999999")) //color of cancel button
+                            .colorConfirm(Color.parseColor("#1269c5"))//color of confirm button
+                            .minYear(2010) //min year in loop
+                            .maxYear(2550) // max year in loop
+                            .showDayMonthYear(true) // shows like dd mm yyyy (default is false)
+                            .dateChose("2017-5-20") // date chose when init popwindow
+                            .build();
+                    pickerPopWin.showPopWin(MettingOrderActivity.this);
                 }
-            }
-        });
-
-        ciReceiveMethod.setTitleNameOnclickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (receiveMethodList != null) {
-                    showReceiveMethodDialog(receiveMethodList);
-                } else {
-                    if (!CommonUtil.isNetworkAvailable(MettingOrderActivity.this)) {
-                        ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
-                        return;
+            });
+            ciAddress.getEditText().addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (orderInfo != null) {
+                        orderInfo.DeliveryAddress = s.toString();
                     }
-                    RetrofitHelper
-                            .getReceiveMethodApi()
-                            .getReceiveMethodList("SettleMethodList", "", "", "", AppInfoUtil.getToken())
-                            .compose(bindToLifecycle())
-                            .subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Observer<ReceiveMethodListEntity>() {
-                                @Override
-                                public void onSubscribe(@NonNull Disposable d) {
+                }
+            });
 
-                                }
+            ciReceiveMethod.getEditText().addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (orderInfo != null) {
+                        orderInfo.ReceiveMethod = s.toString();
+                    }
+                }
+            });
 
-                                @Override
-                                public void onNext(@NonNull ReceiveMethodListEntity receiveMethodListEntity) {
-                                    if (!receiveMethodListEntity.HasError && receiveMethodListEntity.Value.size() > 0) {
-                                        receiveMethodList = receiveMethodListEntity.Value;
-                                        showReceiveMethodDialog(receiveMethodList);
+            ciReceiveMethod.setTitleNameOnclickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (receiveMethodList != null) {
+                        showReceiveMethodDialog(receiveMethodList);
+                    } else {
+                        if (!CommonUtil.isNetworkAvailable(MettingOrderActivity.this)) {
+                            ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
+                            return;
+                        }
+                        RetrofitHelper
+                                .getReceiveMethodApi()
+                                .getReceiveMethodList("SettleMethodList", "", "", "", AppInfoUtil.getToken())
+                                .compose(bindToLifecycle())
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Observer<ReceiveMethodListEntity>() {
+                                    @Override
+                                    public void onSubscribe(@NonNull Disposable d) {
+
                                     }
-                                }
 
-                                @Override
-                                public void onError(@NonNull Throwable e) {
+                                    @Override
+                                    public void onNext(@NonNull ReceiveMethodListEntity receiveMethodListEntity) {
+                                        if (!receiveMethodListEntity.HasError && receiveMethodListEntity.Value.size() > 0) {
+                                            receiveMethodList = receiveMethodListEntity.Value;
+                                            showReceiveMethodDialog(receiveMethodList);
+                                        }
+                                    }
 
-                                }
+                                    @Override
+                                    public void onError(@NonNull Throwable e) {
 
-                                @Override
-                                public void onComplete() {
+                                    }
 
-                                }
-                            });
+                                    @Override
+                                    public void onComplete() {
+
+                                    }
+                                });
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            ciRemark.setEditable(false);
+            ciAddress.setEditable(false);
+            ciReceiveMethod.setEditable(false);
+        }
     }
 
     private void saveOrder() {
