@@ -1,5 +1,6 @@
 package com.yifarj.yifadinghuobao.ui.activity.shoppingcart;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.ButtonBarLayout;
@@ -23,6 +24,8 @@ import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
+import com.yifarj.yifadinghuobao.ui.activity.order.MettingOrderActivity;
+import com.yifarj.yifadinghuobao.utils.NumberUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 import com.yifarj.yifadinghuobao.view.TitleView;
@@ -146,13 +149,16 @@ public class ShoppingCartActivity extends BaseActivity {
 
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
-
+                        createOrder();
                     }
                 });
     }
 
     private void createOrder() {
-
+        Intent intent = new Intent(ShoppingCartActivity.this, MettingOrderActivity.class);
+        intent.putExtra("CreateOrder", true);
+        startActivity(intent);
+        finish();
     }
 
 
@@ -224,7 +230,7 @@ public class ShoppingCartActivity extends BaseActivity {
 
 
     public void showTotalPrice(double totalPrice) {
-        tvTotalAmount.setText(String.valueOf(totalPrice));
+        tvTotalAmount.setText(NumberUtil.formatDoubleToString(totalPrice));
     }
 
     public double getTotalPrice(List<SaleGoodsItemModel> itemData) {
@@ -234,7 +240,8 @@ public class ShoppingCartActivity extends BaseActivity {
                     .forEach(new Consumer<SaleGoodsItemModel>() {
                         @Override
                         public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
-                            totalPrice += saleGoodsItemModel.CurrentPrice * saleGoodsItemModel.Quantity;
+//                            totalPrice += saleGoodsItemModel.UnitPrice * saleGoodsItemModel.Quantity;
+                            totalPrice += saleGoodsItemModel.CurrentPrice;
                         }
                     });
             return totalPrice;

@@ -9,21 +9,20 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
- * 下单
+ * 保存订单
  *
  * @auther Czech.Yuan
- * @date 2017/5/15 18:25
+ * @date 2017/5/21 18:25
  */
-public interface CreateOrderService {
+public interface SaveOrderService {
 
-    /**
-     * 下单
-     */
+
     @FormUrlEncoded
-    @POST(ApiConstants.CUrl.CREATE)
-    Observable<CreateOrderEntity> createOrderInfo(
+    @POST(ApiConstants.CUrl.SAVE)
+    Observable<CreateOrderEntity> saveOrderInfo(
             @Field("DataTypeName") String dataTypeName,
             @Field("Param") String param,
+            @Field("Body") String body,
             @Field("Token") String token
     );
 }

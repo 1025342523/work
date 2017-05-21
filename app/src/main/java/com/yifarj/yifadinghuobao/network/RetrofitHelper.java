@@ -4,11 +4,14 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.yifarj.yifadinghuobao.app.YifaApplication;
 import com.yifarj.yifadinghuobao.network.api.AccountService;
 import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
+import com.yifarj.yifadinghuobao.network.api.FetchOrderService;
 import com.yifarj.yifadinghuobao.network.api.GoodsListService;
 import com.yifarj.yifadinghuobao.network.api.LoginService;
 import com.yifarj.yifadinghuobao.network.api.LogoutService;
 import com.yifarj.yifadinghuobao.network.api.MettingCodeService;
 import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
+import com.yifarj.yifadinghuobao.network.api.ReceiveMethodService;
+import com.yifarj.yifadinghuobao.network.api.SaveOrderService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 
 import java.io.File;
@@ -44,26 +47,26 @@ public class RetrofitHelper {
 //
 //        return createApi(LiveService.class, ApiConstants.LIVE_BASE_URL);
 //    }
-//
-//
-//    public static BiliAppService getBiliAppAPI() {
-//
-//        return createApi(BiliAppService.class, ApiConstants.APP_BASE_URL);
-//    }
-//
-//
-//    public static BiliApiService getBiliAPI() {
-//
-//        return createApi(BiliApiService.class, ApiConstants.API_BASE_URL);
-//    }
-//
-//
-//    public static BiliGoService getBiliGoAPI() {
-//
-//        return createApi(BiliGoService.class, ApiConstants.BILI_GO_BASE_URL);
-//    }
-//
-//
+
+
+    public static FetchOrderService getFetchOrderApi() {
+
+        return createApi(FetchOrderService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
+    public static SaveOrderService getSaveOrderApi() {
+
+        return createApi(SaveOrderService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
+    public static ReceiveMethodService getReceiveMethodApi() {
+
+        return createApi(ReceiveMethodService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+
     public static MettingLoginService getMettingLoginApi() {
 
         return createApi(MettingLoginService.class, ApiConstants.CUrl.BASE_URL);

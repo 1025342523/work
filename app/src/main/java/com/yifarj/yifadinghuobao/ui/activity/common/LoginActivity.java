@@ -136,6 +136,7 @@ public class LoginActivity extends BaseActivity {
 
                                             @Override
                                             public void onNext(@NonNull MettingCodeEntity mettingCodeEntityEntity) {
+
                                                 if (!mettingCodeEntityEntity.HasError && mettingCodeEntityEntity.Tag != null) {
                                                     ToastUtils.showShortSafe("验证码已发送");
                                                     mettingCode = mettingCodeEntityEntity.Tag.substring(7, mettingCodeEntityEntity.Tag.length());
@@ -157,6 +158,11 @@ public class LoginActivity extends BaseActivity {
                                                         mDisposable.dispose();
                                                         //重新订阅
                                                         mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
+                                                        try {
+                                                            RxTextView.text(tvCode).accept("发送验证码");
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
                                                     }
                                                 }
 
@@ -170,6 +176,11 @@ public class LoginActivity extends BaseActivity {
                                                     mDisposable.dispose();
                                                     //重新订阅
                                                     mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
+                                                    try {
+                                                        RxTextView.text(tvCode).accept("发送验证码");
+                                                    } catch (Exception e1) {
+                                                        e1.printStackTrace();
+                                                    }
                                                 }
                                             }
 

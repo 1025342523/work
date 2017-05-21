@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/content_bg">
+
+    <com.yifarj.yifadinghuobao.view.TitleView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon_left="@drawable/ic_title_back"
+        app:title_name="@string/order_details"/>
+
+    <RelativeLayout
+        android:id="@+id/rlBottomView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_90"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/line_color"/>
+
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/size_20"
+            android:layout_marginStart="@dimen/size_20"
+            android:text="@string/total"
+            android:textColor="#2c3643"
+            android:textSize="@dimen/font_26"/>
+
+        <TextView
+            android:id="@+id/tvTotalPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/size_6"
+            android:layout_marginStart="@dimen/size_6"
+            android:layout_toEndOf="@id/tvTotal"
+            android:layout_toRightOf="@id/tvTotal"
+            android:text="0.00"
+            android:textColor="#dd4510"
+            android:textSize="@dimen/font_30"/>
+
+        <RelativeLayout
+            android:id="@+id/rlSave"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true">
+
+            <TextView
+                android:id="@+id/tvSave"
+                android:layout_width="@dimen/size_170"
+                android:layout_height="match_parent"
+                android:background="#dd4510"
+                android:gravity="center"
+                android:text="@string/pending_audit"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_30"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_height="match_parent"
+        android:layout_above="@id/rlBottomView"
+        android:layout_below="@id/titleView">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/llContentView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:editable="false"
+                    app:name="@string/name"/>
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciContact"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:editable="false"
+                    app:name="@string/contact"/>
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:editable="false"
+                    app:name="@string/phone_number"/>
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/size_100"
+                    android:layout_marginTop="@dimen/size_20"
+                    android:background="@color/white">
+
+                    <TextView
+                        android:id="@+id/tvName"
+                        android:layout_width="@dimen/size_150"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:gravity="end"
+                        android:text="@string/goods_list"
+                        android:textColor="#b6c3ca"
+                        android:textSize="@dimen/font_30"/>
+
+
+                </RelativeLayout>
+
+                <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="1px"-->
+                <!--android:layout_marginLeft="@dimen/size_20"-->
+                <!--android:layout_marginStart="@dimen/size_20"-->
+                <!--android:background="@color/line_color"/>-->
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:scrollbars="none"/>
+
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:editable="false"
+                    android:layout_marginTop="@dimen/size_20"
+                    app:name="@string/create_date"/>
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:name="@string/address"/>
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItemUnderline
+                    android:id="@+id/ciReceiveMethod"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:name="@string/receive_method"/>
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciDeliveryDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/size_20"
+                    app:name="@string/delivery_date"/>
+
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciRemark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/size_20"
+                    app:name="@string/remark"/>
+            </LinearLayout>
+        </RelativeLayout>
+    </ScrollView>
+
+
+    <com.yifarj.yifadinghuobao.view.CustomEmptyView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/titleView"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+</RelativeLayout>

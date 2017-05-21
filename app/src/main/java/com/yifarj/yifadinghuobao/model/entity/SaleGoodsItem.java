@@ -3,8 +3,7 @@ package com.yifarj.yifadinghuobao.model.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-
-import com.google.gson.annotations.Expose;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.List;
 
@@ -26,13 +25,16 @@ public class SaleGoodsItem {
         /**
          * 价格系数,用于本地状态保存,不做json序列化
          */
-        @Expose(serialize = false, deserialize = false)
+        @JSONField(serialize = false, deserialize = false)
         public int priceFactor = 1;
         /**
          * 原始价格,用于本地状态保存,不做json序列化
          */
-        @Expose(serialize = false, deserialize = false)
-        public double rawActualPrice;
+        @JSONField(serialize = false, deserialize = false)
+        public double CurrentPrice;
+
+        @JSONField(serialize = false, deserialize = false)
+        public String ImagePath;
 
         public int Id;
         public int BillId;
@@ -134,8 +136,6 @@ public class SaleGoodsItem {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(this.priceFactor);
-            dest.writeDouble(this.rawActualPrice);
             dest.writeInt(this.Id);
             dest.writeInt(this.BillId);
             dest.writeInt(this.SalesType);
@@ -217,8 +217,6 @@ public class SaleGoodsItem {
         }
 
         protected ValueEntity(Parcel in) {
-            this.priceFactor = in.readInt();
-            this.rawActualPrice = in.readDouble();
             this.Id = in.readInt();
             this.BillId = in.readInt();
             this.SalesType = in.readInt();

@@ -9,20 +9,21 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
- * 下单
+ * 查单
  *
  * @auther Czech.Yuan
  * @date 2017/5/15 18:25
  */
-public interface CreateOrderService {
+public interface FetchOrderService {
 
     /**
      * 下单
      */
     @FormUrlEncoded
-    @POST(ApiConstants.CUrl.CREATE)
-    Observable<CreateOrderEntity> createOrderInfo(
+    @POST(ApiConstants.CUrl.FETCH)
+    Observable<CreateOrderEntity> fetchOrderInfo(
             @Field("DataTypeName") String dataTypeName,
+            @Field("Body") String body,
             @Field("Param") String param,
             @Field("Token") String token
     );

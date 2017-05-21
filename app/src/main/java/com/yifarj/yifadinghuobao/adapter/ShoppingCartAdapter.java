@@ -190,7 +190,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
             });
             itemViewHolder.tvName.setText(goodsBean.ProductName);
             itemViewHolder.tvUnit.setText(goodsBean.ProductUnitName);
-            itemViewHolder.tvPrice.setText(String.valueOf(goodsBean.CurrentPrice));
+            itemViewHolder.tvPrice.setText(String.valueOf(goodsBean.UnitPrice));
             itemViewHolder.numberAddSubView.setValue(goodsBean.Quantity);
             itemViewHolder.numberAddSubView.setOnButtonClickListener(new NumberAddSubView.OnButtonClickListener() {
                 @Override
@@ -284,7 +284,6 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         goodsBean.ProductUnitName = unitName.get(select);
                         goodsBean.UnitId = currentUnitList.get(select).Id;
                         goodsBean.UnitPrice = currentUnitList.get(select).BasicFactor * goodsBean.BasicUnitPrice;
-                        goodsBean.CurrentPrice = goodsBean.UnitPrice;
                         notifyDataSetChanged();
 
                         RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
@@ -298,7 +297,6 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                                     mItem.ProductUnitName = goodsBean.ProductUnitName;
                                     mItem.UnitId = goodsBean.UnitId;
                                     mItem.UnitPrice = goodsBean.UnitPrice;
-                                    mItem.CurrentPrice = goodsBean.UnitPrice;
                                     mItem.update().subscribe(new Consumer<Boolean>() {
                                         @Override
                                         public void accept(@NonNull Boolean aBean) throws Exception {

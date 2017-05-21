@@ -1,6 +1,6 @@
 package com.yifarj.yifadinghuobao.network.api;
 
-import com.yifarj.yifadinghuobao.model.entity.CreateOrderEntity;
+import com.yifarj.yifadinghuobao.model.entity.ReceiveMethodListEntity;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
 
 import io.reactivex.Observable;
@@ -9,20 +9,22 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
- * 下单
+ * ReceiveMethodService
  *
  * @auther Czech.Yuan
- * @date 2017/5/15 18:25
+ * @date 2017/5/21 14:33
  */
-public interface CreateOrderService {
+public interface ReceiveMethodService {
 
     /**
-     * 下单
+     * 获取收款方式
      */
     @FormUrlEncoded
-    @POST(ApiConstants.CUrl.CREATE)
-    Observable<CreateOrderEntity> createOrderInfo(
+    @POST(ApiConstants.CUrl.FETCH_LIST)
+    Observable<ReceiveMethodListEntity> getReceiveMethodList(
             @Field("DataTypeName") String dataTypeName,
+            @Field("PageInfo") String pageInfo,
+            @Field("Body") String body,
             @Field("Param") String param,
             @Field("Token") String token
     );
