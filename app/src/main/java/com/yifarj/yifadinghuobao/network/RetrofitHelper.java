@@ -10,6 +10,7 @@ import com.yifarj.yifadinghuobao.network.api.LoginService;
 import com.yifarj.yifadinghuobao.network.api.LogoutService;
 import com.yifarj.yifadinghuobao.network.api.MettingCodeService;
 import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
+import com.yifarj.yifadinghuobao.network.api.OrderListService;
 import com.yifarj.yifadinghuobao.network.api.ReceiveMethodService;
 import com.yifarj.yifadinghuobao.network.api.SaveOrderService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
@@ -42,11 +43,11 @@ public class RetrofitHelper {
         initOkHttpClient();
     }
 
-    //
-//    public static LiveService getLiveAPI() {
-//
-//        return createApi(LiveService.class, ApiConstants.LIVE_BASE_URL);
-//    }
+
+    public static OrderListService getOrderListApi() {
+
+        return createApi(OrderListService.class, ApiConstants.CUrl.BASE_URL);
+    }
 
 
     public static FetchOrderService getFetchOrderApi() {

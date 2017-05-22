@@ -121,8 +121,11 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                             break;
                     }
                 }
-                itemViewHolder.tvPrice.setText(String.valueOf(productPrice));
+
             }
+
+            itemViewHolder.tvPrice.setText(String.valueOf(productPrice));
+
             String tempUnitName = unitName;
             double tempProductPrice = productPrice;
             int tempUnitId = unitId;

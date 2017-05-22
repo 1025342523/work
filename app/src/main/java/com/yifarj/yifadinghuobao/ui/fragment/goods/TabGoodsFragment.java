@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.LogUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
@@ -18,6 +17,7 @@ import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
+import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
@@ -34,8 +34,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * TabGoodsFragment
@@ -85,10 +83,12 @@ public class TabGoodsFragment extends BaseFragment {
         titleView.setRightIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(getActivity(), ShoppingCartActivity.class), REQUEST_REFRESH);
+                Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
+                startActivityForResult(intent, REQUEST_REFRESH);
             }
         });
     }
+
 
     @Override
     protected void lazyLoad() {
@@ -100,6 +100,7 @@ public class TabGoodsFragment extends BaseFragment {
         initRecyclerView();
         isPrepared = false;
     }
+
 
     @Override
     protected void initRefreshLayout() {
@@ -148,7 +149,7 @@ public class TabGoodsFragment extends BaseFragment {
 
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JSON.toJSONString(pageInfo), "status  not in (4,8)", "", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -246,13 +247,12 @@ public class TabGoodsFragment extends BaseFragment {
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_REFRESH) {
-            pageInfo.PageIndex = 0;
-            mIsRefreshing = false;
-            goodsList.clear();
-            loadData();
-        }
+        super.onActivityResult(requestCode, resultCode, data);
+        pageInfo.PageIndex = 0;
+        goodsList.clear();
+        loadData();
     }
 }

@@ -12,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bruce.pickerview.popwindow.DatePickerPopWin;
@@ -24,13 +23,17 @@ import com.wx.wheelview.widget.WheelView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.ItemGoodsListAdapter;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
+import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
+import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.CreateOrderEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
+import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.ReceiveMethodListEntity;
 import com.yifarj.yifadinghuobao.model.entity.SaleGoodsItem;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
+import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
@@ -152,21 +155,25 @@ public class MettingOrderActivity extends BaseActivity {
     public void loadData() {
         getIntentExtra();
         if (isCreate) {
+
             RXSQLite.rx(SQLite.select()
                     .from(SaleGoodsItemModel.class))
                     .queryList()
                     .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                         @Override
                         public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                            if (saleGoodsItemModels != null) {
+                            if (saleGoodsItemModels != null && saleGoodsItemModels.size() > 0) {
                                 Flowable.fromIterable(saleGoodsItemModels)
                                         .forEach(new Consumer<SaleGoodsItemModel>() {
                                             @Override
                                             public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
                                                 SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
                                                 mItem.CurrentPrice = saleGoodsItemModel.CurrentPrice;
+                                                mItem.TotalPrice = saleGoodsItemModel.CurrentPrice;
                                                 mItem.ImagePath = saleGoodsItemModel.Path;
                                                 mItem.ProductName = saleGoodsItemModel.ProductName;
+                                                mItem.ActualPrice = saleGoodsItemModel.UnitPrice;
+                                                mItem.ActualUnitPrice = saleGoodsItemModel.BasicUnitPrice;
                                                 mItem.ProductUnitName = saleGoodsItemModel.ProductUnitName;
                                                 mItem.BasicUnitPrice = saleGoodsItemModel.BasicUnitPrice;
                                                 mItem.UnitPrice = saleGoodsItemModel.UnitPrice;
@@ -196,14 +203,46 @@ public class MettingOrderActivity extends BaseActivity {
                                                 mItem.MaxPurchasePrice = saleGoodsItemModel.MaxPurchasePrice;
                                                 mItem.DefaultLocationName = saleGoodsItemModel.DefaultLocationName;
                                                 mItem.OweRemark = saleGoodsItemModel.Remark;
+                                                mItem.BatchId = "";
                                                 mItemData.add(mItem);
                                                 LogUtils.e("GoodsItem数量为：" + mItemData.size());
+
+
+                                                RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class).where(GoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
+                                                        .queryList()
+                                                        .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                                                            @Override
+                                                            public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                                                                if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
+                                                                    for (GoodsUnitModel mModel : goodsUnitModels) {
+                                                                        if (mModel.ProductId == mItem.ProductId) {
+                                                                            ProductUnitEntity.ValueEntity mUnitData = new ProductUnitEntity.ValueEntity();
+                                                                            mUnitData.Id = mModel.Id;
+                                                                            mUnitData.ProductId = mModel.ProductId;
+                                                                            mUnitData.Name = mModel.Name;
+                                                                            mUnitData.Factor = mModel.Factor;
+                                                                            mUnitData.BasicFactor = mModel.BasicFactor;
+                                                                            mUnitData.IsBasic = mModel.IsBasic;
+                                                                            mUnitData.IsDefault = mModel.IsDefault;
+                                                                            mUnitData.BreakupNotify = mModel.BreakupNotify;
+                                                                            mUnitData.Ordinal = mModel.Ordinal;
+                                                                            mItem.ProductUnitList.add(mUnitData);
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    LogUtils.e("单位List为空");
+                                                                }
+                                                            }
+                                                        });
+
+
                                             }
                                         });
 
                             }
                         }
                     });
+
 
             getCreateOrderInfo();
         } else {
@@ -383,10 +422,11 @@ public class MettingOrderActivity extends BaseActivity {
         if (orderInfo == null) {
             return;
         }
-        LogUtils.e(JSON.toJSONString(orderInfo));
+        orderInfo.SalesOutBillItemList = mItemData;
+        LogUtils.e(JsonUtils.serialize(orderInfo));
         RetrofitHelper
                 .getSaveOrderApi()
-                .saveOrderInfo("SalesOutBill", "", JSON.toJSONString(orderInfo), AppInfoUtil.getToken())
+                .saveOrderInfo("SalesOutBill", "", JsonUtils.serialize(orderInfo), AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -423,7 +463,7 @@ public class MettingOrderActivity extends BaseActivity {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         ToastUtils.showShortSafe(e.getMessage());
-                        ToastUtils.showShortSafe("创建订单失败！onError");
+                        LogUtils.e("创建订单失败！onError");
                     }
 
                     @Override
@@ -550,7 +590,6 @@ public class MettingOrderActivity extends BaseActivity {
                 orderInfo.InvoiceType = "";
                 orderInfo.ReceiveMethod = "";//收款方式
 
-                orderInfo.SalesOutBillItemList = mItemData;
             }
         }
 

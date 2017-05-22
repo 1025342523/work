@@ -3,8 +3,9 @@ package com.yifarj.yifadinghuobao.model.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.google.gson.annotations.Expose;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,15 +26,15 @@ public class SaleGoodsItem {
         /**
          * 价格系数,用于本地状态保存,不做json序列化
          */
-        @JSONField(serialize = false, deserialize = false)
+        @Expose(serialize = false, deserialize = false)
         public int priceFactor = 1;
         /**
          * 原始价格,用于本地状态保存,不做json序列化
          */
-        @JSONField(serialize = false, deserialize = false)
+        @Expose(serialize = false, deserialize = false)
         public double CurrentPrice;
 
-        @JSONField(serialize = false, deserialize = false)
+        @Expose(serialize = false, deserialize = false)
         public String ImagePath;
 
         public int Id;
@@ -108,7 +109,7 @@ public class SaleGoodsItem {
         public String BrandName = "";
         public String OrderCode = "";
         public String PackSpec;
-        public List<ProductUnitEntity.ValueEntity> ProductUnitList;
+        public List<ProductUnitEntity.ValueEntity> ProductUnitList=new ArrayList<>();
         public String SalesStockProductInfo;
         public String ProductUnitName = "";
         public double MemberPrice;

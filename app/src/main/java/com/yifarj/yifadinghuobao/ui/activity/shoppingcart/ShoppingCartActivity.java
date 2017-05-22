@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.raizlabs.android.dbflow.config.FlowManager;
@@ -125,7 +126,7 @@ public class ShoppingCartActivity extends BaseActivity {
             mDialog.setContent("确定清空购物车？");
             mDialog.setConfirmClickListener(view1 -> {
                 FlowManager.getDatabase(AppDatabase.class).reset(ShoppingCartActivity.this);
-//                        Delete.table(GoodsUnitModel.class);
+//                Delete.table(GoodsUnitModel.class);
                 ToastUtils.showShortSafe("购物车已清空");
                 showEmptyView();
                 setResult(RESULT_OK);
@@ -135,6 +136,7 @@ public class ShoppingCartActivity extends BaseActivity {
         titleView.setLeftIconClickListener(view -> {
             if (refresh) {
                 setResult(RESULT_OK);
+                LogUtils.e("返回 true");
             }
             finish();
         });
@@ -159,6 +161,7 @@ public class ShoppingCartActivity extends BaseActivity {
         intent.putExtra("CreateOrder", true);
         startActivity(intent);
         finish();
+        setResult(RESULT_OK);
     }
 
 

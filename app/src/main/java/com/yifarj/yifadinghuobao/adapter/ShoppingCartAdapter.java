@@ -47,7 +47,7 @@ import io.reactivex.functions.Consumer;
 public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
     private List<SaleGoodsItemModel> itemData;
     private List<GoodsUnitModel> unitData;
-    private List<GoodsUnitModel> currentUnitList = new ArrayList<>();
+    private List<GoodsUnitModel> currentUnitList;
     public static Map<Integer, Set<Integer>> selectedMap = new HashMap<Integer, Set<Integer>>();
 
     public ShoppingCartAdapter(RecyclerView recyclerView, List<SaleGoodsItemModel> mItemData, List<GoodsUnitModel> mUnitData) {
@@ -80,7 +80,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         .dontAnimate()
                         .into(itemViewHolder.itemImg);
             }
-            currentUnitList.clear();
+            currentUnitList = new ArrayList<>();
             Flowable.fromIterable(unitData)
                     .forEach(new Consumer<GoodsUnitModel>() {
                         @Override
@@ -130,7 +130,13 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                                                         .forEach(new Consumer<GoodsUnitModel>() {
                                                             @Override
                                                             public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
-                                                                goodsUnitModel.delete();
+                                                                GoodsUnitModel mUnitModel = goodsUnitModel;
+                                                                mUnitModel.delete().subscribe(new Consumer<Boolean>() {
+                                                                    @Override
+                                                                    public void accept(@NonNull Boolean aBoolean) throws Exception {
+                                                                        LogUtils.e("单位：" + mUnitModel.Name + "删除成功");
+                                                                    }
+                                                                });
                                                             }
                                                         });
                                                 ToastUtils.showShortSafe("删除成功");
@@ -284,6 +290,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         goodsBean.ProductUnitName = unitName.get(select);
                         goodsBean.UnitId = currentUnitList.get(select).Id;
                         goodsBean.UnitPrice = currentUnitList.get(select).BasicFactor * goodsBean.BasicUnitPrice;
+                        goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
                         notifyDataSetChanged();
 
                         RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
@@ -297,6 +304,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                                     mItem.ProductUnitName = goodsBean.ProductUnitName;
                                     mItem.UnitId = goodsBean.UnitId;
                                     mItem.UnitPrice = goodsBean.UnitPrice;
+                                    mItem.CurrentPrice = goodsBean.CurrentPrice;
                                     mItem.update().subscribe(new Consumer<Boolean>() {
                                         @Override
                                         public void accept(@NonNull Boolean aBean) throws Exception {

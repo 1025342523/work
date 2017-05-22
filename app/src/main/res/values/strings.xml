@@ -59,4 +59,9 @@
     <string name="order_details">订单详情</string>
     <string name="pending_audit">待审核</string>
     <string name="delivery_date">送货时间</string>
+    <string name="order_list">订货单</string>
+    <string name="draft">草稿</string>
+    <string name="tab_already_completed">已完成</string>
+    <string name="audit">审核</string>
+    <string name="account">记账</string>
 </resources>

@@ -14,8 +14,8 @@
         android:layout_marginBottom="30dp"
         android:layout_marginTop="50dp"
         android:gravity="center"
-        android:textSize="@dimen/font_30"
-        android:textColor="@color/main_text2"/>
+        android:textColor="@color/main_text2"
+        android:textSize="@dimen/font_30"/>
 
     <TextView
         android:layout_width="300dp"
@@ -45,6 +45,12 @@
             />
 
         <TextView
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:background="#ebebeb"/>
+
+        <TextView
             android:id="@+id/confirm"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -56,11 +62,6 @@
             android:textColor="@color/white"
             />
 
-        <TextView
-            android:layout_width="1dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center_vertical"
-            android:background="#ebebeb"/>
 
     </LinearLayout>
 

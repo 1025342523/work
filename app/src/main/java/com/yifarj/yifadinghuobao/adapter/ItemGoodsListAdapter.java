@@ -11,10 +11,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
+import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.SaleGoodsItem;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 
 import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
 
 /**
@@ -54,9 +59,18 @@ public class ItemGoodsListAdapter extends AbsRecyclerViewAdapter {
                     .into(itemViewHolder.itemImg);
 
             itemViewHolder.tvName.setText(goodsBean.ProductName);
-            itemViewHolder.tvUnit.setText(goodsBean.UnitPrice + "/" + goodsBean.ProductUnitName);
-            itemViewHolder.tvPrice.setText(String.valueOf(goodsBean.CurrentPrice));
-            itemViewHolder.tvCount.setText(String.valueOf(goodsBean.Quantity) + goodsBean.ProductUnitName);
+            itemViewHolder.tvPrice.setText(String.valueOf(goodsBean.TotalPrice));
+            String quantity = String.valueOf(goodsBean.Quantity);
+            Flowable.fromIterable(goodsBean.ProductUnitList)
+                    .forEach(new Consumer<ProductUnitEntity.ValueEntity>() {
+                        @Override
+                        public void accept(@NonNull ProductUnitEntity.ValueEntity valueEntity) throws Exception {
+                            if (valueEntity.Id == goodsBean.UnitId) {
+                                itemViewHolder.tvUnit.setText(goodsBean.UnitPrice + "/" + valueEntity.Name);
+                                itemViewHolder.tvCount.setText(quantity + valueEntity.Name);
+                            }
+                        }
+                    });
         }
 
         super.onBindViewHolder(holder, position);

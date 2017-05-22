@@ -13,7 +13,9 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.model.entity.MettingCodeEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
@@ -273,17 +275,43 @@ public class LoginActivity extends BaseActivity {
                         loadingDialog.dismiss();
                         if (!mettingLoginEntity.HasError) {
                             DataSaver.setMettingCustomerInfo(mettingLoginEntity.Value);
+                            String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME);
+                            if (!userName.equals(name)) {
+                                FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
+                            }
                             PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, name);
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         } else {
                             ToastUtils.showShortSafe(getString(R.string.login_failure) + mettingLoginEntity.Information);
+                            if (mDisposable != null && !mDisposable.isDisposed()) {
+                                //停止倒计时
+                                mDisposable.dispose();
+                                //重新订阅
+                                mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
+                                try {
+                                    RxTextView.text(tvCode).accept("发送验证码");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
                         loadingDialog.dismiss();
+                        if (mDisposable != null && !mDisposable.isDisposed()) {
+                            //停止倒计时
+                            mDisposable.dispose();
+                            //重新订阅
+                            mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
+                            try {
+                                RxTextView.text(tvCode).accept("发送验证码");
+                            } catch (Exception x) {
+                                x.printStackTrace();
+                            }
+                        }
                     }
 
                     @Override

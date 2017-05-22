@@ -9,6 +9,7 @@
     <com.yifarj.yifadinghuobao.view.TitleView
         android:id="@+id/titleView"
         android:layout_width="match_parent"
+        app:title_name="商品列表"
         android:layout_height="wrap_content"
         app:icon_right="@drawable/ic_shopping_cart"/>
 

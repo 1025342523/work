@@ -165,6 +165,7 @@
                     android:id="@+id/ciDeliveryDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:editable="false"
                     android:layout_marginBottom="@dimen/size_20"
                     app:name="@string/delivery_date"/>
 
