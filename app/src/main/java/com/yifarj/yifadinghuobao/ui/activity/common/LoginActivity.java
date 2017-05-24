@@ -154,7 +154,7 @@ public class LoginActivity extends BaseActivity {
                                                     }
 
                                                 } else {
-                                                    ToastUtils.showShortSafe("验证码发送失败");
+                                                    ToastUtils.showShortSafe(mettingCodeEntityEntity.Information);
                                                     if (mDisposable != null && !mDisposable.isDisposed()) {
                                                         //停止倒计时
                                                         mDisposable.dispose();
@@ -276,7 +276,7 @@ public class LoginActivity extends BaseActivity {
                         if (!mettingLoginEntity.HasError) {
                             DataSaver.setMettingCustomerInfo(mettingLoginEntity.Value);
                             String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
-                            if (!StringUtils.isEmpty(userName)){
+                            if (!StringUtils.isEmpty(userName)) {
                                 if (!userName.equals(name)) {
                                     FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
                                 }

@@ -39,6 +39,7 @@ import io.reactivex.functions.Consumer;
  */
 public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     public List<GoodsListEntity.ValueEntity> data;
+    public boolean onbind;
     private boolean type;
 
     public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type) {
@@ -61,6 +62,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         if (holder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             GoodsListEntity.ValueEntity goodsBean = data.get(position);
+            onbind = true;
             String unitName = null;
             int unitId = 0;
             double productPrice;
@@ -146,89 +148,108 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             double tempProductPrice = productPrice;
             int tempUnitId = unitId;
             int tempPriceSystemID = priceSystemID;
-            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
-                    .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
-                    .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                @Override
-                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                    LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
-                    if (saleGoodsItemModels.size() > 0) {
-                        SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
-                        mItem.update().subscribe(new Consumer<Boolean>() {
+            if (type) {
+                RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                        .queryList()
+                        .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                             @Override
-                            public void accept(@NonNull Boolean aBean) throws Exception {
-                                LogUtils.e(mItem.ProductName + "设置AnimShopButton的当前Count：" + mItem.Quantity);
-                                itemViewHolder.btnEle.setCount(mItem.Quantity);
+                            public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
+                                if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
+                                    itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+                                } else {
+                                    itemViewHolder.btnEle.setCount(0);
+                                }
+                                onbind = false;
+                            }
+                        });
+            }
+//            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+//                    .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+//                    .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+//                @Override
+//                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+//                    LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+//                    if (saleGoodsItemModels.size() > 0) {
+//                        SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+//                        LogUtils.e(mItem.ProductName + "New设置AnimShopButton的当前Count：" + mItem.Quantity);
+//                        itemViewHolder.btnEle.setCount(mItem.Quantity);
+////                        mItem.update().subscribe(new Consumer<Boolean>() {
+////                            @Override
+////                            public void accept(@NonNull Boolean aBean) throws Exception {
+////                                LogUtils.e(mItem.ProductName + "设置AnimShopButton的当前Count：" + mItem.Quantity);
+////                                itemViewHolder.btnEle.setCount(mItem.Quantity);
+////                            }
+////                        });
+//                    }
+//
+//                }
+//            });
+
+            if (type) {
+                itemViewHolder.btnEle.setOnAddDelListener(new IOnAddDelListener() {
+                    @Override
+                    public void onAddSuccess(int i) {
+                        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                                .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                                .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                            @Override
+                            public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                                LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+                                if (saleGoodsItemModels.size() > 0) {
+                                    SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                                    mItem.Quantity = i;
+                                    mItem.CurrentPrice = mItem.UnitPrice * mItem.Quantity;
+                                    mItem.update().subscribe(new Consumer<Boolean>() {
+                                        @Override
+                                        public void accept(@NonNull Boolean aBean) throws Exception {
+                                            LogUtils.e(mItem.ProductName + "：数量修改为" + i);
+                                        }
+                                    });
+                                } else {
+                                    add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId, tempPriceSystemID);
+                                }
+
                             }
                         });
                     }
 
-                }
-            });
-            itemViewHolder.btnEle.setOnAddDelListener(new IOnAddDelListener() {
-                @Override
-                public void onAddSuccess(int i) {
-                    RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
-                            .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
-                            .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                        @Override
-                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                            LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
-                            if (saleGoodsItemModels.size() > 0) {
-                                SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
-                                mItem.Quantity = i;
-                                mItem.CurrentPrice = mItem.UnitPrice * mItem.Quantity;
-                                mItem.update().subscribe(new Consumer<Boolean>() {
-                                    @Override
-                                    public void accept(@NonNull Boolean aBean) throws Exception {
-                                        LogUtils.e(mItem.ProductName + "：数量修改为" + i);
-                                    }
-                                });
-                            } else {
-                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId, tempPriceSystemID);
+                    @Override
+                    public void onAddFailed(int i, FailType failType) {
+                        LogUtils.e(goodsBean.Name + "添加失败" + i + "\nFailType" + failType);
+                    }
+
+                    @Override
+                    public void onDelSuccess(int i) {
+                        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                                .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                                .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                            @Override
+                            public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                                LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+                                if (saleGoodsItemModels.size() > 0) {
+                                    SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                                    mItem.Quantity = i;
+                                    mItem.CurrentPrice = mItem.UnitPrice * mItem.Quantity;
+                                    mItem.update().subscribe(new Consumer<Boolean>() {
+                                        @Override
+                                        public void accept(@NonNull Boolean aBean) throws Exception {
+                                            LogUtils.e(mItem.ProductName + "：数量修改为" + i);
+                                        }
+                                    });
+                                } else {
+                                    add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId, tempPriceSystemID);
+                                }
+
                             }
+                        });
+                    }
 
-                        }
-                    });
-                }
-
-                @Override
-                public void onAddFailed(int i, FailType failType) {
-                    LogUtils.e(goodsBean.Name + "添加失败" + i + "\nFailType" + failType);
-                }
-
-                @Override
-                public void onDelSuccess(int i) {
-                    RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
-                            .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
-                            .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                        @Override
-                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                            LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
-                            if (saleGoodsItemModels.size() > 0) {
-                                SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
-                                mItem.Quantity = i;
-                                mItem.CurrentPrice = mItem.UnitPrice * mItem.Quantity;
-                                mItem.update().subscribe(new Consumer<Boolean>() {
-                                    @Override
-                                    public void accept(@NonNull Boolean aBean) throws Exception {
-                                        LogUtils.e(mItem.ProductName + "：数量修改为" + i);
-                                    }
-                                });
-                            } else {
-                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId, tempPriceSystemID);
-                            }
-
-                        }
-                    });
-                }
-
-                @Override
-                public void onDelFaild(int i, FailType failType) {
-                    LogUtils.e(goodsBean.Name + "减少失败" + i + "\nFailType" + failType);
-                }
-            });
-
+                    @Override
+                    public void onDelFaild(int i, FailType failType) {
+                        LogUtils.e(goodsBean.Name + "减少失败" + i + "\nFailType" + failType);
+                    }
+                });
+            }
         }
 
         super.onBindViewHolder(holder, position);

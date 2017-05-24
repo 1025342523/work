@@ -1,14 +1,13 @@
 package com.yifarj.yifadinghuobao.ui.fragment.goods;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -55,8 +54,8 @@ public class TabGoodsFragment extends BaseFragment {
     @BindView(R.id.empty_view)
     CustomEmptyView mCustomEmptyView;
 
-    @BindView(R.id.swipe_refresh_layout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
+//    @BindView(R.id.swipe_refresh_layout)
+//    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.titleView)
     TitleView titleView;
@@ -76,6 +75,8 @@ public class TabGoodsFragment extends BaseFragment {
     private List<GoodsListEntity.ValueEntity> goodsList = new ArrayList<>();
 
     private PageInfo pageInfo = new PageInfo();
+
+    private int totalCount;
 
 
     @Override
@@ -173,30 +174,42 @@ public class TabGoodsFragment extends BaseFragment {
             LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
             return;
         }
-        initRefreshLayout();
+//        initRefreshLayout();
+        pageInfo.PageIndex = 0;
+        mIsRefreshing = false;
+        goodsList.clear();
+        loadData();
         initRecyclerView();
         isPrepared = false;
     }
 
 
-    @Override
-    protected void initRefreshLayout() {
-        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
-        mSwipeRefreshLayout.post(() -> {
+//    @Override
+//    protected void initRefreshLayout() {
+//        if (mSwipeRefreshLayout == null) {
+//            return;
+//        }
+//        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
+////        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+//        mSwipeRefreshLayout.post(() -> {
+//
+//            mSwipeRefreshLayout.setRefreshing(true);
+//            mIsRefreshing = true;
+//            loadData();
+//        });
 
-            mSwipeRefreshLayout.setRefreshing(true);
-            mIsRefreshing = true;
-            loadData();
-        });
-
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            pageInfo.PageIndex = 0;
-            mIsRefreshing = false;
-            goodsList.clear();
-            loadData();
-        });
-    }
+//
+//        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+//            try {
+//                pageInfo.PageIndex = 0;
+//                mIsRefreshing = false;
+//                goodsList.clear();
+//                loadData();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
+//    }
 
     @Override
     protected void initRecyclerView() {
@@ -214,9 +227,21 @@ public class TabGoodsFragment extends BaseFragment {
 
             @Override
             public void onLoadMore(int i) {
+                mIsRefreshing = true;
                 pageInfo.PageIndex++;
                 loadData();
                 loadMoreView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (mIsRefreshing) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
     }
@@ -245,6 +270,7 @@ public class TabGoodsFragment extends BaseFragment {
                     @Override
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
+                            totalCount = goodsListEntity.PageInfo.TotalCount;
                             goodsList.addAll(goodsListEntity.Value);
                             finishTask();
                         }
@@ -267,9 +293,9 @@ public class TabGoodsFragment extends BaseFragment {
 
     @Override
     protected void finishTask() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
+//        if (mSwipeRefreshLayout.isRefreshing()) {
+//            mSwipeRefreshLayout.setRefreshing(false);
+//        }
         mIsRefreshing = false;
         if (goodsList != null) {
             if (goodsList.size() == 0) {
@@ -279,7 +305,11 @@ public class TabGoodsFragment extends BaseFragment {
             }
         }
         loadMoreView.setVisibility(View.GONE);
-        mGoodsListAdapter.notifyDataSetChanged();
+        LogUtils.e("Page：", pageInfo.PageIndex);
+        LogUtils.e("ListSize", goodsList.size());
+        if (!mGoodsListAdapter.onbind) {
+            mGoodsListAdapter.notifyDataSetChanged();
+        }
     }
 
     private void createHeadView() {
@@ -298,7 +328,7 @@ public class TabGoodsFragment extends BaseFragment {
     }
 
     public void showEmptyView() {
-        mSwipeRefreshLayout.setRefreshing(false);
+//        mSwipeRefreshLayout.setRefreshing(false);
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
@@ -307,6 +337,9 @@ public class TabGoodsFragment extends BaseFragment {
 
 
     public void hideEmptyView() {
+        if (mCustomEmptyView == null || mRecyclerView == null) {
+            return;
+        }
         mCustomEmptyView.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }

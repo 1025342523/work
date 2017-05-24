@@ -192,6 +192,9 @@ public class TabMainFragment extends BaseFragment {
 
     @Override
     protected void initRefreshLayout() {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
         mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
 //        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
         mSwipeRefreshLayout.post(() -> {
@@ -214,7 +217,7 @@ public class TabMainFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList,false);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, false);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
 //        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -277,6 +280,9 @@ public class TabMainFragment extends BaseFragment {
 
     @Override
     protected void finishTask() {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
         if (mSwipeRefreshLayout.isRefreshing()) {
             mSwipeRefreshLayout.setRefreshing(false);
         }

@@ -1,9 +1,7 @@
 package com.yifarj.yifadinghuobao.ui.fragment.order;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -50,8 +48,8 @@ public class TabOrderFragment extends BaseFragment {
 
     @BindView(R.id.titleView)
     TitleView titleView;
-    @BindView(R.id.swipe_refresh_layout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    //    @BindView(R.id.swipe_refresh_layout)
+//    SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recycle)
     RecyclerView mRecyclerView;
     @BindView(R.id.empty_view)
@@ -99,9 +97,12 @@ public class TabOrderFragment extends BaseFragment {
 
     @Override
     protected void finishTask() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
+//        if (mSwipeRefreshLayout == null) {
+//            return;
+//        }
+//        if (mSwipeRefreshLayout.isRefreshing()) {
+//            mSwipeRefreshLayout.setRefreshing(false);
+//        }
         mIsRefreshing = false;
         if (mSaleOrderList != null) {
             if (mSaleOrderList.size() == 0) {
@@ -137,7 +138,7 @@ public class TabOrderFragment extends BaseFragment {
         mOrderListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
-                if (holder!=null){
+                if (holder != null) {
                     Intent intent = new Intent(getActivity(), MettingOrderActivity.class);
                     intent.putExtra("orderId", mSaleOrderList.get(position).Id);
                     startActivity(intent);
@@ -146,24 +147,27 @@ public class TabOrderFragment extends BaseFragment {
         });
     }
 
-    @Override
-    protected void initRefreshLayout() {
-        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
-        mSwipeRefreshLayout.post(() -> {
-
-            mSwipeRefreshLayout.setRefreshing(true);
-            mIsRefreshing = true;
-            loadData();
-        });
-
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            pageInfo.PageIndex = 0;
-            mIsRefreshing = false;
-            mSaleOrderList.clear();
-            loadData();
-        });
-    }
+//    @Override
+//    protected void initRefreshLayout() {
+//        if (mSwipeRefreshLayout == null) {
+//            return;
+//        }
+//        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
+////        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+//        mSwipeRefreshLayout.post(() -> {
+//
+//            mSwipeRefreshLayout.setRefreshing(true);
+//            mIsRefreshing = true;
+//            loadData();
+//        });
+//
+//        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+//            pageInfo.PageIndex = 0;
+//            mIsRefreshing = false;
+//            mSaleOrderList.clear();
+//            loadData();
+//        });
+//    }
 
     @Override
     protected void lazyLoad() {
@@ -171,7 +175,11 @@ public class TabOrderFragment extends BaseFragment {
             LogUtils.e("TabOrderFragment", "lazyLoad（） false");
             return;
         }
-        initRefreshLayout();
+//        initRefreshLayout();
+        pageInfo.PageIndex = 0;
+        mIsRefreshing = false;
+        mSaleOrderList.clear();
+        loadData();
         initRecyclerView();
         isPrepared = false;
     }
@@ -224,7 +232,7 @@ public class TabOrderFragment extends BaseFragment {
     }
 
     public void showErrorView() {
-        mSwipeRefreshLayout.setRefreshing(false);
+//        mSwipeRefreshLayout.setRefreshing(false);
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
@@ -232,7 +240,9 @@ public class TabOrderFragment extends BaseFragment {
     }
 
     public void showEmptyView() {
-        mSwipeRefreshLayout.setRefreshing(false);
+//        if (mSwipeRefreshLayout != null) {
+//            mSwipeRefreshLayout.setRefreshing(false);
+//        }
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
@@ -241,6 +251,9 @@ public class TabOrderFragment extends BaseFragment {
 
 
     public void hideEmptyView() {
+        if (mCustomEmptyView == null && mRecyclerView == null) {
+            return;
+        }
         mCustomEmptyView.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
