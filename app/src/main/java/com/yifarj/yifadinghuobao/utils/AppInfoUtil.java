@@ -1,6 +1,8 @@
 package com.yifarj.yifadinghuobao.utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
@@ -21,6 +23,8 @@ import java.util.UUID;
  */
 public class AppInfoUtil {
     private static String deviceID;
+    private static String mVersionName;
+    private static int mVersionCode;
 
     public static String genPicUrl(String picName) {
         String accountId = PreferencesUtil.getString(ApiConstants.CPreference.ACCOUNT_ID);
@@ -102,5 +106,42 @@ public class AppInfoUtil {
             LogUtil.e("WifiPreference IpAddress", ex.toString());
         }
         return null;
+    }
+
+    /**
+     * 获取版本信息
+     */
+    public static String getVersionName(Context context) {
+        if (mVersionName == null) {
+            try {
+                PackageInfo pInfo = context.getPackageManager()
+                        .getPackageInfo(context.getPackageName(),
+                                PackageManager.GET_CONFIGURATIONS);
+                mVersionName = pInfo.versionName;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "1.0";
+            }
+        }
+        return mVersionName;
+    }
+
+    /**
+     * 获取版本号
+     */
+    public static int getVersionCode(Context context) {
+        if (mVersionCode <= 0) {
+            try {
+                PackageInfo pInfo = context.getPackageManager()
+                        .getPackageInfo(context.getPackageName(),
+                                PackageManager.GET_CONFIGURATIONS);
+                mVersionCode = pInfo.versionCode;
+            } catch (Exception e) {
+                e.printStackTrace();
+                mVersionCode = 0;
+            }
+        }
+        return mVersionCode;
+
     }
 }

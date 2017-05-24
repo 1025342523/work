@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/content_bg"
+              android:orientation="vertical">
+
+    <com.yifarj.yifadinghuobao.view.TitleView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title_name="亿订货首页"/>
+
+    <RelativeLayout
+        android:id="@+id/rlPagerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.yifarj.yifadinghuobao.view.AutoScrollViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.yifarj.yifadinghuobao.view.ViewPagerIndicator
+            android:id="@+id/indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/size_20"
+            android:gravity="center"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_200"
+        android:layout_marginTop="@dimen/size_20"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/size_40">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_cuxiao"
+            android:gravity="center"
+            android:text="促销商品"
+            android:textSize="@dimen/font_26"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawablePadding="@dimen/size_10"
+            android:drawableTop="@drawable/ic_shoucang"
+            android:gravity="center"
+            android:text="收藏商品"
+            android:textSize="@dimen/font_26"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawablePadding="@dimen/size_10"
+            android:drawableTop="@drawable/ic_news"
+            android:gravity="center"
+            android:text="新品上架"
+            android:textSize="@dimen/font_26"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawablePadding="@dimen/size_10"
+            android:drawableTop="@drawable/ic_zuijing"
+            android:gravity="center"
+            android:text="最近购买"
+            android:textSize="@dimen/font_26"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_80"
+        android:layout_marginTop="@dimen/size_10"
+        android:background="@color/white">
+
+        <TextView
+            android:layout_width="@dimen/size_150"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="end"
+            android:text="热卖商品"
+            android:textColor="#4F4F4F"
+            android:textSize="@dimen/font_32"/>
+    </RelativeLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:scrollbars="none"/>
+
+
+            <com.yifarj.yifadinghuobao.view.CustomEmptyView
+                android:id="@+id/empty_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </FrameLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</LinearLayout>

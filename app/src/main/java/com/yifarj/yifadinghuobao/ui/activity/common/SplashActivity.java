@@ -3,11 +3,10 @@ package com.yifarj.yifadinghuobao.ui.activity.common;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.view.WindowManager;
 
 import com.trello.rxlifecycle2.components.RxActivity;
 import com.yifarj.yifadinghuobao.R;
-import com.yifarj.yifadinghuobao.utils.SystemUiVisibilityUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +28,8 @@ public class SplashActivity extends RxActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
-        SystemUiVisibilityUtil.hideStatusBar(getWindow(), true);
+//        SystemUiVisibilityUtil.hideStatusBar(getWindow(), true);  为做适配，有些机型会崩溃
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setUpSplash();
     }
 

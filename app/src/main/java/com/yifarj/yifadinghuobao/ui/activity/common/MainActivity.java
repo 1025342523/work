@@ -52,7 +52,7 @@ public class MainActivity extends BaseActivity {
         TabWidget mTabWidget = (TabWidget) findViewById(android.R.id.tabs);
         assert mTabWidget != null;
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
-        mFragmentTabHost.setCurrentTab(1);
+        mFragmentTabHost.setCurrentTab(0);
     }
 
     private static final int[] TAB_BUTTON_ICON_RES = {

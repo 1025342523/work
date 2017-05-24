@@ -26,6 +26,9 @@ public class SaleGoodsItemModel extends BaseRXModel {
     public String Path;
 
     @Column
+    public String Code;
+
+    @Column
     public int BillId;
 
     @Column

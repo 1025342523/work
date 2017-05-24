@@ -9,9 +9,10 @@
     <com.yifarj.yifadinghuobao.view.TitleView
         android:id="@+id/titleView"
         android:layout_width="match_parent"
-        app:title_name="商品列表"
         android:layout_height="wrap_content"
-        app:icon_right="@drawable/ic_shopping_cart"/>
+        app:icon_left="@drawable/ic_search"
+        app:icon_right="@drawable/ic_shopping_cart"
+        app:title_name="商品列表"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
@@ -36,6 +37,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
 
+            <com.yifarj.yifadinghuobao.view.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:text_hint="@string/search_view_product"/>
         </FrameLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

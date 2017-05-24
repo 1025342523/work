@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
@@ -75,9 +76,12 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
-        String name = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME);
-        etName.setText(name);
-        etName.setSelection(0, name.length());
+        String name = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
+//        FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
+        if (name != null) {
+            etName.setText(name);
+            etName.setSelection(0, name.length());
+        }
         clicks(btnLogin)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
@@ -85,10 +89,6 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
-                        if (mDisposable != null && !mDisposable.isDisposed()) {
-                            //停止倒计时
-                            mDisposable.dispose();
-                        }
                         login();
                     }
                 });
@@ -275,9 +275,11 @@ public class LoginActivity extends BaseActivity {
                         loadingDialog.dismiss();
                         if (!mettingLoginEntity.HasError) {
                             DataSaver.setMettingCustomerInfo(mettingLoginEntity.Value);
-                            String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME);
-                            if (!userName.equals(name)) {
-                                FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
+                            String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
+                            if (!StringUtils.isEmpty(userName)){
+                                if (!userName.equals(name)) {
+                                    FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
+                                }
                             }
                             PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, name);
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));

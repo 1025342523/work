@@ -64,4 +64,11 @@
     <string name="tab_already_completed">已完成</string>
     <string name="audit">审核</string>
     <string name="account">记账</string>
+    <string name="yifa_software">亿发软件</string>
+    <string name="us">了解亿订货</string>
+    <string name="return_order">退货订单</string>
+    <string name="apply_return">申请退货</string>
+    <string name="mine_address">收货地址</string>
+    <string name="about">关于亿订货</string>
+    <string name="search_view_product">名称/助记符/编号</string>
 </resources>

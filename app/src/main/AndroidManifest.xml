@@ -53,6 +53,16 @@
             android:name=".ui.activity.order.MettingOrderActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name=".ui.activity.web.WebActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name=".ui.activity.common.AboutActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
     </application>
 
 </manifest>

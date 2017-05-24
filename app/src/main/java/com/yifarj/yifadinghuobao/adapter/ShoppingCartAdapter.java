@@ -20,6 +20,7 @@ import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.NumberUtil;
 import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 import com.yifarj.yifadinghuobao.view.CzechYuanEditDialog;
 import com.yifarj.yifadinghuobao.view.NumberAddSubView;
@@ -47,8 +48,8 @@ import io.reactivex.functions.Consumer;
 public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
     private List<SaleGoodsItemModel> itemData;
     private List<GoodsUnitModel> unitData;
-    private List<GoodsUnitModel> currentUnitList;
     public static Map<Integer, Set<Integer>> selectedMap = new HashMap<Integer, Set<Integer>>();
+    private static Map<Integer, List<GoodsUnitModel>> itemUnit = new HashMap<Integer, List<GoodsUnitModel>>();
 
     public ShoppingCartAdapter(RecyclerView recyclerView, List<SaleGoodsItemModel> mItemData, List<GoodsUnitModel> mUnitData) {
         super(recyclerView);
@@ -71,6 +72,19 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             SaleGoodsItemModel goodsBean = itemData.get(position);
             selectedMap.clear();
+
+            RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
+                    .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.ProductId)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                            if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
+                                itemUnit.put(position, goodsUnitModels);
+                            }
+                        }
+                    });
+
             if (goodsBean.Path != null) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.Path))
@@ -80,16 +94,6 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         .dontAnimate()
                         .into(itemViewHolder.itemImg);
             }
-            currentUnitList = new ArrayList<>();
-            Flowable.fromIterable(unitData)
-                    .forEach(new Consumer<GoodsUnitModel>() {
-                        @Override
-                        public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
-                            if (goodsUnitModel.ProductId == goodsBean.ProductId) {
-                                currentUnitList.add(goodsUnitModel);
-                            }
-                        }
-                    });
             itemViewHolder.ivDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -194,9 +198,11 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                     });
                 }
             });
+            itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
+            itemViewHolder.tvBasicPrice.setText(goodsBean.BasicUnitPrice + "元/" + goodsBean.BasicUnitName);
+            itemViewHolder.tvCode.setText("编号：" + goodsBean.Code.substring(goodsBean.Code.length() - 4, goodsBean.Code.length()));
             itemViewHolder.tvName.setText(goodsBean.ProductName);
-            itemViewHolder.tvUnit.setText(goodsBean.ProductUnitName);
-            itemViewHolder.tvPrice.setText(String.valueOf(goodsBean.UnitPrice));
+            itemViewHolder.tvPrice.setText("小计：" + NumberUtil.formatDoubleToString(goodsBean.CurrentPrice) + "元");
             itemViewHolder.numberAddSubView.setValue(goodsBean.Quantity);
             itemViewHolder.numberAddSubView.setOnButtonClickListener(new NumberAddSubView.OnButtonClickListener() {
                 @Override
@@ -258,9 +264,9 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                     }
                 }
             });
-            if (currentUnitList != null) {
+            if (itemUnit != null) {
                 List<String> unitName = new ArrayList<>();
-                Flowable.fromIterable(currentUnitList)
+                Flowable.fromIterable(itemUnit.get(position))
                         .forEach(new Consumer<GoodsUnitModel>() {
                             @Override
                             public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
@@ -288,8 +294,8 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                             select = item;
                         }
                         goodsBean.ProductUnitName = unitName.get(select);
-                        goodsBean.UnitId = currentUnitList.get(select).Id;
-                        goodsBean.UnitPrice = currentUnitList.get(select).BasicFactor * goodsBean.BasicUnitPrice;
+                        goodsBean.UnitId = itemUnit.get(position).get(select).Id;
+                        goodsBean.UnitPrice = itemUnit.get(position).get(select).BasicFactor * goodsBean.BasicUnitPrice;
                         goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
                         notifyDataSetChanged();
 
@@ -343,8 +349,10 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
         ImageView itemImg;
         ImageView ivDelete;
         TextView tvName;
-        TextView tvUnit;
         TextView tvPrice;
+        TextView tvPackSpec;
+        TextView tvBasicPrice;
+        TextView tvCode;
         TagFlowLayout llFlowLayout;
         NumberAddSubView numberAddSubView;
 
@@ -354,8 +362,10 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
 
             itemImg = $(R.id.item_img);
             tvName = $(R.id.tv_name);
-            tvUnit = $(R.id.tv_unit);
+            tvBasicPrice = $(R.id.tv_basicPrice);
             tvPrice = $(R.id.tv_price);
+            tvPackSpec = $(R.id.tv_PackSpec);
+            tvCode = $(R.id.tv_Code);
             llFlowLayout = $(R.id.ll_flowLayout);
             numberAddSubView = $(R.id.num_control);
             ivDelete = $(R.id.iv_delete);

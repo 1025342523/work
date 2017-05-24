@@ -137,9 +137,11 @@ public class TabOrderFragment extends BaseFragment {
         mOrderListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
-                Intent intent = new Intent(getActivity(), MettingOrderActivity.class);
-                intent.putExtra("orderId", mSaleOrderList.get(position).Id);
-                startActivity(intent);
+                if (holder!=null){
+                    Intent intent = new Intent(getActivity(), MettingOrderActivity.class);
+                    intent.putExtra("orderId", mSaleOrderList.get(position).Id);
+                    startActivity(intent);
+                }
             }
         });
     }

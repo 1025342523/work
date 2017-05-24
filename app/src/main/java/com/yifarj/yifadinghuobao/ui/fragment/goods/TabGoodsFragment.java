@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
@@ -22,6 +26,7 @@ import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
+import com.yifarj.yifadinghuobao.view.SearchView;
 import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
@@ -56,6 +61,9 @@ public class TabGoodsFragment extends BaseFragment {
     @BindView(R.id.titleView)
     TitleView titleView;
 
+    @BindView(R.id.searchView)
+    SearchView searchView;
+
     private boolean mIsRefreshing = false;
 
 
@@ -78,15 +86,84 @@ public class TabGoodsFragment extends BaseFragment {
     @Override
     protected void finishCreateView(Bundle savedInstanceState) {
         LogUtils.e("TabGoodsFragment", "finishCreateView");
+//        new QBadgeView(getContext()).bindTarget(titleView.getImageViewContent()).setBadgeTextSize(10, true).setBadgeNumber(9).setGravityOffset(15, 20, true);
         isPrepared = true;
         lazyLoad();
-        titleView.setRightIconClickListener(new View.OnClickListener() {
+        titleView.setRightIconClickListener(view -> {
+            Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
+            startActivityForResult(intent, REQUEST_REFRESH);
+        });
+        titleView.setLeftIconClickListener(view -> searchView.show());
+        searchView.setOnSearchClickListener(new SearchView.OnSearchClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
-                startActivityForResult(intent, REQUEST_REFRESH);
+            public void onSearch(String keyword) {
+                doSearch(keyword);
             }
         });
+        searchView.setOnCancelListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchView.getListView().setAdapter(null);
+                searchView.getEditText().setText("");
+            }
+        });
+        searchView.getEditText().addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String result = s.toString();
+                if (!StringUtils.isEmpty(result) && result.length() == 13) {
+                    doSearch(result);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+
+    private void doSearch(String keyword) {
+        RetrofitHelper.getGoodsListAPI()
+                .getGoodsList("ProductList", "", "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))", "", AppInfoUtil.getToken())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GoodsListEntity>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
+                        if (!goodsListEntity.HasError) {
+                            if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
+                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true));
+                            } else {
+                                ToastUtils.showShortSafe("无结果");
+                            }
+                        } else {
+                            ToastUtils.showShortSafe("无结果");
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
 
@@ -126,7 +203,7 @@ public class TabGoodsFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);

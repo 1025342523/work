@@ -10,13 +10,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/size_200"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/size_10"
         android:layout_marginStart="@dimen/size_10"
         android:orientation="horizontal">
 
         <android.support.v7.widget.CardView
-            android:layout_width="@dimen/size_200"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/size_10"
             android:layout_marginStart="@dimen/size_10"
@@ -43,42 +43,51 @@
                 android:id="@+id/tv_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/size_20"
+                android:layout_margin="@dimen/size_10"
                 android:maxLines="2"
                 android:textColor="#333333"
                 android:textSize="@dimen/font_30"/>
 
             <TextView
-                android:id="@+id/tv_unit"
+                android:id="@+id/tv_Code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/size_20"
+                android:layout_marginStart="@dimen/size_20"
+                android:gravity="center_vertical"
+                android:textColor="@color/main_red"
+                android:textSize="@dimen/font_28"/>
+
+            <TextView
+                android:id="@+id/tv_PackSpec"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/size_20"
                 android:layout_marginStart="@dimen/size_20"
                 android:layout_marginTop="@dimen/size_8"
                 android:gravity="center_vertical"
-                android:textColor="@color/text_desc"
-                android:textSize="@dimen/font_24"
-                android:textStyle="bold"/>
+                android:textColor="@color/light_blue"
+                android:textSize="@dimen/font_26"/>
 
-
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tv_basicPrice"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/size_10">
+                android:layout_marginLeft="@dimen/size_20"
+                android:layout_marginStart="@dimen/size_20"
+                android:layout_marginTop="@dimen/size_8"
+                android:textColor="@color/main_red"
+                android:textSize="@dimen/font_30"/>
 
-                <TextView
-                    android:id="@+id/tv_price"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="@dimen/size_20"
-                    android:layout_marginStart="@dimen/size_20"
-                    android:text="2999.00"
-                    android:textColor="@color/main_red"
-                    android:textSize="@dimen/font_30"/>
-
-
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/tv_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/size_20"
+                android:layout_marginStart="@dimen/size_20"
+                android:layout_marginTop="@dimen/size_8"
+                android:textColor="@color/main_red"
+                android:textSize="@dimen/font_30"/>
 
 
         </LinearLayout>

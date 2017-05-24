@@ -168,6 +168,7 @@ public class MettingOrderActivity extends BaseActivity {
                                             @Override
                                             public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
                                                 SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
+                                                mItem.PriceSystemId = saleGoodsItemModel.PriceSystemId;
                                                 mItem.CurrentPrice = saleGoodsItemModel.CurrentPrice;
                                                 mItem.TotalPrice = saleGoodsItemModel.CurrentPrice;
                                                 mItem.ImagePath = saleGoodsItemModel.Path;

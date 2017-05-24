@@ -49,6 +49,13 @@ public class OrderListAdapter extends AbsRecyclerViewAdapter {
             itemViewHolder.tvTime.setText(time);
             itemViewHolder.tvTotalAmount.setText(amount);
             itemViewHolder.tvOrderStatus.setText(goodsBean.AuditedStatus);
+            if (goodsBean.AuditedStatus.equals("未审核")) {
+                itemViewHolder.tvOrderStatus.setTextColor(getContext().getResources().getColor(R.color.text_desc));
+            } else if (goodsBean.AuditedStatus.equals("已审核")) {
+                itemViewHolder.tvOrderStatus.setTextColor(getContext().getResources().getColor(R.color.main_blue));
+            } else if (goodsBean.AuditedStatus.equals("已记账")) {
+                itemViewHolder.tvOrderStatus.setTextColor(getContext().getResources().getColor(R.color.main_red));
+            }
         }
 
         super.onBindViewHolder(holder, position);

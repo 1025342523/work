@@ -39,17 +39,19 @@ import io.reactivex.functions.Consumer;
  */
 public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     public List<GoodsListEntity.ValueEntity> data;
+    private boolean type;
 
-    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data) {
+    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type) {
         super(recyclerView);
         this.data = data;
+        this.type = type;
     }
 
     @Override
     public ClickableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         bindContext(parent.getContext());
         return new ItemViewHolder(LayoutInflater.from(getContext()).
-                inflate(R.layout.item_goods_list, parent, false));
+                inflate(type ? R.layout.item_goods_list : R.layout.item_goods_list_grid, parent, false));
     }
 
 
@@ -62,6 +64,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             String unitName = null;
             int unitId = 0;
             double productPrice;
+            int priceSystemID;
             if (goodsBean.ProductPictureList.size() > 0) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
@@ -71,64 +74,78 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                         .dontAnimate()
                         .into(itemViewHolder.itemImg);
             }
-
+            itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
+            itemViewHolder.tvCode.setText("编号：" + goodsBean.Code.substring(goodsBean.Code.length() - 4, goodsBean.Code.length()));
             itemViewHolder.tvName.setText(goodsBean.Name);
             for (ProductUnitEntity.ValueEntity unit : goodsBean.ProductUnitList) {
                 if (unit.IsBasic) {
-                    itemViewHolder.tvUnit.setText(unit.Name);
+//                    itemViewHolder.tvUnit.setText(unit.Name);
                     unitName = unit.Name;
                     unitId = unit.Id;
                     LogUtils.e(goodsBean.Name + "：" + unitName);
                 }
             }
             productPrice = goodsBean.Price1;
+            priceSystemID = goodsBean.PriceSystemList.get(1).Id;
             for (GoodsListEntity.ValueEntity.PriceSystemListEntity price : goodsBean.PriceSystemList) {
 
                 if (price.IsOrderMeetingPrice) {
                     switch (price.Id) {
                         case 0:
                             productPrice = goodsBean.Price0;
+                            priceSystemID = 0;
                             break;
                         case 1:
                             productPrice = goodsBean.Price1;
+                            priceSystemID = 1;
                             break;
                         case 2:
                             productPrice = goodsBean.Price2;
+                            priceSystemID = 2;
                             break;
                         case 3:
                             productPrice = goodsBean.Price3;
+                            priceSystemID = 3;
                             break;
                         case 4:
                             productPrice = goodsBean.Price4;
+                            priceSystemID = 4;
                             break;
                         case 5:
                             productPrice = goodsBean.Price5;
+                            priceSystemID = 5;
                             break;
                         case 6:
                             productPrice = goodsBean.Price6;
+                            priceSystemID = 6;
                             break;
                         case 7:
                             productPrice = goodsBean.Price7;
+                            priceSystemID = 7;
                             break;
                         case 8:
                             productPrice = goodsBean.Price8;
+                            priceSystemID = 8;
                             break;
                         case 9:
                             productPrice = goodsBean.Price9;
+                            priceSystemID = 9;
                             break;
                         case 10:
                             productPrice = goodsBean.Price10;
+                            priceSystemID = 10;
                             break;
                     }
                 }
 
             }
 
-            itemViewHolder.tvPrice.setText(String.valueOf(productPrice));
+            itemViewHolder.tvPrice.setText(productPrice + "元/" + unitName);
 
             String tempUnitName = unitName;
             double tempProductPrice = productPrice;
             int tempUnitId = unitId;
+            int tempPriceSystemID = priceSystemID;
             RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
                     .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
                     .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
@@ -160,6 +177,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                             if (saleGoodsItemModels.size() > 0) {
                                 SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
                                 mItem.Quantity = i;
+                                mItem.CurrentPrice = mItem.UnitPrice * mItem.Quantity;
                                 mItem.update().subscribe(new Consumer<Boolean>() {
                                     @Override
                                     public void accept(@NonNull Boolean aBean) throws Exception {
@@ -167,7 +185,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                     }
                                 });
                             } else {
-                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId);
+                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId, tempPriceSystemID);
                             }
 
                         }
@@ -190,6 +208,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                             if (saleGoodsItemModels.size() > 0) {
                                 SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
                                 mItem.Quantity = i;
+                                mItem.CurrentPrice = mItem.UnitPrice * mItem.Quantity;
                                 mItem.update().subscribe(new Consumer<Boolean>() {
                                     @Override
                                     public void accept(@NonNull Boolean aBean) throws Exception {
@@ -197,7 +216,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                     }
                                 });
                             } else {
-                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId);
+                                add(goodsBean, i, tempProductPrice, tempUnitName, tempUnitId, tempPriceSystemID);
                             }
 
                         }
@@ -215,13 +234,17 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         super.onBindViewHolder(holder, position);
     }
 
-    private void add(GoodsListEntity.ValueEntity goodsBean, int count, double productPrice, String unitName, int unitId) {
+    private void add(GoodsListEntity.ValueEntity goodsBean, int count, double productPrice, String unitName, int unitId, int priceSystemID) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = productPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
             itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
         }
+        itemModel.PriceSystemId = priceSystemID;
+        itemModel.PackSpec = goodsBean.PackSpec;
+        itemModel.Code = goodsBean.Code;
         itemModel.ProductName = goodsBean.Name;
+        itemModel.BasicUnitName = unitName;
         itemModel.ProductUnitName = unitName;
         itemModel.BasicUnitPrice = productPrice;
         itemModel.UnitPrice = productPrice;
@@ -296,8 +319,9 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
 
         ImageView itemImg;
         TextView tvName;
-        TextView tvUnit;
+        TextView tvPackSpec;
         TextView tvPrice;
+        TextView tvCode;
         AnimShopButton btnEle;
 
         public ItemViewHolder(View itemView) {
@@ -306,9 +330,10 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
 
             itemImg = $(R.id.item_img);
             tvName = $(R.id.tv_name);
-            tvUnit = $(R.id.tv_unit);
+            tvPackSpec = $(R.id.tv_PackSpec);
             tvPrice = $(R.id.tv_price);
             btnEle = $(R.id.btnEle);
+            tvCode = $(R.id.tv_Code);
         }
     }
 }

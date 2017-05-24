@@ -1,25 +1,321 @@
 package com.yifarj.yifadinghuobao.ui.fragment.main;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
+import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
+import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
+import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
+import com.yifarj.yifadinghuobao.network.PageInfo;
+import com.yifarj.yifadinghuobao.network.RetrofitHelper;
+import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.web.WebActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
+import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.ScreenUtil;
+import com.yifarj.yifadinghuobao.view.AutoScrollViewPager;
+import com.yifarj.yifadinghuobao.view.CustomEmptyView;
+import com.yifarj.yifadinghuobao.view.ViewPagerIndicator;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
-* TabMainFragment
-* @auther  Czech.Yuan
-* @date 2017/5/12 15:07
-*/
-public class TabMainFragment  extends BaseFragment{
+ * TabMainFragment
+ *
+ * @auther Czech.Yuan
+ * @date 2017/5/12 15:07
+ */
+public class TabMainFragment extends BaseFragment {
 
+    @BindView(R.id.viewpager)
+    AutoScrollViewPager viewPager;
+
+    @BindView(R.id.indicator)
+    ViewPagerIndicator indicator;
+
+    @BindView(R.id.rlPagerContainer)
+    RelativeLayout rlPagerContainer;
+
+    @BindView(R.id.recycle)
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.empty_view)
+    CustomEmptyView mCustomEmptyView;
+
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private boolean mIsRefreshing = false;
+
+
+    private View loadMoreView;
+
+    private HeaderViewRecyclerAdapter mHeaderViewRecyclerAdapter;
+
+
+    private List<GoodsListEntity.ValueEntity> goodsList = new ArrayList<>();
+
+    private PageInfo pageInfo = new PageInfo();
+
+    private GoodsListAdapter mGoodsListAdapter;
 
     @Override
     public int getLayoutResId() {
-        return R.layout.fragment_goods;
+        return R.layout.fragment_main;
     }
 
     @Override
     protected void finishCreateView(Bundle savedInstanceState) {
+        isPrepared = true;
+        rlPagerContainer.getLayoutParams().height = ScreenUtil.getScreenWidth(getContext()) * 200 / 750;
+        viewPager.setCurrentItem(0);
+        indicator.setCount(4);
+        indicator.setCurrentItem(0);
+        viewPager.setAdapter(new PagerAdapter() {
+            @Override
+            public int getCount() {
+                return 4;
+            }
 
+            @Override
+            public boolean isViewFromObject(View view, Object object) {
+                return view == object;
+            }
+
+            @Override
+            public Object instantiateItem(ViewGroup container, final int position) {
+                ImageView view = new ImageView(getContext());
+                view.setScaleType(ImageView.ScaleType.FIT_XY);
+                ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                view.setLayoutParams(params);
+                switch (position) {
+                    case 0:
+                        view.setImageResource(R.drawable.banner_1);
+                        break;
+                    case 1:
+                        view.setImageResource(R.drawable.banner_2);
+                        break;
+                    case 2:
+                        view.setImageResource(R.drawable.banner_3);
+                        break;
+                    case 3:
+                        view.setImageResource(R.drawable.banner_4);
+                        break;
+                }
+                container.addView(view);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getActivity(), WebActivity.class);
+                        String url = "";
+                        switch (position) {
+                            case 0:
+                                url = "http://m.yifarj.com/index.php?m=wap";
+                                break;
+                            case 1:
+                                url = "http://m.yifarj.com/index.php?a=lists&typeid=29";
+                                break;
+                            case 2:
+                                url = "http://m.yifarj.com/index.php?a=lists&typeid=19";
+                                break;
+                            case 3:
+                                url = "http://m.yifarj.com/index.php?a=lists&typeid=7";
+                                break;
+                        }
+                        intent.putExtra("url", url);
+                        startActivity(intent);
+                    }
+                });
+                return view;
+            }
+
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object) {
+                container.removeView((View) object);
+            }
+        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (indicator != null) {
+                    indicator.setCurrentItem(position);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        viewPager.startAutoScroll();
+        lazyLoad();
+    }
+
+
+    @Override
+    protected void lazyLoad() {
+        if (!isPrepared && !isVisible) {
+            LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
+            return;
+        }
+        initRefreshLayout();
+        initRecyclerView();
+        isPrepared = false;
+    }
+
+    @Override
+    protected void initRefreshLayout() {
+        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
+//        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+        mSwipeRefreshLayout.post(() -> {
+
+            mSwipeRefreshLayout.setRefreshing(true);
+            mIsRefreshing = true;
+            loadData();
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            pageInfo.PageIndex = 0;
+            mIsRefreshing = false;
+            goodsList.clear();
+            loadData();
+        });
+    }
+
+    @Override
+    protected void initRecyclerView() {
+        mRecyclerView.setHasFixedSize(true);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList,false);
+        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
+//        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
+        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
+        setRecycleNoScroll();
+        createLoadMoreView();
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mGridLayoutManager) {
+
+            @Override
+            public void onLoadMore(int i) {
+                pageInfo.PageIndex++;
+                loadData();
+                loadMoreView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    @Override
+    protected void loadData() {
+
+        LogUtils.e("loadData", "获取商品列表数据");
+        RetrofitHelper.getGoodsListAPI()
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "", AppInfoUtil.getToken())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(goodsListEntity -> {
+                    if (goodsListEntity.PageInfo.PageIndex * goodsListEntity.PageInfo.PageLength >= goodsListEntity.PageInfo.TotalCount) {
+                        loadMoreView.setVisibility(View.GONE);
+                        mHeaderViewRecyclerAdapter.removeFootView();
+                    }
+                })
+                .subscribe(new Observer<GoodsListEntity>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
+                        if (!goodsListEntity.HasError) {
+                            goodsList.addAll(goodsListEntity.Value);
+                            finishTask();
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        showEmptyView();
+                        loadMoreView.setVisibility(View.GONE);
+                        --pageInfo.PageIndex;
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
+    @Override
+    protected void finishTask() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+        mIsRefreshing = false;
+        if (goodsList != null) {
+            if (goodsList.size() == 0) {
+                showEmptyView();
+            } else {
+                hideEmptyView();
+            }
+        }
+        loadMoreView.setVisibility(View.GONE);
+        mGoodsListAdapter.notifyDataSetChanged();
+    }
+
+    public void showEmptyView() {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mCustomEmptyView.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
+        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
+    }
+
+
+    public void hideEmptyView() {
+        mCustomEmptyView.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void createLoadMoreView() {
+        loadMoreView = LayoutInflater.from(getActivity())
+                .inflate(R.layout.layout_load_more, mRecyclerView, false);
+        mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
+        loadMoreView.setVisibility(View.GONE);
+    }
+
+
+    private void setRecycleNoScroll() {
+
+        mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
     }
 }

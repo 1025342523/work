@@ -7,9 +7,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.model.entity.AccountListEntity;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
@@ -28,6 +31,8 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.yifarj.yifadinghuobao.utils.PreferencesUtil.putString;
 
 public class ConnectServerActivity extends BaseActivity {
 
@@ -112,6 +117,18 @@ public class ConnectServerActivity extends BaseActivity {
                             mDialog.setConfirmClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
+                                    String oldAccountID = PreferencesUtil.getString(ApiConstants.CPreference.ACCOUNT_ID);
+                                    String oldUrl = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN);
+                                    if (!StringUtils.isEmpty(oldAccountID)) {
+                                        if (!oldAccountID.equals(mAccountId)) {
+                                            FlowManager.getDatabase(AppDatabase.class).reset(ConnectServerActivity.this);
+                                        }
+                                    }
+                                    if (!StringUtils.isEmpty(oldUrl)) {
+                                        if (!oldUrl.equals(mUrl)) {
+                                            FlowManager.getDatabase(AppDatabase.class).reset(ConnectServerActivity.this);
+                                        }
+                                    }
                                     onSave();
                                     finish();
                                 }
@@ -157,7 +174,7 @@ public class ConnectServerActivity extends BaseActivity {
                         LogUtils.e(mPort);
                         mAccountId = connectInfo3[2].substring(9, connectInfo3[2].length());
                         LogUtils.e(mAccountId);
-                        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
+                        putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
 
                         CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
                         mDialog.setContent("获取服务器信息成功，是否测试连接？");
@@ -178,9 +195,9 @@ public class ConnectServerActivity extends BaseActivity {
     }
 
     public void onSave() {
-        PreferencesUtil.putString(ApiConstants.CPreference.ACCOUNT_ID, mAccountId);
-        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, mIp);
-        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, mPort);
-        PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
+        putString(ApiConstants.CPreference.ACCOUNT_ID, mAccountId);
+        putString(ApiConstants.CPreference.LOGIN_IP, mIp);
+        putString(ApiConstants.CPreference.LOGIN_PORT, mPort);
+        putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
     }
 }
