@@ -293,6 +293,8 @@ public class LoginActivity extends BaseActivity {
                                 mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                 try {
                                     RxTextView.text(tvCode).accept("发送验证码");
+                                    //按钮可点击
+                                    RxView.enabled(tvCode).accept(true);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -310,6 +312,8 @@ public class LoginActivity extends BaseActivity {
                             mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                             try {
                                 RxTextView.text(tvCode).accept("发送验证码");
+                                //按钮可点击
+                                RxView.enabled(tvCode).accept(true);
                             } catch (Exception x) {
                                 x.printStackTrace();
                             }

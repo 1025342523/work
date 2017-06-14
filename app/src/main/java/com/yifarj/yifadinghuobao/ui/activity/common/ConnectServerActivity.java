@@ -166,9 +166,10 @@ public class ConnectServerActivity extends BaseActivity {
                         mUrl = "http://" + server1 + "/yifa.asmx";
                         LogUtils.e(mUrl);
                         String connectInfo = strArray[1];
-                        String connectInfo2 = connectInfo.substring(14, connectInfo.length());
+                        String[] connectInfoArray = connectInfo.split("\\?");
+                        String connectInfo2 = connectInfoArray[1];
                         String[] connectInfo3 = connectInfo2.split("&");
-                        mIp = connectInfo3[0];
+                        mIp = connectInfo3[0].substring(5,connectInfo3[0].length());
                         LogUtils.e(mIp);
                         mPort = connectInfo3[1].substring(5, connectInfo3[1].length());
                         LogUtils.e(mPort);
