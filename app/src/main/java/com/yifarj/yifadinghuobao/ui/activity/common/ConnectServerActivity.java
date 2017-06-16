@@ -2,6 +2,7 @@ package com.yifarj.yifadinghuobao.ui.activity.common;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -80,12 +81,12 @@ public class ConnectServerActivity extends BaseActivity {
 
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
-                        getAccountIds(mPort, mIp, "");
+                        getAccountIds(mIp, mPort, mKeyCode);
                     }
                 });
     }
 
-    private void getAccountIds(String port, String ip, String keycode) {
+    private void getAccountIds(String ip, String port, String keycode) {
         if (!CommonUtil.isNetworkAvailable(ConnectServerActivity.this)) {
             ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
             return;
@@ -134,14 +135,16 @@ public class ConnectServerActivity extends BaseActivity {
                                 }
                             });
                         } else {
-                            ToastUtils.showShortSafe("测试连接失败");
+                            ToastUtils.showShortSafe("测试连接失败，服务器异常");
+                            LogUtils.e(valueEntity.Information);
                         }
 
                     }
 
                     @Override
                     public void onError(Throwable t) {
-                        ToastUtils.showShortSafe("测试连接失败");
+                        ToastUtils.showShortSafe("测试连接失败，请检查网络是否畅通");
+                        LogUtils.e(t.getMessage());
                     }
 
                     @Override
@@ -158,45 +161,46 @@ public class ConnectServerActivity extends BaseActivity {
             if (requestCode == REQUEST_BARCODE) {
 
                 if (data != null) {
-                    mUrl = "http://120.77.216.91:8888/351/yifa.asmx";
-                    mIp = "127.0.0.1";
-                    mPort = "1218";
-                    mAccountId = "75";
-                    mKeyCode = "yidinghuo";
-//                    try {
-//                        String serverInfo = data.getStringExtra("barcode");
-//                        String tempServerInfo = serverInfo.substring(7, serverInfo.length());
-//                        LogUtils.e(tempServerInfo);
-//                        String[] connectInfoArray = tempServerInfo.split("\\?");
-//                        String server1 = connectInfoArray[0];
-//                        String server2 = server1.substring(0, server1.length() - 13);
-//                        mUrl = "http://" + server2 + "yifa.asmx";
-//                        LogUtils.e(mUrl);
-//                        String connectInfo2 = connectInfoArray[1];
-//                        String[] connectInfo3 = connectInfo2.split("&");
-//                        mIp = connectInfo3[0].substring(5, connectInfo3[0].length());
-//                        LogUtils.e(mIp);
-//                        mPort = connectInfo3[1].substring(5, connectInfo3[1].length());
-//                        LogUtils.e(mPort);
-//                        mAccountId = connectInfo3[2].substring(9, connectInfo3[2].length());
-//                        LogUtils.e(mAccountId);
-//                        if (connectInfo3.length > 3) {
-//                            mKeyCode = connectInfo3[3].substring(8, connectInfo3[3].length());
-//                        }
-//                        LogUtils.e(mKeyCode);
-                    putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
-//
-                    CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
-                    mDialog.setContent("获取服务器信息成功，是否测试连接？");
-                    mDialog.setConfirmClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            getAccountIds(mPort, mIp, mKeyCode);
+                    String serverInfo = data.getStringExtra("barcode");
+                    try {
+                        String tempServerInfo = serverInfo.substring(7, serverInfo.length());
+                        String[] connectInfoArray = tempServerInfo.split("\\?");
+                        String server1 = connectInfoArray[0];
+                        String server2;
+                        if (server1.contains("yidinghuo")) {
+                            server2 = server1.substring(0, server1.length() - 13);
+                        } else {
+                            server2 = server1.substring(0, server1.length() - 8);
                         }
-                    });
-//                    } catch (Exception e) {
-//                        ToastUtils.showShortSafe("获取服务器信息失败，请重新获取");
-//                    }
+                        mUrl = "http://" + server2 + "yifa.asmx";
+                        String connectInfo2 = connectInfoArray[1];
+                        String[] connectInfo3 = connectInfo2.split("&");
+                        mIp = connectInfo3[0].substring(5, connectInfo3[0].length());
+                        mPort = connectInfo3[1].substring(5, connectInfo3[1].length());
+                        mAccountId = connectInfo3[2].substring(9, connectInfo3[2].length());
+                        if (connectInfo3.length > 3) {
+                            mKeyCode = connectInfo3[3].substring(8, connectInfo3[3].length());
+                        } else {
+                            mKeyCode = "";
+                        }
+                        Log.e("Url", mUrl);
+                        Log.e("mIp", mIp);
+                        Log.e("mPort", mPort);
+                        Log.e("mAccountId", mAccountId);
+                        Log.e("mKeyCode", mKeyCode);
+
+                        putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
+                        CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
+                        mDialog.setContent("获取服务器信息成功，是否测试连接？");
+                        mDialog.setConfirmClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                getAccountIds(mIp, mPort, mKeyCode);
+                            }
+                        });
+                    } catch (Exception e) {
+                        ToastUtils.showShortSafe("获取服务器信息失败，请重新获取");
+                    }
                 } else {
                     ToastUtils.showShortSafe("未获取到服务器信息，请重新获取");
                 }
