@@ -21,6 +21,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
+import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
 
@@ -87,11 +88,16 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                     LogUtils.e(goodsBean.Name + "：" + unitName);
                 }
             }
-            productPrice = goodsBean.Price1;
-            priceSystemID = goodsBean.PriceSystemList.get(1).Id;
+
+            productPrice = 0;
+            priceSystemID = DataSaver.getPriceSystemId();
+
+
+            boolean hasOrderMeetingPrice = false;
             for (GoodsListEntity.ValueEntity.PriceSystemListEntity price : goodsBean.PriceSystemList) {
 
                 if (price.IsOrderMeetingPrice) {
+                    hasOrderMeetingPrice = true;
                     switch (price.Id) {
                         case 0:
                             productPrice = goodsBean.Price0;
@@ -140,6 +146,44 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                     }
                 }
 
+            }
+
+            if (!hasOrderMeetingPrice) {
+                priceSystemID = DataSaver.getPriceSystemId();
+
+                switch (priceSystemID) {
+                    case 1:
+                        productPrice = goodsBean.Price1;
+                        break;
+                    case 2:
+                        productPrice = goodsBean.Price2;
+                        break;
+                    case 3:
+                        productPrice = goodsBean.Price3;
+                        break;
+                    case 4:
+                        productPrice = goodsBean.Price4;
+                        break;
+                    case 5:
+                        productPrice = goodsBean.Price5;
+                        break;
+                    case 6:
+                        productPrice = goodsBean.Price6;
+                        break;
+                    case 7:
+                        productPrice = goodsBean.Price7;
+                        break;
+                    case 8:
+                        productPrice = goodsBean.Price8;
+                        break;
+                    case 9:
+                        productPrice = goodsBean.Price9;
+                        break;
+                    case 10:
+                        productPrice = goodsBean.Price10;
+                        break;
+
+                }
             }
 
             itemViewHolder.tvPrice.setText(productPrice + "元/" + unitName);

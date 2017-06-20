@@ -11,6 +11,7 @@ import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
 public class DataSaver {
 
     private static MettingLoginEntity.ValueEntity mettingCustomerInfo;
+    private static int mPriceSystemId;
 
     public static void setMettingCustomerInfo(MettingLoginEntity.ValueEntity customerInfo) {
         mettingCustomerInfo = customerInfo;
@@ -18,5 +19,13 @@ public class DataSaver {
 
     public static MettingLoginEntity.ValueEntity getMettingCustomerInfo() {
         return mettingCustomerInfo;
+    }
+
+    public static void setPriceSystemId(int priceSystemId) {
+        mPriceSystemId = priceSystemId;
+    }
+
+    public static int getPriceSystemId() {
+        return mPriceSystemId;
     }
 }

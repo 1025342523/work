@@ -5,6 +5,7 @@ import com.yifarj.yifadinghuobao.app.YifaApplication;
 import com.yifarj.yifadinghuobao.network.api.AccountService;
 import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
 import com.yifarj.yifadinghuobao.network.api.FetchOrderService;
+import com.yifarj.yifadinghuobao.network.api.FetchTraderService;
 import com.yifarj.yifadinghuobao.network.api.GoodsListService;
 import com.yifarj.yifadinghuobao.network.api.LoginService;
 import com.yifarj.yifadinghuobao.network.api.LogoutService;
@@ -107,6 +108,11 @@ public class RetrofitHelper {
     public static LoginService getLoginApi() {
 
         return createApi(LoginService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+    public static FetchTraderService getTraderApi() {
+
+        return createApi(FetchTraderService.class, ApiConstants.CUrl.BASE_URL);
     }
 
 

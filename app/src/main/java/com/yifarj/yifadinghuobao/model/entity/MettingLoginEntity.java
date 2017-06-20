@@ -97,9 +97,9 @@ public class MettingLoginEntity {
         public int vip_sex;
         public int card_status;
         public int oper_id;
-        public int acc_num;
-        public int dec_num;
-        public int res_num;
+        public double acc_num;
+        public double dec_num;
+        public double res_num;
         public String memo;
         public String homeplace;
         public String marriage;

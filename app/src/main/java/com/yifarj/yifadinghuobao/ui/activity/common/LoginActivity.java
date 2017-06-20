@@ -19,6 +19,7 @@ import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.model.entity.MettingCodeEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
+import com.yifarj.yifadinghuobao.model.entity.TraderEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
@@ -272,8 +273,8 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onNext(@NonNull MettingLoginEntity mettingLoginEntity) {
-                        loadingDialog.dismiss();
                         if (!mettingLoginEntity.HasError) {
+                            LogUtils.e("mettingLoginEntity success!");
                             DataSaver.setMettingCustomerInfo(mettingLoginEntity.Value);
                             String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
                             if (!StringUtils.isEmpty(userName)) {
@@ -282,8 +283,72 @@ public class LoginActivity extends BaseActivity {
                                 }
                             }
                             PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, name);
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
+
+                            LogUtils.e("登录 onComplete");
+                            LogUtils.e("traderId " + mettingLoginEntity.Value.TraderId);
+                            RetrofitHelper.getTraderApi()
+                                    .fetchTrader("Trader", "Id =" + mettingLoginEntity.Value.TraderId, "", AppInfoUtil.getToken())
+                                    .compose(bindToLifecycle())
+                                    .subscribeOn(Schedulers.newThread())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new Observer<TraderEntity>() {
+                                        @Override
+                                        public void onSubscribe(@NonNull Disposable d) {
+                                            LogUtils.e("获取Trader onSubscribe");
+                                        }
+
+                                        @Override
+                                        public void onNext(@NonNull TraderEntity traderEntity) {
+                                            if (!traderEntity.HasError && traderEntity.Value != null) {
+                                                loadingDialog.dismiss();
+                                                LogUtils.e("获取Trader onNext");
+                                                DataSaver.setPriceSystemId(traderEntity.Value.DefaultPriceSystemId);
+                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                finish();
+                                            } else {
+                                                ToastUtils.showShortSafe(getString(R.string.login_failure) + traderEntity.Information.toString());
+                                                if (mDisposable != null && !mDisposable.isDisposed()) {
+                                                    //停止倒计时
+                                                    mDisposable.dispose();
+                                                    //重新订阅
+                                                    mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
+                                                    try {
+                                                        RxTextView.text(tvCode).accept("发送验证码");
+                                                        //按钮可点击
+                                                        RxView.enabled(tvCode).accept(true);
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onError(@NonNull Throwable e) {
+                                            LogUtils.e("获取Trader onError" + e.getMessage());
+                                            loadingDialog.dismiss();
+                                            ToastUtils.showShortSafe(getString(R.string.login_failure) + e.getMessage());
+                                            if (mDisposable != null && !mDisposable.isDisposed()) {
+                                                //停止倒计时
+                                                mDisposable.dispose();
+                                                //重新订阅
+                                                mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
+                                                try {
+                                                    RxTextView.text(tvCode).accept("发送验证码");
+                                                    //按钮可点击
+                                                    RxView.enabled(tvCode).accept(true);
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onComplete() {
+                                            loadingDialog.dismiss();
+                                        }
+                                    });
+
                         } else {
                             ToastUtils.showShortSafe(getString(R.string.login_failure) + mettingLoginEntity.Information);
                             if (mDisposable != null && !mDisposable.isDisposed()) {
@@ -304,6 +369,7 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        LogUtils.e("登录 onError" + e.getMessage());
                         loadingDialog.dismiss();
                         if (mDisposable != null && !mDisposable.isDisposed()) {
                             //停止倒计时
@@ -322,7 +388,7 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onComplete() {
-                        loadingDialog.dismiss();
+//                        loadingDialog.dismiss();
                     }
                 });
     }
