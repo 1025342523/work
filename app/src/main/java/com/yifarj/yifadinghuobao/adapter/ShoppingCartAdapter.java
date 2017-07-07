@@ -232,7 +232,6 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         });
                         notifyDataSetChanged();
                     }
-
                 }
 
                 @Override

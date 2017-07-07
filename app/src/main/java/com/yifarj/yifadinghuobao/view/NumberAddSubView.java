@@ -28,7 +28,7 @@ public class NumberAddSubView extends LinearLayout implements View.OnClickListen
 
 
     public static final String TAG = "NumberAddSubView";
-    public static final int DEFUALT_MAX = 1000;
+    public static final int DEFUALT_MAX = 10000;
 
     private TextView mEtxtNum;
     private ImageView mBtnAdd;

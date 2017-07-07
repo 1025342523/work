@@ -14,6 +14,7 @@ import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
 import com.yifarj.yifadinghuobao.network.api.OrderListService;
 import com.yifarj.yifadinghuobao.network.api.ReceiveMethodService;
 import com.yifarj.yifadinghuobao.network.api.SaveOrderService;
+import com.yifarj.yifadinghuobao.network.api.StockInfoForToolTipListService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 
 import java.io.File;
@@ -115,6 +116,10 @@ public class RetrofitHelper {
         return createApi(FetchTraderService.class, ApiConstants.CUrl.BASE_URL);
     }
 
+    public static StockInfoForToolTipListService getStockInfoListApi() {
+
+        return createApi(StockInfoForToolTipListService.class, ApiConstants.CUrl.BASE_URL);
+    }
 
     /**
      * 根据传入的baseUrl，和api创建retrofit

@@ -15,6 +15,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
+import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
@@ -22,6 +23,7 @@ import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
@@ -55,8 +57,8 @@ public class TabGoodsFragment extends BaseFragment {
     @BindView(R.id.empty_view)
     CustomEmptyView mCustomEmptyView;
 
-//    @BindView(R.id.swipe_refresh_layout)
-//    SwipeRefreshLayout mSwipeRefreshLayout;
+    //    @BindView(R.id.swipe_refresh_layout)
+    //    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.titleView)
     TitleView titleView;
@@ -88,7 +90,7 @@ public class TabGoodsFragment extends BaseFragment {
     @Override
     protected void finishCreateView(Bundle savedInstanceState) {
         LogUtils.e("TabGoodsFragment", "finishCreateView");
-//        new QBadgeView(getContext()).bindTarget(titleView.getImageViewContent()).setBadgeTextSize(10, true).setBadgeNumber(9).setGravityOffset(15, 20, true);
+        //        new QBadgeView(getContext()).bindTarget(titleView.getImageViewContent()).setBadgeTextSize(10, true).setBadgeNumber(9).setGravityOffset(15, 20, true);
         isPrepared = true;
         lazyLoad();
         titleView.setRightIconClickListener(view -> {
@@ -175,7 +177,7 @@ public class TabGoodsFragment extends BaseFragment {
             LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
             return;
         }
-//        initRefreshLayout();
+        //        initRefreshLayout();
         pageInfo.PageIndex = 0;
         mIsRefreshing = false;
         goodsList.clear();
@@ -185,32 +187,32 @@ public class TabGoodsFragment extends BaseFragment {
     }
 
 
-//    @Override
-//    protected void initRefreshLayout() {
-//        if (mSwipeRefreshLayout == null) {
-//            return;
-//        }
-//        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
-////        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
-//        mSwipeRefreshLayout.post(() -> {
-//
-//            mSwipeRefreshLayout.setRefreshing(true);
-//            mIsRefreshing = true;
-//            loadData();
-//        });
+    //    @Override
+    //    protected void initRefreshLayout() {
+    //        if (mSwipeRefreshLayout == null) {
+    //            return;
+    //        }
+    //        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
+    ////        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+    //        mSwipeRefreshLayout.post(() -> {
+    //
+    //            mSwipeRefreshLayout.setRefreshing(true);
+    //            mIsRefreshing = true;
+    //            loadData();
+    //        });
 
-//
-//        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-//            try {
-//                pageInfo.PageIndex = 0;
-//                mIsRefreshing = false;
-//                goodsList.clear();
-//                loadData();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
-//    }
+    //
+    //        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+    //            try {
+    //                pageInfo.PageIndex = 0;
+    //                mIsRefreshing = false;
+    //                goodsList.clear();
+    //                loadData();
+    //            } catch (Exception e) {
+    //                e.printStackTrace();
+    //            }
+    //        });
+    //    }
 
     @Override
     protected void initRecyclerView() {
@@ -239,6 +241,17 @@ public class TabGoodsFragment extends BaseFragment {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 return mIsRefreshing;
+            }
+        });
+
+        mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                if (holder != null && position < goodsList.size()) {
+                    Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                    intent.putExtra("shoppingId", goodsList.get(position).Id);
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -290,9 +303,9 @@ public class TabGoodsFragment extends BaseFragment {
 
     @Override
     protected void finishTask() {
-//        if (mSwipeRefreshLayout.isRefreshing()) {
-//            mSwipeRefreshLayout.setRefreshing(false);
-//        }
+        //        if (mSwipeRefreshLayout.isRefreshing()) {
+        //            mSwipeRefreshLayout.setRefreshing(false);
+        //        }
         mIsRefreshing = false;
         if (goodsList != null) {
             if (goodsList.size() == 0) {
@@ -313,19 +326,19 @@ public class TabGoodsFragment extends BaseFragment {
 
         View headView = LayoutInflater.from(getActivity())
                 .inflate(R.layout.layout_search_archive_head_view, mRecyclerView, false);
-//        RecyclerView mHeadRecycler = (RecyclerView) headView.findViewById(
-//                R.id.search_archive_bangumi_head_recycler);
-//        mHeadRecycler.setHasFixedSize(false);
-//        mHeadRecycler.setNestedScrollingEnabled(false);
-//        mHeadRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
-//        mHeadRecycler.setAdapter(mGoodsListAdapter);
+        //        RecyclerView mHeadRecycler = (RecyclerView) headView.findViewById(
+        //                R.id.search_archive_bangumi_head_recycler);
+        //        mHeadRecycler.setHasFixedSize(false);
+        //        mHeadRecycler.setNestedScrollingEnabled(false);
+        //        mHeadRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        //        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
+        //        mHeadRecycler.setAdapter(mGoodsListAdapter);
 
         mHeaderViewRecyclerAdapter.addHeaderView(headView);
     }
 
     public void showEmptyView() {
-//        mSwipeRefreshLayout.setRefreshing(false);
+        //        mSwipeRefreshLayout.setRefreshing(false);
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);

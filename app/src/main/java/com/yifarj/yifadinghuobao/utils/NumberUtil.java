@@ -39,7 +39,7 @@ public class NumberUtil {
     }
 
     public static String formatDoubleToString(Double d) {
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0.000");//格式化设置
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");//格式化设置
         return decimalFormat.format(d);
     }
 

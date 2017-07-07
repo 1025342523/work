@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="size_700">350dp</dimen>
+    <dimen name="size_600">300dp</dimen>
     <dimen name="size_560">280dp</dimen>
     <dimen name="size_500">250dp</dimen>
     <dimen name="size_360">180dp</dimen>
@@ -33,6 +35,7 @@
     <dimen name="size_24">12dp</dimen>
     <dimen name="size_20">10dp</dimen>
     <dimen name="size_16">8dp</dimen>
+    <dimen name="size_14">8dp</dimen>
     <dimen name="size_12">6dp</dimen>
     <dimen name="size_10">5dp</dimen>
     <dimen name="size_8">4dp</dimen>

@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import com.blankj.utilcode.util.LogUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
+import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
@@ -24,6 +25,7 @@ import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.web.WebActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
@@ -231,6 +233,16 @@ public class TabMainFragment extends BaseFragment {
                 pageInfo.PageIndex++;
                 loadData();
                 loadMoreView.setVisibility(View.VISIBLE);
+            }
+        });
+        mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                if (holder != null && position < goodsList.size()) {
+                    Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                    intent.putExtra("shoppingId", goodsList.get(position).Id);
+                    startActivity(intent);
+                }
             }
         });
     }

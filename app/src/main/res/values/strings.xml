@@ -71,4 +71,11 @@
     <string name="mine_address">收货地址</string>
     <string name="about">关于亿订货</string>
     <string name="search_view_product">名称/助记符/编号</string>
+    <string name="shop_detail">商品详情</string>
+    <string name="add_shoppingcart">加入购物车</string>
+    <string name="unit">单位</string>
+    <string name="order_quantity">订购数量</string>
+    <string name="shop_introduction">商品介绍</string>
+    <string name="product_parameters">产品参数</string>
+    <string name="save_image">保存图片</string>
 </resources>
