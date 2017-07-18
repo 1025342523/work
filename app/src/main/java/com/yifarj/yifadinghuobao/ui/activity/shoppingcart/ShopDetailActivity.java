@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.facebook.stetho.common.LogUtil;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -21,6 +22,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.loader.GlideImageLoader;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
+import com.yifarj.yifadinghuobao.model.entity.ProductMemoryPriceEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.StockInfoForToolTipListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
@@ -29,13 +31,17 @@ import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
 import com.yifarj.yifadinghuobao.utils.NumberUtil;
+import com.yifarj.yifadinghuobao.utils.ProductPictureUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.CzechYuanEditDialog;
 import com.yifarj.yifadinghuobao.view.NumberAddSubView;
 import com.yifarj.yifadinghuobao.view.TitleView;
+import com.yifarj.yifadinghuobao.view.utils.PriceSystemGenerator;
+import com.yifarj.yifadinghuobao.vo.PriceSystem;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
+import com.youth.banner.listener.OnBannerListener;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -103,6 +109,11 @@ public class ShopDetailActivity extends BaseActivity {
     private boolean isExist = false;
     private String basicUnitName;
     private String tempUnitName;
+    private int traderId;
+    private double basicUnitPrice;
+    private int orderCount = 0;
+
+    private static final int REQUEST_REFRESH = 10;
 
     private List<Integer> selectedUnitList = new ArrayList<>(new HashSet<>());
 
@@ -119,13 +130,31 @@ public class ShopDetailActivity extends BaseActivity {
 
     @Override
     public void loadData() {
-        int traderId;
         shoppingId = getIntent().getIntExtra("shoppingId", 0);
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else {
             return;
         }
+
+        // 查询购物车商品
+        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+                .queryList()
+                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                    @Override
+                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                        orderCount = saleGoodsItemModels.size();
+                        if (orderCount > 0) {
+                            shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
+                            LogUtils.e("orderCount：" + orderCount);
+                        } else if (orderCount == 0) {
+                            shopDetail_titleView.setRightIconText(View.GONE, 0);
+                            LogUtils.e("orderCount：" + orderCount);
+                        }
+                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
+                    }
+                });
+
 
         // 查询购物车里是否有当前商品
         RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where(SaleGoodsItemModel_Table.ProductId.eq(shoppingId)))
@@ -142,6 +171,7 @@ public class ShopDetailActivity extends BaseActivity {
                             unitPrice = saleGoodsItemModel.get(0).UnitPrice;
                             basicUnitName = saleGoodsItemModel.get(0).BasicUnitName;
                             tempUnitName = saleGoodsItemModel.get(0).ProductUnitName;
+                            basicUnitPrice = saleGoodsItemModel.get(0).BasicUnitPrice;
                             isExist = true;
                         }
                     }
@@ -185,7 +215,7 @@ public class ShopDetailActivity extends BaseActivity {
                                                 if (item.WarehouseId == goodsBean.DefaultWarehouseId) {
                                                     LogUtils.e("SalesQuantityPackString", item.SalesQuantityPackString);
                                                     chosen = true;
-                                                    shopDetail_Inventory.setText(item.SalesQuantityPackString);//可开库存
+                                                    shopDetail_Inventory.setText("库存：" + item.SalesQuantityPackString);//可开库存
                                                 }
                                             }
                                             if (!chosen) {
@@ -222,7 +252,7 @@ public class ShopDetailActivity extends BaseActivity {
                             //设置自动轮播，默认为true
                             banner.isAutoPlay(false);
                             //设置图片集合
-                            List<String> list =new ArrayList<String>();
+                            List<String> list = new ArrayList<String>();
                             for (GoodsListEntity.ValueEntity.ProductPictureListEntity unit : goodsBean.ProductPictureList) {
                                 list.add(AppInfoUtil.genPicUrl(unit.Path));
                                 LogUtils.e(goodsBean.Name + "图片Url：" + AppInfoUtil.genPicUrl(unit.Path));
@@ -230,6 +260,14 @@ public class ShopDetailActivity extends BaseActivity {
                             banner.setImages(list);
                             //banner设置方法全部调用完毕时最后调用
                             banner.start();
+
+                            banner.setOnBannerListener(new OnBannerListener() {
+                                @Override
+                                public void OnBannerClick(int position) {
+                                    LogUtils.e(goodsBean.Name + "图片position：" + position + ",Url:" + list.get(position));
+                                    ProductPictureUtil.createLargeImageDialog(ShopDetailActivity.this, list.get(position));
+                                }
+                            });
 
                             //商品名称
                             shopDetail_Name.setText(goodsBean.Name);
@@ -248,7 +286,9 @@ public class ShopDetailActivity extends BaseActivity {
                                         unitName = unit.Name;
                                         basicUnitName = unit.Name;
                                         unitId = unit.Id;
-                                        LogUtils.e(goodsBean.Name + "：" + unitName);
+                                        basicUnitPrice = goodsBean.MemoryPrice;
+                                        getProductMemoryPrice(unitId, 0);
+                                        LogUtils.e(goodsBean.Name + ",unitName:" + unitName + ",unitPrice:" + unitPrice);
                                     }
                                 }
                             }
@@ -256,13 +296,10 @@ public class ShopDetailActivity extends BaseActivity {
                             //货品订购数量
                             shopDetail_orderNum.setValue(quantity);
                             //货品价格
-                            shopDetail_Price.setText(goodsBean.MemoryPrice + "元/" + basicUnitName);
+                            shopDetail_Price.setText(basicUnitPrice + "元/" + basicUnitName);
                             //货品总价
                             totalPrice = unitPrice * quantity;
                             shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
-                            if (!isExist) {
-                                unitPrice = goodsBean.MemoryPrice;
-                            }
 
                             //商品单位
                             final LayoutInflater mInflater = LayoutInflater.from(ShopDetailActivity.this);
@@ -287,9 +324,7 @@ public class ShopDetailActivity extends BaseActivity {
                                         }
                                         unitName = goodsBean.ProductUnitList.get(select).Name;
                                         unitId = goodsBean.ProductUnitList.get(select).Id;
-                                        unitPrice = goodsBean.ProductUnitList.get(select).BasicFactor * goodsBean.MemoryPrice;
-                                        totalPrice = quantity * unitPrice;
-                                        shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
+                                        getProductMemoryPrice(unitId, select);
                                         LogUtils.e(goodsBean.Name + "：修改单位" + unitName);
                                     } else {
                                         setSelectedUnit(tagAdapter);
@@ -381,13 +416,14 @@ public class ShopDetailActivity extends BaseActivity {
                         @Override
                         public void accept(@NonNull ProductUnitEntity.ValueEntity valueEntity) throws Exception {
                             if (tempUnitName.equals(valueEntity.Name)) {
-                                int unitPosition=goodsBean.ProductUnitList.indexOf(valueEntity);
+                                int unitPosition = goodsBean.ProductUnitList.indexOf(valueEntity);
                                 tagAdapter.setSelectedList(unitPosition);
                                 selectedUnitList.add(goodsBean.ProductUnitList.indexOf(valueEntity));
                                 unitName = goodsBean.ProductUnitList.get(unitPosition).Name;
                                 unitId = goodsBean.ProductUnitList.get(unitPosition).Id;
-                                unitPrice = goodsBean.ProductUnitList.get(unitPosition).BasicFactor * goodsBean.MemoryPrice;
-                                totalPrice = quantity * unitPrice;
+                                /*unitPrice = goodsBean.ProductUnitList.get(unitPosition).BasicFactor * basicUnitPrice;
+                                totalPrice = quantity * unitPrice;*/
+                                getProductMemoryPrice(unitId, unitPosition);
                                 shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
                                 LogUtils.e(goodsBean.Name + "：修改单位" + unitName);
                             }
@@ -398,22 +434,166 @@ public class ShopDetailActivity extends BaseActivity {
             selectedUnitList.add(0);
             unitName = goodsBean.ProductUnitList.get(0).Name;
             unitId = goodsBean.ProductUnitList.get(0).Id;
-            unitPrice = goodsBean.ProductUnitList.get(0).BasicFactor * goodsBean.MemoryPrice;
-            totalPrice = quantity * unitPrice;
+            /*unitPrice = goodsBean.ProductUnitList.get(0).BasicFactor * basicUnitPrice;
+            totalPrice = quantity * unitPrice;*/
+            getProductMemoryPrice(unitId, 0);
             shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
             LogUtils.e(goodsBean.Name + "：修改单位" + unitName);
         }
     }
 
+    /**
+     * 获取记忆价格
+     */
+    private void getProductMemoryPrice(int productUnitId, int select) {
+        String b;
+        b = "ProductId=" + goodsBean.Id + " and " +
+                "TraderId=" + traderId + " and " +
+                "ProductUnitId=" + productUnitId;
+        //获取当前商品的记忆价格
+        RetrofitHelper.getProductMemoryPriceApi()
+                .getProductMemoryPrice("TraderProductPrice", b, "", AppInfoUtil.getToken())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ProductMemoryPriceEntity>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull ProductMemoryPriceEntity entity) {
+                        if (!entity.HasError) {
+                            PriceSystem.PriceSystemListEntity selectedPriceSystem = null;
+                            boolean selected = false;
+                            double memoryPrice = 0;
+                            if (entity.Value.ProductId != 0 && entity.Value.ProductUnitId != 0 && entity.Value.Price > 0) {
+                                for (PriceSystem.PriceSystemListEntity item :
+                                        PriceSystemGenerator.getInstance().PriceSystemList) {
+                                    if (entity.Value.PriceSystemId == item.Id) {
+                                        selected = true;
+                                        selectedPriceSystem = item;
+                                        LogUtils.e("selectedPriceSystem" + selectedPriceSystem);
+                                    }
+                                }
+                                //存在默认价格
+                                memoryPrice = entity.Value.Price;
+                                LogUtils.e(goodsBean.Name + "存在记忆价格,记忆价格为:" + memoryPrice);
+                            } else if (DataSaver.getPriceSystemId() != 0) {
+                                for (PriceSystem.PriceSystemListEntity item :
+                                        PriceSystemGenerator.getInstance().PriceSystemList) {
+                                    if (item.Id == DataSaver.getPriceSystemId()) {
+                                        selected = true;
+                                        selectedPriceSystem = item;
+                                        LogUtils.e("selectedPriceSystem" + selectedPriceSystem);
+                                    }
+                                }
+                                //没有记忆价格,但是有默认价格体系
+                                LogUtils.e(goodsBean.Name + "不存在记忆价格");
+                            }
+                            if (!selected || DataSaver.getPriceSystemId() == 0) {
+                                selectedPriceSystem = PriceSystemGenerator.getInstance().PriceSystemList.get(0);
+                            }
+                            goodsBean.PriceSystemList.get(0).Id = selectedPriceSystem.Id;
+                            setGoodsItemPriceWithUnitAndPriceSystem(memoryPrice, select, productUnitId);
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    /**
+     * 根据记忆价格、价格体系和单位设置价格,如果有记忆价格,
+     * 则设置价格为记忆价格,如果没有记忆价格,则根据价格体系和单位设置价格
+     *
+     * @param memoryPrice 记忆价格
+     */
+    @SuppressWarnings("deprecation")
+    private void setGoodsItemPriceWithUnitAndPriceSystem(double memoryPrice, int select, int productUnitId) {
+        double price = 0;
+        double basicPrice = 0;
+        if (memoryPrice > 0) {//有记忆价格
+            if (select == 0) {
+                basicPrice = memoryPrice;
+                price = basicPrice;
+            } else {
+                price = memoryPrice;
+                for (ProductUnitEntity.ValueEntity unitItem :
+                        goodsBean.ProductUnitList) {
+                    if (unitItem.Id == productUnitId) {
+                        basicPrice = price / unitItem.BasicFactor;
+                    }
+                }
+            }
+        } else {//没有记忆价格,则通过单位id获取单位价格
+            //获取价格体系的价格
+            switch (goodsBean.PriceSystemList.get(0).Id) {
+                case 1:
+                    basicPrice = goodsBean.Price1;
+                    break;
+                case 2:
+                    basicPrice = goodsBean.Price2;
+                    break;
+                case 3:
+                    basicPrice = goodsBean.Price3;
+                    break;
+                case 4:
+                    basicPrice = goodsBean.Price4;
+                    break;
+                case 5:
+                    basicPrice = goodsBean.Price5;
+                    break;
+                case 6:
+                    basicPrice = goodsBean.Price6;
+                    break;
+                case 7:
+                    basicPrice = goodsBean.Price7;
+                    break;
+                case 8:
+                    basicPrice = goodsBean.Price8;
+                    break;
+                case 9:
+                    basicPrice = goodsBean.Price9;
+                    break;
+                case 10:
+                    basicPrice = goodsBean.Price10;
+                    break;
+            }
+            for (ProductUnitEntity.ValueEntity unitItem :
+                    goodsBean.ProductUnitList) {
+                if (unitItem.Id == productUnitId) {
+                    price = basicPrice * unitItem.BasicFactor;
+                }
+            }
+        }
+        unitPrice = price;
+        basicUnitPrice = basicPrice;
+        LogUtil.e("setGoodsItemPriceWithUnitAndPriceSystem basicPrice", basicPrice + "");
+        LogUtil.e("setGoodsItemPriceWithUnitAndPriceSystem goodsItem.PriceSystemId", goodsBean.PriceSystemList.get(0).Id + "");
+        totalPrice = quantity * unitPrice;
+        shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
+    }
+
     private void init() {
         shopDetail_titleView.setLeftIconClickListener(view -> {
+            setResult(RESULT_OK);
             finish();
         });
         shopDetail_titleView.setRightIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ShopDetailActivity.this, ShoppingCartActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_REFRESH);
             }
         });
         //加入购物车
@@ -466,7 +646,12 @@ public class ShopDetailActivity extends BaseActivity {
                                             }
                                         }
                                     });
-                            add(goodsBean, quantity, unitName, unitId, unitPrice, totalPrice);
+                            add(goodsBean, quantity, unitName, unitId, unitPrice, totalPrice, basicUnitPrice);
+                            if (!isExist) {
+                                orderCount = orderCount + 1;
+                                shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("orderCount：" + orderCount);
+                            }
                         } else {
                             Toast.makeText(ShopDetailActivity.this, "请输入订购数量", Toast.LENGTH_SHORT).show();
                         }
@@ -474,7 +659,7 @@ public class ShopDetailActivity extends BaseActivity {
                 });
     }
 
-    private void add(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice) {
+    private void add(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = totalPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
@@ -486,7 +671,7 @@ public class ShopDetailActivity extends BaseActivity {
         itemModel.ProductName = goodsBean.Name;
         itemModel.BasicUnitName = unitName;
         itemModel.ProductUnitName = unitName;
-        itemModel.BasicUnitPrice = goodsBean.MemoryPrice;
+        itemModel.BasicUnitPrice = basicUnitPrice;
         itemModel.UnitPrice = unitPrice;
         itemModel.Discount = 1.0f;
         itemModel.SalesType = 1;
@@ -557,4 +742,9 @@ public class ShopDetailActivity extends BaseActivity {
         emptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        loadData();
+    }
 }

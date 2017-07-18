@@ -1,6 +1,6 @@
 package com.yifarj.yifadinghuobao.network.api;
 
-import com.yifarj.yifadinghuobao.model.entity.StockInfoForToolTipListEntity;
+import com.yifarj.yifadinghuobao.model.entity.ProductMemoryPriceEntity;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
 
 import io.reactivex.Observable;
@@ -9,22 +9,21 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 /**
- * StockInfoForToolTipListService
+ * ProductMemoryPriceService
  *
  * @auther zydx-pc
- * @date 2017/7/6 10:59
+ * @date 2017/7/10 15:13
  */
 
-public interface StockInfoForToolTipListService {
+public interface ProductMemoryPriceService {
 
     /**
-     * 库存列表
+     * 记忆价格
      */
     @FormUrlEncoded
-    @POST(ApiConstants.CUrl.FETCH_LIST)
-    Observable<StockInfoForToolTipListEntity> getStockInfoList(
+    @POST(ApiConstants.CUrl.FETCH)
+    Observable<ProductMemoryPriceEntity> getProductMemoryPrice(
             @Field("DataTypeName") String dataTypeName,
-            @Field("PageInfo") String pageInfo,
             @Field("Body") String body,
             @Field("Param") String param,
             @Field("Token") String token

@@ -8,8 +8,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.yifarj.yifadinghuobao.R;
 import com.youth.banner.loader.ImageLoader;
 
-import static com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table.Path;
-
 /**
  * Created by zydx-pc on 2017/6/29.
  */

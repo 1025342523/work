@@ -13,11 +13,14 @@ import android.view.View;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
+import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
@@ -40,6 +43,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -79,7 +83,7 @@ public class TabGoodsFragment extends BaseFragment {
 
     private PageInfo pageInfo = new PageInfo();
 
-    private int totalCount;
+    private int totalCount,orderCount;
 
 
     @Override
@@ -132,6 +136,9 @@ public class TabGoodsFragment extends BaseFragment {
         });
     }
 
+    public void setRightIcon(int visibility,int title){
+        titleView.setRightIconText(visibility,title);
+    }
 
     private void doSearch(String keyword) {
         RetrofitHelper.getGoodsListAPI()
@@ -149,7 +156,7 @@ public class TabGoodsFragment extends BaseFragment {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true));
+                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true,TabGoodsFragment.this));
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }
@@ -219,13 +226,14 @@ public class TabGoodsFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true,TabGoodsFragment.this);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         setRecycleNoScroll();
         createHeadView();
         createLoadMoreView();
+
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLinearLayoutManager) {
 
             @Override
@@ -250,7 +258,7 @@ public class TabGoodsFragment extends BaseFragment {
                 if (holder != null && position < goodsList.size()) {
                     Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
-                    startActivity(intent);
+                    startActivityForResult(intent,REQUEST_REFRESH);
                 }
             }
         });
@@ -258,7 +266,23 @@ public class TabGoodsFragment extends BaseFragment {
 
     @Override
     protected void loadData() {
-
+        // 查询购物车商品
+        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+                .queryList()
+                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                    @Override
+                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                        orderCount = saleGoodsItemModels.size();
+                        if(orderCount>0){
+                            titleView.setRightIconText(View.VISIBLE,orderCount);
+                            LogUtils.e("orderCount："+orderCount);
+                        }else if(orderCount==0){
+                            titleView.setRightIconText(View.GONE,0);
+                            LogUtils.e("orderCount："+orderCount);
+                        }
+                        LogUtils.e("saleGoodsItemModels："+saleGoodsItemModels.size());
+                    }
+                });
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
@@ -315,8 +339,8 @@ public class TabGoodsFragment extends BaseFragment {
             }
         }
         loadMoreView.setVisibility(View.GONE);
-        LogUtils.e("Page：", pageInfo.PageIndex);
-        LogUtils.e("ListSize", goodsList.size());
+        LogUtils.e("Page："+pageInfo.PageIndex);
+        LogUtils.e("ListSize"+goodsList.size());
         if (!mGoodsListAdapter.onbind) {
             if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
                 mGoodsListAdapter.notifyDataSetChanged();
@@ -365,7 +389,6 @@ public class TabGoodsFragment extends BaseFragment {
 
 
     private void setRecycleNoScroll() {
-
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
     }
 
