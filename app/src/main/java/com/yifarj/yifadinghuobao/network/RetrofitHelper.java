@@ -12,6 +12,7 @@ import com.yifarj.yifadinghuobao.network.api.LogoutService;
 import com.yifarj.yifadinghuobao.network.api.MettingCodeService;
 import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
 import com.yifarj.yifadinghuobao.network.api.OrderListService;
+import com.yifarj.yifadinghuobao.network.api.ProductCategoryListService;
 import com.yifarj.yifadinghuobao.network.api.ReceiveMethodService;
 import com.yifarj.yifadinghuobao.network.api.SaveOrderService;
 import com.yifarj.yifadinghuobao.network.api.StockInfoForToolTipListService;
@@ -119,6 +120,11 @@ public class RetrofitHelper {
     public static StockInfoForToolTipListService getStockInfoListApi() {
 
         return createApi(StockInfoForToolTipListService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+    public static ProductCategoryListService getProductCategoryListApi() {
+
+        return createApi(ProductCategoryListService.class, ApiConstants.CUrl.BASE_URL);
     }
 
     /**

@@ -112,7 +112,10 @@ public class TabOrderFragment extends BaseFragment {
             }
         }
         loadMoreView.setVisibility(View.GONE);
-        mOrderListAdapter.notifyDataSetChanged();
+        if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
+            mOrderListAdapter.notifyDataSetChanged();
+        }
+
     }
 
     @Override
@@ -246,7 +249,7 @@ public class TabOrderFragment extends BaseFragment {
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
-        mCustomEmptyView.setEmptyText("暂无订货单");
+        mCustomEmptyView.setEmptyText("暂无数据");
     }
 
 
