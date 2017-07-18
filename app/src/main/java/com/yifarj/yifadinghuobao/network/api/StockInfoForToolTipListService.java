@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 /**
  * StockInfoForToolTipListService
  *
- * @auther rlj
+ * @auther zydx-pc
  * @date 2017/7/6 10:59
  */
 

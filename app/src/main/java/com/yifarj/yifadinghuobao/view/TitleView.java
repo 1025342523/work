@@ -12,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.StringUtils;
-import com.facebook.stetho.common.StringUtil;
 import com.yifarj.yifadinghuobao.R;
 
 /**
@@ -25,6 +24,7 @@ public class TitleView extends RelativeLayout {
     private ImageView ivRightLeft;
     private ImageView ivLeft;
     private TextView tvRight;
+    private TextView tvRightIcon;
 
     public TitleView(Context context) {
         super(context);
@@ -57,6 +57,7 @@ public class TitleView extends RelativeLayout {
         ivRightLeft = (ImageView) contentView.findViewById(R.id.ivRightLeft);
         ivLeft = (ImageView) contentView.findViewById(R.id.ivLeft);
         tvRight = (TextView) contentView.findViewById(R.id.tvRight);
+        tvRightIcon = (TextView) contentView.findViewById(R.id.tvRight_icon);
         if (array != null) {
             for (int i = 0; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
@@ -203,5 +204,14 @@ public class TitleView extends RelativeLayout {
 
     public ImageView getImageViewContent() {
         return ivRight;
+    }
+
+    public void setRightIconText(int visibility,int title){
+        if(tvRightIcon != null && title > 0){
+            tvRightIcon.setVisibility(visibility);
+            tvRightIcon.setText(String.valueOf(title));
+        }else if (title == 0) {
+            tvRightIcon.setVisibility(visibility);
+        }
     }
 }

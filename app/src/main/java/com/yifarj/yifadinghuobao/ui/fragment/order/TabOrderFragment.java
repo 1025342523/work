@@ -8,11 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.OrderListAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
+import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.SaleOrderListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
@@ -65,7 +68,7 @@ public class TabOrderFragment extends BaseFragment {
 
 
     private boolean mIsRefreshing = false;
-
+    private int orderCount=0;
 
     private View loadMoreView;
 
@@ -186,6 +189,23 @@ public class TabOrderFragment extends BaseFragment {
 
     @Override
     protected void loadData() {
+        // 查询购物车商品
+        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+                .queryList()
+                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                    @Override
+                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                        LogUtils.e("saleGoodsItemModels："+saleGoodsItemModels.size());
+                        orderCount = saleGoodsItemModels.size();
+                        if(orderCount>0){
+                            titleView.setRightIconText(View.VISIBLE,orderCount);
+                            LogUtils.e("orderCount："+orderCount);
+                        }else if(orderCount==0){
+                            titleView.setRightIconText(View.GONE,0);
+                            LogUtils.e("orderCount："+orderCount);
+                        }
+                    }
+                });
         int contactId = DataSaver.getMettingCustomerInfo().Id;
         RetrofitHelper
                 .getOrderListApi()

@@ -17,6 +17,21 @@
         android:padding="@dimen/size_10"
         android:scaleType="fitXY"/>
 
+    <TextView
+        android:id="@+id/tvRight_icon"
+        android:layout_width="@dimen/size_40"
+        android:layout_height="@dimen/size_40"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="@dimen/size_16"
+        android:layout_marginTop="@dimen/size_10"
+        android:gravity="center"
+        android:maxLines="1"
+        android:background="@drawable/shape_titleview_icon"
+        android:textColor="@color/main_blue"
+        android:textSize="@dimen/font_24"
+        android:visibility="gone"/>
+
     <ImageView
         android:id="@+id/ivRightLeft"
         android:layout_width="wrap_content"
