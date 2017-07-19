@@ -101,7 +101,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         LogUtils.e("TabGoodsFragment", "finishCreateView");
         pageInfo = new PageInfo();
         goodsList = new ArrayList<>();
-        //        new QBadgeView(getContext()).bindTarget(titleView.getImageViewContent()).setBadgeTextSize(10, true).setBadgeNumber(9).setGravityOffset(15, 20, true);
         isPrepared = true;
 
         lazyLoad();

@@ -13,6 +13,7 @@ import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
+import com.yifarj.yifadinghuobao.view.TitleView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public class ProductCategoryActivity extends BaseActivity {
     @BindView(R.id.empty_view)
     CustomEmptyView mCustomEmptyView;
 
+    @BindView(R.id.titleView)
+    TitleView titleView;
 
     private ProductCategoryAdapter mProductCategoryAdapter;
 
@@ -56,6 +59,12 @@ public class ProductCategoryActivity extends BaseActivity {
 
     @Override
     public void loadData() {
+        titleView.setLeftIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         initRecyclerView();
         RetrofitHelper.getProductCategoryListApi()
                 .getProductCategoryList("ProductCategoryList", "", "", "", AppInfoUtil.getToken())

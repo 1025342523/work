@@ -1,6 +1,6 @@
 package com.yifarj.yifadinghuobao.view.utils;
 
-import com.alibaba.fastjson.JSON;
+import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
 import com.yifarj.yifadinghuobao.vo.PriceSystem;
 
 import java.util.ArrayList;
@@ -88,10 +88,10 @@ public class PriceSystemGenerator {
 
 
     public static PriceSystem getInstance() {
-        if(priceSystem == null) {
+        if (priceSystem == null) {
             synchronized (PriceSystemGenerator.class) {
-                if(priceSystem == null) {
-                    priceSystem = JSON.parseObject(priceSystemStr, PriceSystem.class);
+                if (priceSystem == null) {
+                    priceSystem = JsonUtils.deserialize(priceSystemStr, PriceSystem.class);
                 }
             }
         }
@@ -102,7 +102,7 @@ public class PriceSystemGenerator {
         List<String> systemNames = new ArrayList<>();
         PriceSystem priceSystem = getInstance();
         for (PriceSystem.PriceSystemListEntity item :
-                priceSystem.PriceSystemList ) {
+                priceSystem.PriceSystemList) {
             systemNames.add(item.Name);
         }
         return systemNames;

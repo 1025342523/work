@@ -120,8 +120,6 @@ dependencies {
     compile 'cn.bingoogolapple:bga-zxing:1.1.0@aar'
     //日期选择
     compile 'com.brucetoo.pickview:library:1.2.3'
-    //徽章控件
-    compile 'q.rorbin:badgeview:1.1.0'
     //Debug
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
@@ -133,8 +131,6 @@ dependencies {
     //banner
     compile 'com.youth.banner:banner:1.4.9'
 
-    compile 'com.alibaba:fastjson:1.2.32'
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 }
 
 configurations.all {
