@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -52,7 +53,7 @@ import io.reactivex.schedulers.Schedulers;
  * @auther Czech.Yuan
  * @date 2017/5/12 15:07
  */
-public class TabGoodsFragment extends BaseFragment {
+public class TabGoodsFragment extends BaseFragment implements View.OnClickListener{
     private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.recycle)
@@ -72,7 +73,6 @@ public class TabGoodsFragment extends BaseFragment {
 
     private boolean mIsRefreshing = false;
 
-
     private View loadMoreView;
 
     private HeaderViewRecyclerAdapter mHeaderViewRecyclerAdapter;
@@ -85,6 +85,10 @@ public class TabGoodsFragment extends BaseFragment {
 
     private int totalCount,orderCount;
 
+    LinearLayout rlTab1;
+    LinearLayout rlTab2;
+    LinearLayout rlTab3;
+    LinearLayout rlTab4;
 
     @Override
     public int getLayoutResId() {
@@ -96,6 +100,7 @@ public class TabGoodsFragment extends BaseFragment {
         LogUtils.e("TabGoodsFragment", "finishCreateView");
         //        new QBadgeView(getContext()).bindTarget(titleView.getImageViewContent()).setBadgeTextSize(10, true).setBadgeNumber(9).setGravityOffset(15, 20, true);
         isPrepared = true;
+
         lazyLoad();
         titleView.setRightIconClickListener(view -> {
             Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
@@ -186,6 +191,8 @@ public class TabGoodsFragment extends BaseFragment {
         }
         //        initRefreshLayout();
         pageInfo.PageIndex = 0;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "CreatedTime";
         mIsRefreshing = false;
         goodsList.clear();
         loadData();
@@ -232,6 +239,7 @@ public class TabGoodsFragment extends BaseFragment {
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         setRecycleNoScroll();
         createHeadView();
+        rlTab1.setSelected(true);
         createLoadMoreView();
 
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLinearLayoutManager) {
@@ -360,6 +368,15 @@ public class TabGoodsFragment extends BaseFragment {
         //        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
         //        mHeadRecycler.setAdapter(mGoodsListAdapter);
 
+        rlTab1=(LinearLayout)headView.findViewById(R.id.search_all_layout);
+        rlTab2=(LinearLayout)headView.findViewById(R.id.search_name_layout);
+        rlTab3=(LinearLayout)headView.findViewById(R.id.search_code_layout);
+        rlTab4=(LinearLayout)headView.findViewById(R.id.search_price_layout);
+        rlTab1.setOnClickListener(this);
+        rlTab2.setOnClickListener(this);
+        rlTab3.setOnClickListener(this);
+        rlTab4.setOnClickListener(this);
+
         mHeaderViewRecyclerAdapter.addHeaderView(headView);
     }
 
@@ -398,6 +415,82 @@ public class TabGoodsFragment extends BaseFragment {
         super.onActivityResult(requestCode, resultCode, data);
         pageInfo.PageIndex = 0;
         goodsList.clear();
+        onTab1Click();
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.search_all_layout:
+                onTab1Click();
+                break;
+            case R.id.search_name_layout:
+                onTab2Click();
+                break;
+            case R.id.search_code_layout:
+                onTab3Click();
+                break;
+            case R.id.search_price_layout:
+                onTab4Click();
+                break;
+        }
+    }
+
+    private void onTab1Click() {
+        setCheckedItem(0);
+        goodsList.clear();
+        pageInfo.PageIndex = 0;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "CreatedTime";
         loadData();
+    }
+
+    private void onTab2Click() {
+        setCheckedItem(1);
+        goodsList.clear();
+        pageInfo.PageIndex = 0;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "Name";
+        loadData();
+    }
+
+    private void onTab3Click() {
+        setCheckedItem(2);
+        goodsList.clear();
+        pageInfo.PageIndex = 0;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "Code";
+        loadData();
+    }
+
+    private void onTab4Click() {
+        setCheckedItem(3);
+        goodsList.clear();
+        pageInfo.PageIndex = 0;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "Price0";
+        loadData();
+    }
+
+    public void setCheckedItem(int position) {
+        rlTab1.setSelected(false);
+        rlTab2.setSelected(false);
+        rlTab3.setSelected(false);
+        rlTab4.setSelected(false);
+        switch (position) {
+            case 0:
+                rlTab1.setSelected(true);
+                break;
+            case 1:
+                rlTab2.setSelected(true);
+                break;
+            case 2:
+                rlTab3.setSelected(true);
+                break;
+            case 3:
+                rlTab4.setSelected(true);
+                break;
+        }
     }
 }
