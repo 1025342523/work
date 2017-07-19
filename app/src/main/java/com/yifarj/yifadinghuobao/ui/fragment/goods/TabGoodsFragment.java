@@ -54,7 +54,7 @@ import io.reactivex.schedulers.Schedulers;
  * @auther Czech.Yuan
  * @date 2017/5/12 15:07
  */
-public class TabGoodsFragment extends BaseFragment implements View.OnClickListener{
+public class TabGoodsFragment extends BaseFragment implements View.OnClickListener {
     private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.recycle)
@@ -332,6 +332,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
                     @Override
                     public void onError(@NonNull Throwable e) {
+                        LogUtils.e("获取商品列表数据失败", e.getMessage());
                         showEmptyView();
                         loadMoreView.setVisibility(View.GONE);
                         --pageInfo.PageIndex;
@@ -380,10 +381,10 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         //        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
         //        mHeadRecycler.setAdapter(mGoodsListAdapter);
 
-        rlTab1=(LinearLayout)headView.findViewById(R.id.search_all_layout);
-        rlTab2=(LinearLayout)headView.findViewById(R.id.search_name_layout);
-        rlTab3=(LinearLayout)headView.findViewById(R.id.search_code_layout);
-        rlTab4=(LinearLayout)headView.findViewById(R.id.search_price_layout);
+        rlTab1 = (LinearLayout) headView.findViewById(R.id.search_all_layout);
+        rlTab2 = (LinearLayout) headView.findViewById(R.id.search_name_layout);
+        rlTab3 = (LinearLayout) headView.findViewById(R.id.search_code_layout);
+        rlTab4 = (LinearLayout) headView.findViewById(R.id.search_price_layout);
         rlTab1.setOnClickListener(this);
         rlTab2.setOnClickListener(this);
         rlTab3.setOnClickListener(this);

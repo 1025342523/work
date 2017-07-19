@@ -126,7 +126,7 @@ public class GoodsListEntity {
         public int GQIntermediaryRate;
         public int TraderId;
         public String TraderName;
-        public int SalesTax;
+        public double SalesTax;
         public int SaleTypeId;
         public double MemoryPrice;
         public List<ProductUnitEntity.ValueEntity> ProductUnitList;
