@@ -26,13 +26,14 @@ import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.productCategory.ProductCategoryActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
+import com.yifarj.yifadinghuobao.view.CzechYuanTitleView;
 import com.yifarj.yifadinghuobao.view.SearchView;
-import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class TabGoodsFragment extends BaseFragment {
     //    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.titleView)
-    TitleView titleView;
+    CzechYuanTitleView titleView;
 
     @BindView(R.id.searchView)
     SearchView searchView;
@@ -79,11 +80,11 @@ public class TabGoodsFragment extends BaseFragment {
 
     private GoodsListAdapter mGoodsListAdapter;
 
-    private List<GoodsListEntity.ValueEntity> goodsList = new ArrayList<>();
+    private List<GoodsListEntity.ValueEntity> goodsList;
 
-    private PageInfo pageInfo = new PageInfo();
+    private PageInfo pageInfo;
 
-    private int totalCount,orderCount;
+    private int totalCount, orderCount;
 
 
     @Override
@@ -94,6 +95,8 @@ public class TabGoodsFragment extends BaseFragment {
     @Override
     protected void finishCreateView(Bundle savedInstanceState) {
         LogUtils.e("TabGoodsFragment", "finishCreateView");
+        pageInfo = new PageInfo();
+        goodsList = new ArrayList<>();
         //        new QBadgeView(getContext()).bindTarget(titleView.getImageViewContent()).setBadgeTextSize(10, true).setBadgeNumber(9).setGravityOffset(15, 20, true);
         isPrepared = true;
         lazyLoad();
@@ -101,7 +104,17 @@ public class TabGoodsFragment extends BaseFragment {
             Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
             startActivityForResult(intent, REQUEST_REFRESH);
         });
-        titleView.setLeftIconClickListener(view -> searchView.show());
+        titleView.setLeftIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ProductCategoryActivity.class);
+                startActivity(intent);
+            }
+        });
+        titleView.setRlSearchClickListener(view -> {
+            searchView.show();
+            titleView.setVisibility(View.GONE);
+        });
         searchView.setOnSearchClickListener(new SearchView.OnSearchClickListener() {
             @Override
             public void onSearch(String keyword) {
@@ -111,8 +124,7 @@ public class TabGoodsFragment extends BaseFragment {
         searchView.setOnCancelListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchView.getListView().setAdapter(null);
-                searchView.getEditText().setText("");
+                titleView.setVisibility(View.VISIBLE);
             }
         });
         searchView.getEditText().addTextChangedListener(new TextWatcher() {
@@ -136,8 +148,8 @@ public class TabGoodsFragment extends BaseFragment {
         });
     }
 
-    public void setRightIcon(int visibility,int title){
-        titleView.setRightIconText(visibility,title);
+    public void setRightIcon(int visibility, int title) {
+        titleView.setRightIconText(visibility, title);
     }
 
     private void doSearch(String keyword) {
@@ -156,7 +168,7 @@ public class TabGoodsFragment extends BaseFragment {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true,TabGoodsFragment.this));
+                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this));
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }
@@ -226,7 +238,7 @@ public class TabGoodsFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true,TabGoodsFragment.this);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, TabGoodsFragment.this);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -258,7 +270,7 @@ public class TabGoodsFragment extends BaseFragment {
                 if (holder != null && position < goodsList.size()) {
                     Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
-                    startActivityForResult(intent,REQUEST_REFRESH);
+                    startActivityForResult(intent, REQUEST_REFRESH);
                 }
             }
         });
@@ -273,14 +285,14 @@ public class TabGoodsFragment extends BaseFragment {
                     @Override
                     public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
                         orderCount = saleGoodsItemModels.size();
-                        if(orderCount>0){
-                            titleView.setRightIconText(View.VISIBLE,orderCount);
-                            LogUtils.e("orderCount："+orderCount);
-                        }else if(orderCount==0){
-                            titleView.setRightIconText(View.GONE,0);
-                            LogUtils.e("orderCount："+orderCount);
+                        if (orderCount > 0) {
+                            titleView.setRightIconText(View.VISIBLE, orderCount);
+                            LogUtils.e("orderCount：" + orderCount);
+                        } else if (orderCount == 0) {
+                            titleView.setRightIconText(View.GONE, 0);
+                            LogUtils.e("orderCount：" + orderCount);
                         }
-                        LogUtils.e("saleGoodsItemModels："+saleGoodsItemModels.size());
+                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
                     }
                 });
         LogUtils.e("loadData", "获取商品列表数据");
@@ -339,8 +351,8 @@ public class TabGoodsFragment extends BaseFragment {
             }
         }
         loadMoreView.setVisibility(View.GONE);
-        LogUtils.e("Page："+pageInfo.PageIndex);
-        LogUtils.e("ListSize"+goodsList.size());
+        LogUtils.e("Page：" + pageInfo.PageIndex);
+        LogUtils.e("ListSize" + goodsList.size());
         if (!mGoodsListAdapter.onbind) {
             if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
                 mGoodsListAdapter.notifyDataSetChanged();

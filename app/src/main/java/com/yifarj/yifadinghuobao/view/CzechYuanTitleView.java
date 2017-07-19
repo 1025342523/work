@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.StringUtils;
 import com.yifarj.yifadinghuobao.R;
 
 /**
@@ -19,11 +18,10 @@ import com.yifarj.yifadinghuobao.R;
  */
 public class CzechYuanTitleView extends RelativeLayout {
 
-    private TextView tvTitle;
     private ImageView ivRight;
-    private ImageView ivRightLeft;
     private ImageView ivLeft;
-    private TextView tvRight;
+    private RelativeLayout rlSearch;
+    private TextView tvRightIcon;
 
     public CzechYuanTitleView(Context context) {
         super(context);
@@ -32,13 +30,13 @@ public class CzechYuanTitleView extends RelativeLayout {
 
     public CzechYuanTitleView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TitleView);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CzechYuanTitleView);
         initContent(context, typedArray);
     }
 
     public CzechYuanTitleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TitleView, defStyleAttr, 0);
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CzechYuanTitleView, defStyleAttr, 0);
         initContent(context, typedArray);
     }
 
@@ -51,61 +49,26 @@ public class CzechYuanTitleView extends RelativeLayout {
         if (Build.VERSION.SDK_INT >= 21) {//5.0以上使用状态栏一体,需要减小TitleBar的高度
             contentView.getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.size_84);
         }
-        tvTitle = (TextView) contentView.findViewById(R.id.tvTitle);
         ivRight = (ImageView) contentView.findViewById(R.id.ivRight);
-        ivRightLeft = (ImageView) contentView.findViewById(R.id.ivRightLeft);
         ivLeft = (ImageView) contentView.findViewById(R.id.ivLeft);
-        tvRight = (TextView) contentView.findViewById(R.id.tvRight);
+        rlSearch = (RelativeLayout) contentView.findViewById(R.id.rlSearch);
+        tvRightIcon = (TextView) contentView.findViewById(R.id.tvRight_icon);
         if (array != null) {
             for (int i = 0; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
                 Drawable drawable;
-                int resId;
-                String name;
                 switch (attr) {
-                    case R.styleable.TitleView_title_name:
-                        resId = array.getResourceId(R.styleable.TitleView_title_name, 0);
-                        name = array.getString(R.styleable.TitleView_title_name);
-                        if (!isInEditMode()) {
-                            if (resId > 0) {
-                                tvTitle.setText(resId);
-                            } else {
-                                tvTitle.setText(name);
-                            }
-                        } else if (!StringUtils.isEmpty(name)) {
-                            tvTitle.setText(name);
-                        }
-                        break;
-                    case R.styleable.TitleView_text_right:
-                        resId = array.getResourceId(R.styleable.TitleView_text_right, 0);
-                        name = array.getString(R.styleable.TitleView_text_right);
-                        if (!isInEditMode()) {
-                            if (resId > 0) {
-                                tvRight.setText(resId);
-                            } else {
-                                tvRight.setText(name);
-                            }
-                        } else if (!StringUtils.isEmpty(name)) {
-                            tvRight.setText(name);
-                        }
-                        break;
-                    case R.styleable.TitleView_icon_left:
+                    case R.styleable.CzechYuanTitleView_icon_left_czech_yuan:
 
-                        drawable = array.getDrawable(R.styleable.TitleView_icon_left);
+                        drawable = array.getDrawable(R.styleable.CzechYuanTitleView_icon_left_czech_yuan);
                         if (drawable != null) {
                             ivLeft.setImageDrawable(drawable);
                         }
                         break;
-                    case R.styleable.TitleView_icon_right:
-                        drawable = array.getDrawable(R.styleable.TitleView_icon_right);
+                    case R.styleable.CzechYuanTitleView_icon_right_czech_yuan:
+                        drawable = array.getDrawable(R.styleable.CzechYuanTitleView_icon_right_czech_yuan);
                         if (drawable != null) {
                             ivRight.setImageDrawable(drawable);
-                        }
-                        break;
-                    case R.styleable.TitleView_icon_right_left:
-                        drawable = array.getDrawable(R.styleable.TitleView_icon_right_left);
-                        if (drawable != null) {
-                            ivRightLeft.setImageDrawable(drawable);
                         }
                         break;
                 }
@@ -126,30 +89,12 @@ public class CzechYuanTitleView extends RelativeLayout {
         }
     }
 
-    public void setRightLeftIconClickListener(OnClickListener l) {
-        if (ivRightLeft != null) {
-            ivRightLeft.setOnClickListener(l);
+    public void setRlSearchClickListener(OnClickListener l) {
+        if (rlSearch != null) {
+            rlSearch.setOnClickListener(l);
         }
     }
 
-    public void setRightTextClickListener(OnClickListener l) {
-        if (tvRight != null) {
-            tvRight.setVisibility(View.VISIBLE);
-            tvRight.setOnClickListener(l);
-        }
-    }
-
-    public void setTitle(String title) {
-        if (tvTitle != null && title != null) {
-            tvTitle.setText(title);
-        }
-    }
-
-    public void setTitle(int resId) {
-        if (resId != 0 && tvTitle != null) {
-            tvTitle.setText(resId);
-        }
-    }
 
     public void setImageLeft(int resId) {
         if (ivLeft != null) {
@@ -160,18 +105,6 @@ public class CzechYuanTitleView extends RelativeLayout {
     public void setImageRight(int resId) {
         if (ivRight != null) {
             ivRight.setImageResource(resId);
-        }
-    }
-
-    public void setImageRightLeft(int resId) {
-        if (ivRightLeft != null) {
-            ivRightLeft.setImageResource(resId);
-        }
-    }
-
-    public void setRightTextVisibility(int visibility) {
-        if (tvRight != null) {
-            tvRight.setVisibility(visibility);
         }
     }
 
@@ -187,20 +120,17 @@ public class CzechYuanTitleView extends RelativeLayout {
         }
     }
 
-    public void setTvRightEnabled(boolean enabled) {
-        if (tvRight != null) {
-            tvRight.setEnabled(enabled);
-        }
-    }
-
-
-    public void setTvRightTextColor(int color) {
-        if (tvRight != null) {
-            tvRight.setTextColor(color);
-        }
-    }
 
     public ImageView getImageViewContent() {
         return ivRight;
+    }
+
+    public void setRightIconText(int visibility, int title) {
+        if (tvRightIcon != null && title > 0) {
+            tvRightIcon.setVisibility(visibility);
+            tvRightIcon.setText(String.valueOf(title));
+        } else if (title == 0) {
+            tvRightIcon.setVisibility(visibility);
+        }
     }
 }

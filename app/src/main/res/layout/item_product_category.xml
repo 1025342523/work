@@ -14,6 +14,6 @@
         android:gravity="center"
         android:maxLines="2"
         android:textColor="@drawable/selector_color_item_text"
-        android:textSize="@dimen/font_30"/>
+        android:textSize="@dimen/font_28"/>
 
 </RelativeLayout>

@@ -54,7 +54,7 @@
     <string name="goods_list">商品清单</string>
     <string name="phone_number">联系电话</string>
     <string name="contact">联系人</string>
-    <string name="name">名称</string>
+    <string name="name">名称</string>SSS
     <string name="total">合计：</string>
     <string name="order_details">订单详情</string>
     <string name="pending_audit">待审核</string>
@@ -70,7 +70,7 @@
     <string name="apply_return">申请退货</string>
     <string name="mine_address">收货地址</string>
     <string name="about">关于亿订货</string>
-    <string name="search_view_product">名称/助记符/编号</string>
+    <string name="search_view_product">搜索商品</string>
     <string name="shop_detail">商品详情</string>
     <string name="add_shoppingcart">加入购物车</string>
     <string name="unit">单位</string>

@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,7 +34,7 @@ public class SearchView extends LinearLayout {
     private TextView tvCancel;
     private LinearLayout llContent;
     private boolean showing;
-    private ImageView mSearchTextClear;
+    private ImageView ivLeft, ivSearch;
     private OnClickListener mOnCancelListener;
     private OnSearchClickListener mOnSearchClickListener;
 
@@ -69,8 +66,8 @@ public class SearchView extends LinearLayout {
         llContent = (LinearLayout) content.findViewById(R.id.llContent);
         etSearch = (EditText) content.findViewById(R.id.etSearch);
         lvSearch = (RecyclerView) content.findViewById(R.id.searchContent);
-        tvCancel = (TextView) content.findViewById(R.id.tvCancel);
-        mSearchTextClear = (ImageView) content.findViewById(R.id.search_text_clear);
+        ivLeft = (ImageView) content.findViewById(R.id.ivLeft);
+        ivSearch = (ImageView) content.findViewById(R.id.ivSearch);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(context);
         lvSearch.setLayoutManager(mLinearLayoutManager);
         lvSearch.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
@@ -91,41 +88,25 @@ public class SearchView extends LinearLayout {
                         }
                 }
             }
-            etSearch.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (!TextUtils.isEmpty(editable)) {
-                        mSearchTextClear.setVisibility(VISIBLE);
-                    } else {
-                        mSearchTextClear.setVisibility(GONE);
-                    }
-                }
-            });
-
-            mSearchTextClear.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    etSearch.setText("");
-                    lvSearch.setAdapter(null);
-                }
-            });
-            tvCancel.setOnClickListener(new OnClickListener() {
+            ivLeft.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mOnCancelListener != null) {
                         mOnCancelListener.onClick(v);
                     }
-                    hide();
+                    cancelSearchView();
+                }
+            });
+            ivSearch.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mOnSearchClickListener != null) {
+                        mOnSearchClickListener.onSearch(etSearch.getText().toString());
+                    }
+                    if (mContext instanceof Activity) {
+                        hideInputMethod((Activity) mContext);
+                    }
                 }
             });
             etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -197,6 +178,7 @@ public class SearchView extends LinearLayout {
     }
 
     public void hideSearchView() {
+        hideInputMethod((Activity) mContext);
         llContent.setVisibility(View.INVISIBLE);
         showing = false;
     }
@@ -260,5 +242,11 @@ public class SearchView extends LinearLayout {
 
     public interface OnSearchClickListener {
         void onSearch(String keyword);
+    }
+
+    public void setSearchImageOnclickListener(OnClickListener l) {
+        if (ivSearch != null) {
+            ivSearch.setOnClickListener(l);
+        }
     }
 }

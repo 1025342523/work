@@ -34,6 +34,11 @@
         <attr name="icon_right_left" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="CzechYuanTitleView">
+        <attr name="icon_left_czech_yuan" format="reference"/>
+        <attr name="icon_right_czech_yuan" format="reference"/>
+    </declare-styleable>
+
     <declare-styleable name="SearchView">
         <attr name="text_hint" format="reference|string"/>
     </declare-styleable>
