@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -16,6 +17,8 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.database.model.CollectionItemModel;
+import com.yifarj.yifadinghuobao.database.model.CollectionItemModel_Table;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
@@ -96,6 +99,8 @@ public class ShopDetailActivity extends BaseActivity {
     ScrollView scrollView;
     @BindView(R.id.addShopCart)
     LinearLayout addShopCart;
+    @BindView(R.id.shopDetail_collection)
+    ImageView collection;
 
     private GoodsListEntity.ValueEntity goodsBean;
     private Banner banner;
@@ -108,10 +113,12 @@ public class ShopDetailActivity extends BaseActivity {
     private double unitPrice;
     private boolean isExist = false;
     private String basicUnitName;
+    private int basicUnitId;
     private String tempUnitName;
     private int traderId;
     private double basicUnitPrice;
     private int orderCount = 0;
+    private boolean isCollection = false;
 
     private static final int REQUEST_REFRESH = 10;
 
@@ -172,7 +179,22 @@ public class ShopDetailActivity extends BaseActivity {
                             basicUnitName = saleGoodsItemModel.get(0).BasicUnitName;
                             tempUnitName = saleGoodsItemModel.get(0).ProductUnitName;
                             basicUnitPrice = saleGoodsItemModel.get(0).BasicUnitPrice;
+                            basicUnitId = saleGoodsItemModel.get(0).BasicUnitId;
                             isExist = true;
+                        }
+                    }
+                });
+
+        // 查询收藏商品中是否有当前商品
+        RXSQLite.rx(SQLite.select().from(CollectionItemModel.class).where(CollectionItemModel_Table.ProductId.eq(shoppingId)))
+                .queryList()
+                .subscribe(new Consumer<List<CollectionItemModel>>() {
+                    @Override
+                    public void accept(@NonNull List<CollectionItemModel> collectionItemModel) throws Exception {
+                        if (collectionItemModel != null && collectionItemModel.size() > 0) {
+                            LogUtils.e("收藏夹中有此商品" + collectionItemModel.get(0).ProductName);
+                            isCollection = true;
+                            collection.setSelected(true);
                         }
                     }
                 });
@@ -285,6 +307,7 @@ public class ShopDetailActivity extends BaseActivity {
                                     if (unit.IsBasic) {
                                         unitName = unit.Name;
                                         basicUnitName = unit.Name;
+                                        basicUnitId = unit.Id;
                                         unitId = unit.Id;
                                         basicUnitPrice = goodsBean.MemoryPrice;
                                         getProductMemoryPrice(unitId, 0);
@@ -596,6 +619,24 @@ public class ShopDetailActivity extends BaseActivity {
                 startActivityForResult(intent, REQUEST_REFRESH);
             }
         });
+
+        collection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isCollection){
+                    isCollection=false;
+                    collection.setSelected(false);
+                    deleteCollection();
+                    Toast.makeText(ShopDetailActivity.this, "取消收藏成功", Toast.LENGTH_SHORT).show();
+                }else {
+                    isCollection=true;
+                    collection.setSelected(true);
+                    addCollection(goodsBean);
+                    Toast.makeText(ShopDetailActivity.this, "收藏成功", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         //加入购物车
         RxView.clicks(shopDetail_addShoppingCart)
                 .compose(bindToLifecycle())
@@ -669,7 +710,7 @@ public class ShopDetailActivity extends BaseActivity {
         itemModel.PackSpec = goodsBean.PackSpec;
         itemModel.Code = goodsBean.Code;
         itemModel.ProductName = goodsBean.Name;
-        itemModel.BasicUnitName = unitName;
+        itemModel.BasicUnitName = basicUnitName;
         itemModel.ProductUnitName = unitName;
         itemModel.BasicUnitPrice = basicUnitPrice;
         itemModel.UnitPrice = unitPrice;
@@ -732,6 +773,82 @@ public class ShopDetailActivity extends BaseActivity {
                         }
                     });
                 });
+    }
+
+    private void addCollection(GoodsListEntity.ValueEntity goodsBean) {
+        CollectionItemModel itemModel = new CollectionItemModel();
+        itemModel.CurrentPrice = basicUnitPrice;
+        if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
+            itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
+        }
+        itemModel.PriceSystemId = DataSaver.getPriceSystemId();
+        itemModel.PackSpec = goodsBean.PackSpec;
+        itemModel.Code = goodsBean.Code;
+        itemModel.ProductName = goodsBean.Name;
+        itemModel.BasicUnitName = basicUnitName;
+        itemModel.ProductUnitName = basicUnitName;
+        itemModel.BasicUnitPrice = basicUnitPrice;
+        itemModel.UnitPrice = basicUnitPrice;
+        itemModel.Discount = 1.0f;
+        itemModel.SalesType = 1;
+        itemModel.TaxRate = 1.0;
+        itemModel.UnitId = basicUnitId;
+        itemModel.Quantity = 0;
+        itemModel.WarehouseId = goodsBean.DefaultWarehouseId;
+        itemModel.ProductId = goodsBean.Id;
+        itemModel.LocationId = goodsBean.DefaultLocationId;
+        itemModel.PackSpec = goodsBean.PackSpec;
+        itemModel.Price0 = goodsBean.Price0;
+        itemModel.Price1 = goodsBean.Price1;
+        itemModel.Price2 = goodsBean.Price2;
+        itemModel.Price3 = goodsBean.Price3;
+        itemModel.Price4 = goodsBean.Price4;
+        itemModel.Price5 = goodsBean.Price5;
+        itemModel.Price6 = goodsBean.Price6;
+        itemModel.Price7 = goodsBean.Price7;
+        itemModel.Price8 = goodsBean.Price8;
+        itemModel.Price9 = goodsBean.Price9;
+        itemModel.Price10 = goodsBean.Price10;
+        itemModel.MinSalesQuantity = goodsBean.MinSalesQuantity;
+        itemModel.MaxSalesQuantity = goodsBean.MaxSalesQuantity;
+        itemModel.MinSalesPrice = goodsBean.MinSalesPrice;
+        itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
+        itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
+        itemModel.OweRemark = goodsBean.Remark;
+        itemModel.insert()
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(@NonNull Long aLong) throws Exception {
+                        LogUtils.e("收藏Item插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                    }
+                });
+        itemModel.save().subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(@NonNull Boolean aBoolean) throws Exception {
+                LogUtils.e("收藏Item保存数据成功");
+            }
+        });
+    }
+
+    public void deleteCollection(){
+        RXSQLite.rx(SQLite.select().from(CollectionItemModel.class)
+                .where(CollectionItemModel_Table.ProductId.eq(goodsBean.Id)))
+                .queryList().subscribe(new Consumer<List<CollectionItemModel>>() {
+            @Override
+            public void accept(@NonNull List<CollectionItemModel> collectionItemModels) throws Exception {
+                LogUtils.e("collectionItemModels.size()：" + collectionItemModels.size());
+                if (collectionItemModels.size() > 0) {
+                    CollectionItemModel mItem = collectionItemModels.get(0);
+                    mItem.delete().subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(@NonNull Boolean aBean) throws Exception {
+                            LogUtils.e(mItem.ProductName + "：从收藏中删除\n" + aBean);
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     public void showEmptyView() {

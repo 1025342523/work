@@ -23,6 +23,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
+import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.goods.TabGoodsFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
@@ -44,12 +45,14 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     private boolean type;
     private int orderCount=0;
     private TabGoodsFragment context;
+    private BaseActivity activity;
 
-    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type,TabGoodsFragment context) {
+    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type,TabGoodsFragment context,BaseActivity activity) {
         super(recyclerView);
         this.data = data;
         this.type = type;
         this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -97,7 +100,8 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             String tempUnitName = unitName;
             int tempUnitId = unitId;
             if (type) {
-                RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                        .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
                         .queryList()
                         .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                             @Override
@@ -122,9 +126,17 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                 LogUtils.e("saleGoodsItemModels："+saleGoodsItemModels.size());
                                 orderCount = saleGoodsItemModels.size();
                                 if(orderCount>0){
-                                    context.setRightIcon(View.VISIBLE,orderCount);
+                                    if(context != null){
+                                        context.setRightIcon(View.VISIBLE,orderCount);
+                                    }else if(activity != null){
+                                        activity.setRightIcon(View.VISIBLE,orderCount);
+                                    }
                                 }else if(orderCount==0){
-                                    context.setRightIcon(View.GONE,0);
+                                    if(context != null){
+                                        context.setRightIcon(View.GONE,0);
+                                    }else if(activity != null){
+                                        activity.setRightIcon(View.GONE,0);
+                                    }
                                 }
                                 LogUtils.e("orderCount："+orderCount);
                             }
@@ -150,7 +162,11 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                             if(i==1){
                                                 orderCount=orderCount+1;
                                                 if (orderCount>0){
-                                                    context.setRightIcon(View.VISIBLE,orderCount);
+                                                    if(context != null){
+                                                        context.setRightIcon(View.VISIBLE,orderCount);
+                                                    }else if(activity != null){
+                                                        activity.setRightIcon(View.VISIBLE,orderCount);
+                                                    }
                                                     LogUtils.e("orderCount："+orderCount);
                                                 }
                                             }
@@ -162,7 +178,11 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                     if(i==1){
                                         orderCount=orderCount+1;
                                         if (orderCount>0){
-                                            context.setRightIcon(View.VISIBLE,orderCount);
+                                            if(context != null){
+                                                context.setRightIcon(View.VISIBLE,orderCount);
+                                            }else if(activity != null){
+                                                activity.setRightIcon(View.VISIBLE,orderCount);
+                                            }
                                             LogUtils.e("orderCount："+orderCount);
                                         }
                                     }
@@ -197,10 +217,18 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                                 delete(goodsBean);
                                                 orderCount=orderCount-1;
                                                 if (orderCount>0){
-                                                    context.setRightIcon(View.VISIBLE,orderCount);
+                                                    if(context != null){
+                                                        context.setRightIcon(View.VISIBLE,orderCount);
+                                                    }else if(activity != null){
+                                                        activity.setRightIcon(View.VISIBLE,orderCount);
+                                                    }
                                                     LogUtils.e("orderCount："+orderCount);
                                                 }else if(orderCount==0){
-                                                    context.setRightIcon(View.GONE,0);
+                                                    if(context != null){
+                                                        context.setRightIcon(View.GONE,0);
+                                                    }else if(activity != null){
+                                                        activity.setRightIcon(View.GONE,0);
+                                                    }
                                                     LogUtils.e("orderCount："+orderCount);
                                                 }
                                             }

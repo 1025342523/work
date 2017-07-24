@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.yifarj.yifadinghuobao.R;
@@ -25,6 +26,10 @@ import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.main.CollectionActivity;
+import com.yifarj.yifadinghuobao.ui.activity.main.NewProductActivity;
+import com.yifarj.yifadinghuobao.ui.activity.main.PromotionActivity;
+import com.yifarj.yifadinghuobao.ui.activity.main.RecommendActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.web.WebActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
@@ -70,13 +75,20 @@ public class TabMainFragment extends BaseFragment {
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private boolean mIsRefreshing = false;
+    @BindView(R.id.tvPromotion)
+    TextView tvPromotion;
+    @BindView(R.id.tvCollection)
+    TextView tvCollection;
+    @BindView(R.id.tvNewProduct)
+    TextView tvNewProduct;
+    @BindView(R.id.tvRecommend)
+    TextView tvRecommend;
 
+    private boolean mIsRefreshing = false;
 
     private View loadMoreView;
 
     private HeaderViewRecyclerAdapter mHeaderViewRecyclerAdapter;
-
 
     private List<GoodsListEntity.ValueEntity> goodsList = new ArrayList<>();
 
@@ -178,6 +190,36 @@ public class TabMainFragment extends BaseFragment {
             }
         });
         viewPager.startAutoScroll();
+
+        tvPromotion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getActivity(),PromotionActivity.class);
+                startActivity(intent);
+            }
+        });
+        tvCollection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getActivity(),CollectionActivity.class);
+                startActivity(intent);
+            }
+        });
+        tvNewProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getActivity(),NewProductActivity.class);
+                startActivity(intent);
+            }
+        });
+        tvRecommend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getActivity(),RecommendActivity.class);
+                startActivity(intent);
+            }
+        });
+
         lazyLoad();
     }
 
@@ -220,7 +262,7 @@ public class TabMainFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, false,null);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, false,null,null);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
 //        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -249,7 +291,6 @@ public class TabMainFragment extends BaseFragment {
 
     @Override
     protected void loadData() {
-
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())

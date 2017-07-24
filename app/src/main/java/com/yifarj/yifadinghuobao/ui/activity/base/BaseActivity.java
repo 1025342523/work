@@ -67,4 +67,5 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     public void finishTask() {
     }
 
+    public void setRightIcon(int visibility, int title){}
 }

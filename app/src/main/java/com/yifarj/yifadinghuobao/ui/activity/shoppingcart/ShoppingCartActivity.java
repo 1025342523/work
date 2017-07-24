@@ -13,15 +13,14 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.runtime.FlowContentObserver;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.SQLOperator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.ShoppingCartAdapter;
-import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
@@ -125,8 +124,9 @@ public class ShoppingCartActivity extends BaseActivity {
             CzechYuanDialog mDialog = new CzechYuanDialog(ShoppingCartActivity.this, R.style.CzechYuanDialog);
             mDialog.setContent("确定清空购物车？");
             mDialog.setConfirmClickListener(view1 -> {
-                FlowManager.getDatabase(AppDatabase.class).reset(ShoppingCartActivity.this);
-//                Delete.table(GoodsUnitModel.class);
+//                FlowManager.getDatabase(AppDatabase.class).reset(ShoppingCartActivity.this);
+                Delete.table(SaleGoodsItemModel.class);
+                Delete.table(GoodsUnitModel.class);
                 ToastUtils.showShortSafe("购物车已清空");
                 showEmptyView();
                 setResult(RESULT_OK);

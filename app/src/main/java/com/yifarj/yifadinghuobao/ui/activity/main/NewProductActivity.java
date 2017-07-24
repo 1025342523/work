@@ -1,4 +1,4 @@
-package com.yifarj.yifadinghuobao.ui.fragment.goods;
+package com.yifarj.yifadinghuobao.ui.activity.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -27,14 +26,13 @@ import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
-import com.yifarj.yifadinghuobao.ui.activity.productCategory.ProductCategoryActivity;
+import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
-import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
-import com.yifarj.yifadinghuobao.view.CzechYuanTitleView;
 import com.yifarj.yifadinghuobao.view.SearchView;
+import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
 import java.util.ArrayList;
@@ -49,26 +47,20 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * TabGoodsFragment
+ * 新品上架
  *
- * @auther Czech.Yuan
- * @date 2017/5/12 15:07
+ * Created by zydx-pc on 2017/7/19.
  */
-public class TabGoodsFragment extends BaseFragment implements View.OnClickListener {
+
+public class NewProductActivity extends BaseActivity {
     private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.recycle)
     RecyclerView mRecyclerView;
-
     @BindView(R.id.empty_view)
     CustomEmptyView mCustomEmptyView;
-
-    //    @BindView(R.id.swipe_refresh_layout)
-    //    SwipeRefreshLayout mSwipeRefreshLayout;
-
-    @BindView(R.id.titleView)
-    CzechYuanTitleView titleView;
-
+    @BindView(R.id.newproduct_titleView)
+    TitleView titleView;
     @BindView(R.id.searchView)
     SearchView searchView;
 
@@ -86,39 +78,36 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     private int totalCount, orderCount;
 
-    LinearLayout rlTab1;
-    LinearLayout rlTab2;
-    LinearLayout rlTab3;
-    LinearLayout rlTab4;
-
     @Override
-    public int getLayoutResId() {
-        return R.layout.fragment_goods;
+    public int getLayoutId() {
+        return R.layout.activity_new_product;
     }
 
     @Override
-    protected void finishCreateView(Bundle savedInstanceState) {
-        LogUtils.e("TabGoodsFragment", "finishCreateView");
+    public void initViews(Bundle savedInstanceState) {
         pageInfo = new PageInfo();
         goodsList = new ArrayList<>();
-        isPrepared = true;
 
         lazyLoad();
-        titleView.setRightIconClickListener(view -> {
-            Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
-            startActivityForResult(intent, REQUEST_REFRESH);
-        });
+
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ProductCategoryActivity.class);
-                startActivity(intent);
+                finish();
             }
         });
-        titleView.setRlSearchClickListener(view -> {
-            searchView.show();
-            titleView.setVisibility(View.GONE);
+        titleView.setRightIconClickListener(view -> {
+            Intent intent = new Intent(this, ShoppingCartActivity.class);
+            startActivityForResult(intent, REQUEST_REFRESH);
         });
+        titleView.setRightLeftIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchView.show();
+                titleView.setVisibility(View.GONE);
+            }
+        });
+
         searchView.setOnSearchClickListener(new SearchView.OnSearchClickListener() {
             @Override
             public void onSearch(String keyword) {
@@ -158,7 +147,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     private void doSearch(String keyword) {
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", "", "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status = 1)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -172,7 +161,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this,null));
+                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,NewProductActivity.this));
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }
@@ -193,64 +182,24 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                 });
     }
 
-
-    @Override
-    protected void lazyLoad() {
-        if (!isPrepared && !isVisible) {
-            LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
-            return;
-        }
-        //        initRefreshLayout();
+    public void lazyLoad() {
         pageInfo.PageIndex = 0;
-        pageInfo.SortOrder = 2;
-        pageInfo.SortedColumn = "CreatedTime";
+        pageInfo.SortOrder = 1;
         mIsRefreshing = false;
         goodsList.clear();
         loadData();
         initRecyclerView();
-        isPrepared = false;
     }
 
-
-    //    @Override
-    //    protected void initRefreshLayout() {
-    //        if (mSwipeRefreshLayout == null) {
-    //            return;
-    //        }
-    //        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
-    ////        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
-    //        mSwipeRefreshLayout.post(() -> {
-    //
-    //            mSwipeRefreshLayout.setRefreshing(true);
-    //            mIsRefreshing = true;
-    //            loadData();
-    //        });
-
-    //
-    //        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-    //            try {
-    //                pageInfo.PageIndex = 0;
-    //                mIsRefreshing = false;
-    //                goodsList.clear();
-    //                loadData();
-    //            } catch (Exception e) {
-    //                e.printStackTrace();
-    //            }
-    //        });
-    //    }
-
-    @Override
-    protected void initRecyclerView() {
+    public void initRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, TabGoodsFragment.this,null);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null,this);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         setRecycleNoScroll();
-        createHeadView();
-        rlTab1.setSelected(true);
         createLoadMoreView();
 
         mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLinearLayoutManager) {
@@ -275,7 +224,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
                 if (holder != null && position < goodsList.size()) {
-                    Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                    Intent intent = new Intent(NewProductActivity.this, ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
                     startActivityForResult(intent, REQUEST_REFRESH);
                 }
@@ -284,7 +233,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
-    protected void loadData() {
+    public void loadData() {
         // 查询购物车商品
         RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
                 .queryList()
@@ -304,7 +253,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                 });
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status = 1", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -345,8 +294,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     }
 
-    @Override
-    protected void finishTask() {
+    public void finishTask() {
         //        if (mSwipeRefreshLayout.isRefreshing()) {
         //            mSwipeRefreshLayout.setRefreshing(false);
         //        }
@@ -368,31 +316,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
-    private void createHeadView() {
-        View headView = LayoutInflater.from(getActivity())
-                .inflate(R.layout.layout_search_archive_head_view, mRecyclerView, false);
-        //        RecyclerView mHeadRecycler = (RecyclerView) headView.findViewById(
-        //                R.id.search_archive_bangumi_head_recycler);
-        //        mHeadRecycler.setHasFixedSize(false);
-        //        mHeadRecycler.setNestedScrollingEnabled(false);
-        //        mHeadRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //        mGoodsListAdapter = new GoodsListAdapter(mHeadRecycler, goodsList);
-        //        mHeadRecycler.setAdapter(mGoodsListAdapter);
-
-        rlTab1 = (LinearLayout) headView.findViewById(R.id.search_all_layout);
-        rlTab2 = (LinearLayout) headView.findViewById(R.id.search_name_layout);
-        rlTab3 = (LinearLayout) headView.findViewById(R.id.search_code_layout);
-        rlTab4 = (LinearLayout) headView.findViewById(R.id.search_price_layout);
-        rlTab1.setOnClickListener(this);
-        rlTab2.setOnClickListener(this);
-        rlTab3.setOnClickListener(this);
-        rlTab4.setOnClickListener(this);
-
-        mHeaderViewRecyclerAdapter.addHeaderView(headView);
-    }
-
     public void showEmptyView() {
-        //        mSwipeRefreshLayout.setRefreshing(false);
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
@@ -409,7 +333,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void createLoadMoreView() {
-        loadMoreView = LayoutInflater.from(getActivity())
+        loadMoreView = LayoutInflater.from(this)
                 .inflate(R.layout.layout_load_more, mRecyclerView, false);
         mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
         loadMoreView.setVisibility(View.GONE);
@@ -426,86 +350,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         super.onActivityResult(requestCode, resultCode, data);
         pageInfo.PageIndex = 0;
         goodsList.clear();
-        onTab1Click();
-    }
-
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.search_all_layout:
-                mIsRefreshing = false;
-                onTab1Click();
-                break;
-            case R.id.search_name_layout:
-                mIsRefreshing = false;
-                onTab2Click();
-                break;
-            case R.id.search_code_layout:
-                mIsRefreshing = false;
-                onTab3Click();
-                break;
-            case R.id.search_price_layout:
-                mIsRefreshing = false;
-                onTab4Click();
-                break;
-        }
-    }
-
-    private void onTab1Click() {
-        setCheckedItem(0);
-        goodsList.clear();
-        pageInfo.PageIndex = 0;
-        pageInfo.SortOrder = 2;
-        pageInfo.SortedColumn = "CreatedTime";
         loadData();
-    }
-
-    private void onTab2Click() {
-        setCheckedItem(1);
-        goodsList.clear();
-        pageInfo.PageIndex = 0;
-        pageInfo.SortOrder = 2;
-        pageInfo.SortedColumn = "Name";
-        loadData();
-    }
-
-    private void onTab3Click() {
-        setCheckedItem(2);
-        goodsList.clear();
-        pageInfo.PageIndex = 0;
-        pageInfo.SortOrder = 2;
-        pageInfo.SortedColumn = "Code";
-        loadData();
-    }
-
-    private void onTab4Click() {
-        setCheckedItem(3);
-        goodsList.clear();
-        pageInfo.PageIndex = 0;
-        pageInfo.SortOrder = 2;
-        pageInfo.SortedColumn = "Price0";
-        loadData();
-    }
-
-    public void setCheckedItem(int position) {
-        rlTab1.setSelected(false);
-        rlTab2.setSelected(false);
-        rlTab3.setSelected(false);
-        rlTab4.setSelected(false);
-        switch (position) {
-            case 0:
-                rlTab1.setSelected(true);
-                break;
-            case 1:
-                rlTab2.setSelected(true);
-                break;
-            case 2:
-                rlTab3.setSelected(true);
-                break;
-            case 3:
-                rlTab4.setSelected(true);
-                break;
-        }
     }
 }
