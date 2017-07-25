@@ -12,17 +12,87 @@
         app:icon_left="@drawable/ic_title_back"
         app:title_name="货品分类"/>
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/titleView">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycleView"
-            android:layout_width="@dimen/size_200"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:overScrollMode="never"
             android:scrollbars="none"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/recycleView"
+            android:layout_toRightOf="@id/recycleView">
+
+            <TextView
+                android:id="@+id/tvParentName"
+                android:layout_width="@dimen/size_240"
+                android:layout_height="@dimen/size_60"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/size_60"
+                android:background="@drawable/shape_button"
+                android:gravity="center"
+                android:textColor="@color/main_desc"
+                android:textSize="@dimen/font_28"/>
+
+            <LinearLayout
+                android:id="@+id/llAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvParentName"
+                android:layout_marginTop="@dimen/size_40"
+                android:orientation="vertical"
+                android:padding="@dimen/size_20">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/size_100"
+                    android:background="@drawable/shape_bg_dialog"
+                    android:gravity="center"
+                    android:text="新品上架"
+                    android:textColor="@color/main_desc"
+                    android:textSize="@dimen/font_28"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/size_100"
+                    android:layout_marginTop="@dimen/size_10"
+                    android:background="@drawable/shape_bg_dialog"
+                    android:gravity="center"
+                    android:text="热卖推荐"
+                    android:textColor="@color/main_desc"
+                    android:textSize="@dimen/font_28"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/size_100"
+                    android:layout_marginTop="@dimen/size_10"
+                    android:background="@drawable/shape_bg_dialog"
+                    android:gravity="center"
+                    android:text="清仓优惠"
+                    android:textColor="@color/main_desc"
+                    android:textSize="@dimen/font_28"/>
+
+            </LinearLayout>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycleViewChild"
+                android:layout_width="@dimen/size_200"
+                android:layout_height="match_parent"
+                android:layout_below="@id/tvParentName"
+                android:layout_marginBottom="@dimen/size_20"
+                android:layout_marginTop="@dimen/size_20"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:visibility="gone"/>
+        </RelativeLayout>
 
 
         <com.yifarj.yifadinghuobao.view.CustomEmptyView
@@ -31,5 +101,5 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"/>
 
-    </FrameLayout>
+    </RelativeLayout>
 </RelativeLayout>

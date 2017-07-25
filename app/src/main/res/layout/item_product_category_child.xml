@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:clickable="true"
+              android:foreground="?attr/selectableItemBackground"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/size_20"
+        android:layout_marginStart="@dimen/size_20"
+        android:layout_marginTop="@dimen/size_20"
+        android:gravity="center"
+        android:maxLines="2"
+        android:textColor="@color/main_text2"
+        android:textSize="@dimen/font_28"/>
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="@dimen/size_120"
+        android:layout_height="@dimen/size_80"
+        android:layout_marginTop="@dimen/size_8"
+        android:background="@color/white"
+        android:text="@string/all"
+        android:textColor="@color/text_desc"
+        android:textSize="@dimen/font_26"/>
+
+</LinearLayout>

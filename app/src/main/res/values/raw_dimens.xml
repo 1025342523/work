@@ -8,6 +8,7 @@
     <dimen name="size_300">150dp</dimen>
     <dimen name="size_280">140dp</dimen>
     <dimen name="size_255">127.5dp</dimen>
+    <dimen name="size_240">120dp</dimen>
     <dimen name="size_200">100dp</dimen>
     <dimen name="size_190">95dp</dimen>
     <dimen name="size_170">85dp</dimen>

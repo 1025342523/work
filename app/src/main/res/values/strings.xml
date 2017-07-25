@@ -78,4 +78,5 @@
     <string name="shop_introduction">商品介绍</string>
     <string name="product_parameters">产品参数</string>
     <string name="save_image">保存图片</string>
+    <string name="all">全部</string>
 </resources>
