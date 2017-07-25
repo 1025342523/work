@@ -172,7 +172,18 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this,null));
+                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this,null);
+                                goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                                        if (holder != null && position < goodsListEntity.Value.size()) {
+                                            Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsListEntity.Value.get(position).Id);
+                                            startActivityForResult(intent, REQUEST_REFRESH);
+                                        }
+                                    }
+                                });
+                                searchView.getListView().setAdapter(goodsListAdapter);
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }

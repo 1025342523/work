@@ -50,11 +50,11 @@ import static com.yifarj.yifadinghuobao.R.id.promotion_titleView;
 
 /**
  * 促销商品
- *
+ * <p>
  * Created by zydx-pc on 2017/7/19.
  */
 
-public class PromotionActivity extends BaseActivity{
+public class PromotionActivity extends BaseActivity {
     private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.recycle)
@@ -150,7 +150,7 @@ public class PromotionActivity extends BaseActivity{
 
     private void doSearch(String keyword) {
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status = 64)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", "", "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 64)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -164,7 +164,18 @@ public class PromotionActivity extends BaseActivity{
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, PromotionActivity.this));
+                                GoodsListAdapter goodsListAdapter = new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, PromotionActivity.this);
+                                goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                                        if (holder != null && position < goodsListEntity.Value.size()) {
+                                            Intent intent = new Intent(PromotionActivity.this, ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsListEntity.Value.get(position).Id);
+                                            startActivityForResult(intent, REQUEST_REFRESH);
+                                        }
+                                    }
+                                });
+                                searchView.getListView().setAdapter(goodsListAdapter);
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }
@@ -198,7 +209,7 @@ public class PromotionActivity extends BaseActivity{
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true,null, this);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);

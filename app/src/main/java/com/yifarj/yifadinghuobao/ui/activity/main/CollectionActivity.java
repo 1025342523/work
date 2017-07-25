@@ -267,7 +267,18 @@ public class CollectionActivity extends BaseActivity {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, CollectionActivity.this));
+                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, CollectionActivity.this);
+                                goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                                        if (holder != null && position < goodsListEntity.Value.size()) {
+                                            Intent intent = new Intent(CollectionActivity.this, ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsListEntity.Value.get(position).Id);
+                                            startActivityForResult(intent, REQUEST_REFRESH);
+                                        }
+                                    }
+                                });
+                                searchView.getListView().setAdapter(goodsListAdapter);
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }

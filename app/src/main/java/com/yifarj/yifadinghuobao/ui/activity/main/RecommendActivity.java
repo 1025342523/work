@@ -147,7 +147,7 @@ public class RecommendActivity extends BaseActivity {
 
     private void doSearch(String keyword) {
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status = 128)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", "", "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 128)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -161,7 +161,18 @@ public class RecommendActivity extends BaseActivity {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,RecommendActivity.this));
+                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,RecommendActivity.this);
+                                goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                                        if (holder != null && position < goodsListEntity.Value.size()) {
+                                            Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsListEntity.Value.get(position).Id);
+                                            startActivityForResult(intent, REQUEST_REFRESH);
+                                        }
+                                    }
+                                });
+                                searchView.getListView().setAdapter(goodsListAdapter);
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }
