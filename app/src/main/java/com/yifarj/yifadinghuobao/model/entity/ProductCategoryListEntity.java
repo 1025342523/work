@@ -49,5 +49,6 @@ public class ProductCategoryListEntity {
         public int ProductCount;
         public String Abbreviate;
         public double GQIntermediaryRate;
+        public boolean isSelect;
     }
 }

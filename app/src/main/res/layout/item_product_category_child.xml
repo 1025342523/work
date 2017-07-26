@@ -23,7 +23,7 @@
         android:layout_width="@dimen/size_120"
         android:layout_height="@dimen/size_80"
         android:layout_marginTop="@dimen/size_8"
-        android:background="@color/white"
+        android:background="@drawable/shape_bg_dialog"
         android:text="@string/all"
         android:textColor="@color/text_desc"
         android:textSize="@dimen/font_26"/>

@@ -38,6 +38,7 @@
                 android:layout_marginTop="@dimen/size_60"
                 android:background="@drawable/shape_button"
                 android:gravity="center"
+                android:text="全部货品"
                 android:textColor="@color/main_desc"
                 android:textSize="@dimen/font_28"/>
 
@@ -51,6 +52,7 @@
                 android:padding="@dimen/size_20">
 
                 <TextView
+                    android:id="@+id/tv1"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/size_100"
                     android:background="@drawable/shape_bg_dialog"
@@ -60,6 +62,7 @@
                     android:textSize="@dimen/font_28"/>
 
                 <TextView
+                    android:id="@+id/tv2"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/size_100"
                     android:layout_marginTop="@dimen/size_10"
@@ -70,6 +73,7 @@
                     android:textSize="@dimen/font_28"/>
 
                 <TextView
+                    android:id="@+id/tv3"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/size_100"
                     android:layout_marginTop="@dimen/size_10"
@@ -84,10 +88,12 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycleViewChild"
-                android:layout_width="@dimen/size_200"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tvParentName"
                 android:layout_marginBottom="@dimen/size_20"
+                android:layout_marginLeft="@dimen/size_20"
+                android:layout_marginStart="@dimen/size_20"
                 android:layout_marginTop="@dimen/size_20"
                 android:overScrollMode="never"
                 android:scrollbars="none"

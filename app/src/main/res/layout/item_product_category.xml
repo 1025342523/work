@@ -4,8 +4,7 @@
                 android:layout_width="90dp"
                 android:layout_height="50dp"
                 android:background="@drawable/selector_color_item_bg"
-                android:clickable="true"
-                android:foreground="?attr/selectableItemBackground">
+                android:clickable="true">
 
     <TextView
         android:id="@+id/tvPCName"

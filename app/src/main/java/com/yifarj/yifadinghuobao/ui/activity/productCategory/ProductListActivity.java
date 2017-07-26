@@ -152,8 +152,14 @@ public class ProductListActivity extends BaseActivity {
     }
 
     private void doSearch(String keyword) {
+        String body;
+        if (categoryId == 0) {
+            body = "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))";
+        } else {
+            body = "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and CategoryId = " + categoryId + ")";
+        }
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and CategoryId = " + categoryId + ")", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", "", body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -258,8 +264,14 @@ public class ProductListActivity extends BaseActivity {
                     }
                 });
         LogUtils.e("loadData", "获取商品列表数据");
+        String body;
+        if (categoryId == 0) {
+            body = "status  not in (4,8)";
+        } else {
+            body = "CategoryId = " + categoryId;
+        }
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "CategoryId = " + categoryId, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -325,8 +337,8 @@ public class ProductListActivity extends BaseActivity {
     public void showEmptyView() {
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
-        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
+        mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
+        mCustomEmptyView.setEmptyText("暂无数据");
     }
 
 

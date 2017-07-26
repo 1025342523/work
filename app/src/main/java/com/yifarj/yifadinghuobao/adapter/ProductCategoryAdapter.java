@@ -23,6 +23,7 @@ import java.util.List;
 public class ProductCategoryAdapter extends AbsRecyclerViewAdapter {
     public List<ProductCategoryListEntity.ValueEntity> data;
 
+
     public ProductCategoryAdapter(RecyclerView recyclerView, List<ProductCategoryListEntity.ValueEntity> data) {
         super(recyclerView);
         this.data = data;
@@ -42,12 +43,11 @@ public class ProductCategoryAdapter extends AbsRecyclerViewAdapter {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             ProductCategoryListEntity.ValueEntity item = data.get(position);
             itemViewHolder.tvPCName.setText(item.Name);
-            itemViewHolder.rlItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    itemViewHolder.rlItem.setSelected(true);
-                }
-            });
+            if (item.isSelect) {
+                itemViewHolder.itemView.setSelected(true);
+            } else {
+                itemViewHolder.itemView.setSelected(false);
+            }
         }
 
         super.onBindViewHolder(holder, position);

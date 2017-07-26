@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.ProductCategoryAdapter;
 import com.yifarj.yifadinghuobao.adapter.ProductCategoryChildAdapter;
@@ -15,18 +16,23 @@ import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.model.entity.ProductCategoryListEntity;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
+import com.yifarj.yifadinghuobao.ui.activity.main.NewProductActivity;
+import com.yifarj.yifadinghuobao.ui.activity.main.PromotionActivity;
+import com.yifarj.yifadinghuobao.ui.activity.main.RecommendActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.TitleView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -55,12 +61,22 @@ public class ProductCategoryActivity extends BaseActivity {
     @BindView(R.id.tvParentName)
     TextView parentName;
 
+    @BindView(R.id.tv1)
+    TextView tv1;
+
+    @BindView(R.id.tv2)
+    TextView tv2;
+
+    @BindView(R.id.tv3)
+    TextView tv3;
+
     private ProductCategoryAdapter mProductCategoryAdapter;
 
     private List<ProductCategoryListEntity.ValueEntity> mItemData = new ArrayList<>();
     private List<ProductCategoryListEntity.ValueEntity> parentData = new ArrayList<>();
     private List<ProductCategoryListEntity.ValueEntity> childData = new ArrayList<>();
     private ProductCategoryChildAdapter mProductCategoryChildAdapter;
+    private int mPosition;
 
 
     @Override
@@ -75,6 +91,54 @@ public class ProductCategoryActivity extends BaseActivity {
 
     @Override
     public void loadData() {
+        RxView.clicks(parentName)
+                .compose(bindToLifecycle())
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        Intent intent = new Intent(ProductCategoryActivity.this, ProductListActivity.class);
+                        if (parentData.size() > 1) {
+                            intent.putExtra("CategoryId", parentData.get(mPosition).Id);
+                            intent.putExtra("CategoryName", parentData.get(mPosition).Name);
+                        } else {
+                            intent.putExtra("CategoryId", 0);
+                            intent.putExtra("CategoryName", "全部货品");
+                        }
+                        startActivity(intent);
+                    }
+                });
+
+        RxView.clicks(tv1)
+                .compose(bindToLifecycle())
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        Intent intent = new Intent(ProductCategoryActivity.this, NewProductActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        RxView.clicks(tv2)
+                .compose(bindToLifecycle())
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        Intent intent = new Intent(ProductCategoryActivity.this, RecommendActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        RxView.clicks(tv3)
+                .compose(bindToLifecycle())
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        Intent intent = new Intent(ProductCategoryActivity.this, PromotionActivity.class);
+                        startActivity(intent);
+                    }
+                });
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,6 +168,7 @@ public class ProductCategoryActivity extends BaseActivity {
                             allProduct.Path = "0";
                             allProduct.Name = "全部货品";
                             allProduct.Id = 0;
+                            allProduct.isSelect = true;
                             parentData.add(allProduct);
                             for (ProductCategoryListEntity.ValueEntity item : mItemData) {
                                 if (item.Level == 1) {
@@ -157,10 +222,12 @@ public class ProductCategoryActivity extends BaseActivity {
         mProductCategoryAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+
                 if (holder != null) {
+                    mPosition = position;
                     if (position == 0) {
-                        parentName.setText(parentData.get(position).Name);
                         llAll.setVisibility(View.VISIBLE);
+                        parentName.setText("全部货品");
                         recycleViewChild.setVisibility(View.GONE);
                     } else {
                         llAll.setVisibility(View.GONE);
@@ -172,11 +239,11 @@ public class ProductCategoryActivity extends BaseActivity {
                                 break;
                             }
                         }
+                        childData.clear();
+                        parentName.setText(parentData.get(position).Name);
                         if (flag) {
-                            childData.clear();
-                            parentName.setText(parentData.get(position).Name);
                             for (ProductCategoryListEntity.ValueEntity item : mItemData) {
-                                if (item.Path.contains(String.valueOf(parentData.get(position).Id)) && item.Id != mItemData.get(position).Id) {
+                                if (item.Level != 1 && item.Id != mItemData.get(position).Id && item.Path.contains(String.valueOf(parentData.get(position).Id))) {
                                     childData.add(item);
                                 }
                             }
@@ -192,17 +259,23 @@ public class ProductCategoryActivity extends BaseActivity {
                                 }
                             });
                         } else {
+                            parentName.setText(parentData.get(position).Name);
                             Intent intent = new Intent(ProductCategoryActivity.this, ProductListActivity.class);
                             intent.putExtra("CategoryId", parentData.get(position).Id);
                             intent.putExtra("CategoryName", parentData.get(position).Name);
                             startActivity(intent);
+                            llAll.setVisibility(View.GONE);
+                            recycleViewChild.setVisibility(View.GONE);
                         }
                     }
+                    for (ProductCategoryListEntity.ValueEntity tempItem : parentData) {
+                        tempItem.isSelect = false;
+                    }
+                    parentData.get(position).isSelect = true;
+                    mProductCategoryAdapter.notifyDataSetChanged();
                 }
             }
         });
-
-        mRecyclerView.getLayoutManager().smoothScrollToPosition(mRecyclerView, null, 0);
 
     }
 
