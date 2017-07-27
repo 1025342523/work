@@ -16,13 +16,12 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.bruce.pickerview.popwindow.DatePickerPopWin;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
+import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.wx.wheelview.widget.WheelView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.ItemGoodsListAdapter;
-import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
@@ -451,7 +450,8 @@ public class MettingOrderActivity extends BaseActivity {
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             finish();
                                             //清空购物车
-                                            FlowManager.getDatabase(AppDatabase.class).reset(MettingOrderActivity.this);
+//                                            FlowManager.getDatabase(AppDatabase.class).reset(MettingOrderActivity.this);
+                                            Delete.table(SaleGoodsItemModel.class);
                                         }
                                     })
                                     .setCancelable(false)

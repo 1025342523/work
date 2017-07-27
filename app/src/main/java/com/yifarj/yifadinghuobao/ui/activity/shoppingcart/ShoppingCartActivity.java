@@ -21,6 +21,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.ShoppingCartAdapter;
+import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
@@ -64,6 +65,7 @@ public class ShoppingCartActivity extends BaseActivity {
     @BindView(R.id.rl_bottom)
     RelativeLayout rl_bottom;
 
+    private static final int REQUEST_REFRESH = 10;
     private ShoppingCartAdapter mShoppingCartAdapter;
     private List<SaleGoodsItemModel> mItemData = new ArrayList<>();
     private List<GoodsUnitModel> mUnitData = new ArrayList<>();
@@ -203,6 +205,17 @@ public class ShoppingCartActivity extends BaseActivity {
         mShoppingCartAdapter = new ShoppingCartAdapter(mRecyclerView, mItemData, mUnitData);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mShoppingCartAdapter);
+
+        mShoppingCartAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                if (holder != null && position < mItemData.size()) {
+                    Intent intent = new Intent(ShoppingCartActivity.this, ShopDetailActivity.class);
+                    intent.putExtra("shoppingId", mItemData.get(position).ProductId);
+                    startActivityForResult(intent, REQUEST_REFRESH);
+                }
+            }
+        });
     }
 
     @Override
@@ -269,5 +282,12 @@ public class ShoppingCartActivity extends BaseActivity {
             return totalCount;
         }
         return totalCount;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mItemData.clear();
+        loadData();
     }
 }

@@ -267,7 +267,7 @@ public class CollectionActivity extends BaseActivity {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, CollectionActivity.this);
+                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, CollectionActivity.this,0);
                                 goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {

@@ -46,13 +46,15 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     private int orderCount=0;
     private TabGoodsFragment context;
     private BaseActivity activity;
+    private int icon;
 
-    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type,TabGoodsFragment context,BaseActivity activity) {
+    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type,TabGoodsFragment context,BaseActivity activity,int icon) {
         super(recyclerView);
         this.data = data;
         this.type = type;
         this.context = context;
         this.activity = activity;
+        this.icon = icon;
     }
 
     @Override
@@ -81,6 +83,24 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                         .dontAnimate()
                         .into(itemViewHolder.itemImg);
             }
+
+            switch (icon){
+                case 0:
+                    break;
+                case 1:
+                    itemViewHolder.tvIcon.setVisibility(View.VISIBLE);
+                    itemViewHolder.tvIcon.setText("促销");
+                    break;
+                case 2:
+                    itemViewHolder.tvIcon.setVisibility(View.VISIBLE);
+                    itemViewHolder.tvIcon.setText("新品");
+                    break;
+                case 3:
+                    itemViewHolder.tvIcon.setVisibility(View.VISIBLE);
+                    itemViewHolder.tvIcon.setText("推荐");
+                    break;
+            }
+
             itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
             if (goodsBean.Code.length() <= 6) {
                 itemViewHolder.tvCode.setText("编号：" + goodsBean.Code);
@@ -386,6 +406,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         TextView tvPrice;
         TextView tvCode;
         AnimShopButton btnEle;
+        TextView tvIcon;
 
         public ItemViewHolder(View itemView) {
 
@@ -397,6 +418,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             tvPrice = $(R.id.tv_price);
             btnEle = $(R.id.btnEle);
             tvCode = $(R.id.tv_Code);
+            tvIcon = $(R.id.tv_icon);
         }
     }
 }

@@ -173,7 +173,7 @@ public class ProductListActivity extends BaseActivity {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, ProductListActivity.this));
+                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, ProductListActivity.this,0));
                             } else {
                                 ToastUtils.showShortSafe("无结果");
                             }
@@ -207,7 +207,7 @@ public class ProductListActivity extends BaseActivity {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this,0);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);

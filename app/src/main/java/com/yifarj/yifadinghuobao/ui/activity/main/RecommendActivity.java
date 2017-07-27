@@ -161,7 +161,7 @@ public class RecommendActivity extends BaseActivity {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,RecommendActivity.this);
+                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,RecommendActivity.this,3);
                                 goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
@@ -206,7 +206,7 @@ public class RecommendActivity extends BaseActivity {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null,this);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null,this,3);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);

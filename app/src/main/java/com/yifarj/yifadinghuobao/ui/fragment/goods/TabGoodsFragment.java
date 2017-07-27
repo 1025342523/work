@@ -172,7 +172,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                GoodsListAdapter goodsListAdapter = new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this, null);
+                                GoodsListAdapter goodsListAdapter = new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this, null,0);
                                 goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
@@ -255,7 +255,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, TabGoodsFragment.this, null);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, TabGoodsFragment.this, null,0);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -435,8 +435,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        pageInfo.PageIndex = 0;
-        goodsList.clear();
         onTab1Click();
     }
 

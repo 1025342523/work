@@ -262,7 +262,7 @@ public class TabMainFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, false,null,null);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, false,null,null,0);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
 //        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
