@@ -83,6 +83,7 @@ public class LoginActivity extends BaseActivity {
             etName.setText(name);
             etName.setSelection(0, name.length());
         }
+
         clicks(btnLogin)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
@@ -313,6 +314,7 @@ public class LoginActivity extends BaseActivity {
                                                     //重新订阅
                                                     mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                                     try {
+                                                        loadingDialog.dismiss();
                                                         RxTextView.text(tvCode).accept("发送验证码");
                                                         //按钮可点击
                                                         RxView.enabled(tvCode).accept(true);
@@ -326,7 +328,6 @@ public class LoginActivity extends BaseActivity {
                                         @Override
                                         public void onError(@NonNull Throwable e) {
                                             LogUtils.e("获取Trader onError" + e.getMessage());
-                                            loadingDialog.dismiss();
                                             ToastUtils.showShortSafe(getString(R.string.login_failure) + e.getMessage());
                                             if (mDisposable != null && !mDisposable.isDisposed()) {
                                                 //停止倒计时
@@ -334,6 +335,7 @@ public class LoginActivity extends BaseActivity {
                                                 //重新订阅
                                                 mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                                 try {
+                                                    loadingDialog.dismiss();
                                                     RxTextView.text(tvCode).accept("发送验证码");
                                                     //按钮可点击
                                                     RxView.enabled(tvCode).accept(true);
@@ -358,6 +360,7 @@ public class LoginActivity extends BaseActivity {
                                 mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                 try {
                                     RxTextView.text(tvCode).accept("发送验证码");
+                                    loadingDialog.dismiss();
                                     //按钮可点击
                                     RxView.enabled(tvCode).accept(true);
                                 } catch (Exception e) {

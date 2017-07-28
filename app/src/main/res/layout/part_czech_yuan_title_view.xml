@@ -18,7 +18,7 @@
         android:scaleType="fitXY"/>
 
 
-    <ImageView
+    <TextView
         android:id="@+id/ivLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +26,9 @@
         android:layout_marginLeft="@dimen/size_20"
         android:layout_marginStart="@dimen/size_20"
         android:padding="@dimen/size_10"
-        android:scaleType="fitXY"/>
+        android:text="分类"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_20"/>
 
     <TextView
         android:id="@+id/tvRight_icon"
@@ -36,9 +38,9 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="@dimen/size_16"
         android:layout_marginTop="@dimen/size_10"
+        android:background="@drawable/shape_titleview_icon"
         android:gravity="center"
         android:maxLines="1"
-        android:background="@drawable/shape_titleview_icon"
         android:textColor="@color/main_blue"
         android:textSize="@dimen/font_24"
         android:visibility="gone"/>

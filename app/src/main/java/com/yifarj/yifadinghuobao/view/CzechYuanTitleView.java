@@ -19,7 +19,7 @@ import com.yifarj.yifadinghuobao.R;
 public class CzechYuanTitleView extends RelativeLayout {
 
     private ImageView ivRight;
-    private ImageView ivLeft;
+    private TextView ivLeft;
     private RelativeLayout rlSearch;
     private TextView tvRightIcon;
 
@@ -50,7 +50,7 @@ public class CzechYuanTitleView extends RelativeLayout {
             contentView.getLayoutParams().height = getResources().getDimensionPixelSize(R.dimen.size_84);
         }
         ivRight = (ImageView) contentView.findViewById(R.id.ivRight);
-        ivLeft = (ImageView) contentView.findViewById(R.id.ivLeft);
+        ivLeft = (TextView) contentView.findViewById(R.id.ivLeft);
         rlSearch = (RelativeLayout) contentView.findViewById(R.id.rlSearch);
         tvRightIcon = (TextView) contentView.findViewById(R.id.tvRight_icon);
         if (array != null) {
@@ -62,7 +62,8 @@ public class CzechYuanTitleView extends RelativeLayout {
 
                         drawable = array.getDrawable(R.styleable.CzechYuanTitleView_icon_left_czech_yuan);
                         if (drawable != null) {
-                            ivLeft.setImageDrawable(drawable);
+                            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                            ivLeft.setCompoundDrawables(null, drawable, null, null);
                         }
                         break;
                     case R.styleable.CzechYuanTitleView_icon_right_czech_yuan:
@@ -95,12 +96,6 @@ public class CzechYuanTitleView extends RelativeLayout {
         }
     }
 
-
-    public void setImageLeft(int resId) {
-        if (ivLeft != null) {
-            ivLeft.setImageResource(resId);
-        }
-    }
 
     public void setImageRight(int resId) {
         if (ivRight != null) {

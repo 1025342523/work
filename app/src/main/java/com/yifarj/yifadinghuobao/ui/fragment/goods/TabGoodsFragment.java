@@ -116,8 +116,8 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
             }
         });
         titleView.setRlSearchClickListener(view -> {
-            searchView.show();
             titleView.setVisibility(View.GONE);
+            searchView.show();
         });
         searchView.setOnSearchClickListener(new SearchView.OnSearchClickListener() {
             @Override
@@ -172,7 +172,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                GoodsListAdapter goodsListAdapter = new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this, null,0);
+                                GoodsListAdapter goodsListAdapter = new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, TabGoodsFragment.this, null, 0);
                                 goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
@@ -255,7 +255,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, TabGoodsFragment.this, null,0);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, TabGoodsFragment.this, null, 0);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -404,10 +404,13 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     public void showEmptyView() {
         //        mSwipeRefreshLayout.setRefreshing(false);
+        if (mCustomEmptyView == null || mRecyclerView == null) {
+            return;
+        }
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
-        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
+        mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
+        mCustomEmptyView.setEmptyText("暂无数据");
     }
 
 
