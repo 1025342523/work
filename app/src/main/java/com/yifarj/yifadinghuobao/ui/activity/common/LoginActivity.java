@@ -304,6 +304,7 @@ public class LoginActivity extends BaseActivity {
                                                 loadingDialog.dismiss();
                                                 LogUtils.e("获取Trader onNext");
                                                 DataSaver.setPriceSystemId(traderEntity.Value.DefaultPriceSystemId);
+                                                DataSaver.setTraderInfo(traderEntity.Value);
                                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                                 finish();
                                             } else {

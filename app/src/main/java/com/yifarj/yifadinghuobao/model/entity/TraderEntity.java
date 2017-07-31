@@ -200,7 +200,7 @@ public class TraderEntity {
         public Object Propery26;
         public List<TraderContactListEntity> TraderContactList;
         public List<?> ShipperAddressList;
-        public List<?> TraderDeliveryAddressList;
+        public List<TraderDeliveryAddressListEntity> TraderDeliveryAddressList;
         public List<PriceSystemListEntity> PriceSystemList;
 
         public static class TraderContactListEntity {
@@ -317,6 +317,12 @@ public class TraderEntity {
             public boolean IsOrderMeetingPrice;
             public boolean GuidePrice;
             public boolean IsProtectivePrice;
+        }
+
+        public static class TraderDeliveryAddressListEntity {
+            public String Address;
+            public int Id;
+            public int TraderId;
         }
     }
 }

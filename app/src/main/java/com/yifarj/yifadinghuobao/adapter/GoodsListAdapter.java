@@ -27,6 +27,7 @@ import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.goods.TabGoodsFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
+
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -43,12 +44,12 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     public List<GoodsListEntity.ValueEntity> data;
     public boolean onbind;
     private boolean type;
-    private int orderCount=0;
+    private int orderCount = 0;
     private TabGoodsFragment context;
     private BaseActivity activity;
     private int icon;
 
-    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type,TabGoodsFragment context,BaseActivity activity,int icon) {
+    public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type, TabGoodsFragment context, BaseActivity activity, int icon) {
         super(recyclerView);
         this.data = data;
         this.type = type;
@@ -73,8 +74,8 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             onbind = true;
             String unitName = null;
             int unitId = 0;
-
-            if (goodsBean.ProductPictureList.size() > 0) {
+            itemViewHolder.itemImg.setImageResource(R.drawable.default_image);
+            if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
                         .centerCrop()
@@ -84,7 +85,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                         .into(itemViewHolder.itemImg);
             }
 
-            switch (icon){
+            switch (icon) {
                 case 0:
                     break;
                 case 1:
@@ -143,22 +144,22 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                         .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                             @Override
                             public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                                LogUtils.e("saleGoodsItemModels："+saleGoodsItemModels.size());
+                                LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
                                 orderCount = saleGoodsItemModels.size();
-                                if(orderCount>0){
-                                    if(context != null){
-                                        context.setRightIcon(View.VISIBLE,orderCount);
-                                    }else if(activity != null){
-                                        activity.setRightIcon(View.VISIBLE,orderCount);
+                                if (orderCount > 0) {
+                                    if (context != null) {
+                                        context.setRightIcon(View.VISIBLE, orderCount);
+                                    } else if (activity != null) {
+                                        activity.setRightIcon(View.VISIBLE, orderCount);
                                     }
-                                }else if(orderCount==0){
-                                    if(context != null){
-                                        context.setRightIcon(View.GONE,0);
-                                    }else if(activity != null){
-                                        activity.setRightIcon(View.GONE,0);
+                                } else if (orderCount == 0) {
+                                    if (context != null) {
+                                        context.setRightIcon(View.GONE, 0);
+                                    } else if (activity != null) {
+                                        activity.setRightIcon(View.GONE, 0);
                                     }
                                 }
-                                LogUtils.e("orderCount："+orderCount);
+                                LogUtils.e("orderCount：" + orderCount);
                             }
                         });
 
@@ -179,31 +180,31 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                         @Override
                                         public void accept(@NonNull Boolean aBean) throws Exception {
                                             LogUtils.e(mItem.ProductName + "：数量增加为" + i);
-                                            if(i==1){
-                                                orderCount=orderCount+1;
-                                                if (orderCount>0){
-                                                    if(context != null){
-                                                        context.setRightIcon(View.VISIBLE,orderCount);
-                                                    }else if(activity != null){
-                                                        activity.setRightIcon(View.VISIBLE,orderCount);
+                                            if (i == 1) {
+                                                orderCount = orderCount + 1;
+                                                if (orderCount > 0) {
+                                                    if (context != null) {
+                                                        context.setRightIcon(View.VISIBLE, orderCount);
+                                                    } else if (activity != null) {
+                                                        activity.setRightIcon(View.VISIBLE, orderCount);
                                                     }
-                                                    LogUtils.e("orderCount："+orderCount);
+                                                    LogUtils.e("orderCount：" + orderCount);
                                                 }
                                             }
                                         }
                                     });
                                 } else {
                                     add(goodsBean, i, tempUnitName, tempUnitId);
-                                    LogUtils.e("onAddSuccess---add---"+goodsBean.Name);
-                                    if(i==1){
-                                        orderCount=orderCount+1;
-                                        if (orderCount>0){
-                                            if(context != null){
-                                                context.setRightIcon(View.VISIBLE,orderCount);
-                                            }else if(activity != null){
-                                                activity.setRightIcon(View.VISIBLE,orderCount);
+                                    LogUtils.e("onAddSuccess---add---" + goodsBean.Name);
+                                    if (i == 1) {
+                                        orderCount = orderCount + 1;
+                                        if (orderCount > 0) {
+                                            if (context != null) {
+                                                context.setRightIcon(View.VISIBLE, orderCount);
+                                            } else if (activity != null) {
+                                                activity.setRightIcon(View.VISIBLE, orderCount);
                                             }
-                                            LogUtils.e("orderCount："+orderCount);
+                                            LogUtils.e("orderCount：" + orderCount);
                                         }
                                     }
                                 }
@@ -233,30 +234,30 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                         @Override
                                         public void accept(@NonNull Boolean aBean) throws Exception {
                                             LogUtils.e(mItem.ProductName + "：数量减少为" + i);
-                                            if(i==0){
+                                            if (i == 0) {
                                                 delete(goodsBean);
-                                                orderCount=orderCount-1;
-                                                if (orderCount>0){
-                                                    if(context != null){
-                                                        context.setRightIcon(View.VISIBLE,orderCount);
-                                                    }else if(activity != null){
-                                                        activity.setRightIcon(View.VISIBLE,orderCount);
+                                                orderCount = orderCount - 1;
+                                                if (orderCount > 0) {
+                                                    if (context != null) {
+                                                        context.setRightIcon(View.VISIBLE, orderCount);
+                                                    } else if (activity != null) {
+                                                        activity.setRightIcon(View.VISIBLE, orderCount);
                                                     }
-                                                    LogUtils.e("orderCount："+orderCount);
-                                                }else if(orderCount==0){
-                                                    if(context != null){
-                                                        context.setRightIcon(View.GONE,0);
-                                                    }else if(activity != null){
-                                                        activity.setRightIcon(View.GONE,0);
+                                                    LogUtils.e("orderCount：" + orderCount);
+                                                } else if (orderCount == 0) {
+                                                    if (context != null) {
+                                                        context.setRightIcon(View.GONE, 0);
+                                                    } else if (activity != null) {
+                                                        activity.setRightIcon(View.GONE, 0);
                                                     }
-                                                    LogUtils.e("orderCount："+orderCount);
+                                                    LogUtils.e("orderCount：" + orderCount);
                                                 }
                                             }
                                         }
                                     });
                                 } else {
                                     add(goodsBean, i, tempUnitName, tempUnitId);
-                                    LogUtils.e("onDelSuccess---add---"+goodsBean.Name);
+                                    LogUtils.e("onDelSuccess---add---" + goodsBean.Name);
                                 }
 
                             }
