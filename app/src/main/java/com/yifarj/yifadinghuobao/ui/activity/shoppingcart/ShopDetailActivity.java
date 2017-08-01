@@ -279,6 +279,9 @@ public class ShopDetailActivity extends BaseActivity {
                                 list.add(AppInfoUtil.genPicUrl(unit.Path));
                                 LogUtils.e(goodsBean.Name + "图片Url：" + AppInfoUtil.genPicUrl(unit.Path));
                             }
+                            if(list.size()==0){
+                                list.add("http://img4.imgtn.bdimg.com/it/u=1007043693,2735869963&fm=26&gp=0.jpg");
+                            }
                             banner.setImages(list);
                             //banner设置方法全部调用完毕时最后调用
                             banner.start();

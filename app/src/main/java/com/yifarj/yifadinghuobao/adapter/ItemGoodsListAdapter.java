@@ -4,16 +4,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.SaleGoodsItem;
-import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 
 import java.util.List;
 
@@ -50,23 +46,26 @@ public class ItemGoodsListAdapter extends AbsRecyclerViewAdapter {
         if (holder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             SaleGoodsItem.ValueEntity goodsBean = data.get(position);
-            Glide.with(getContext())
+            /*Glide.with(getContext())
                     .load(AppInfoUtil.genPicUrl(goodsBean.ImagePath))
                     .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.default_image)
                     .dontAnimate()
-                    .into(itemViewHolder.itemImg);
+                    .into(itemViewHolder.itemImg);*/
 
             itemViewHolder.tvName.setText(goodsBean.ProductName);
             itemViewHolder.tvPrice.setText(String.valueOf(goodsBean.TotalPrice));
+//            itemViewHolder.tvCode.setText(goodsBean.Code);
+            itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
+
             String quantity = String.valueOf(goodsBean.Quantity);
             Flowable.fromIterable(goodsBean.ProductUnitList)
                     .forEach(new Consumer<ProductUnitEntity.ValueEntity>() {
                         @Override
                         public void accept(@NonNull ProductUnitEntity.ValueEntity valueEntity) throws Exception {
                             if (valueEntity.Id == goodsBean.UnitId) {
-                                itemViewHolder.tvUnit.setText(goodsBean.UnitPrice + "/" + valueEntity.Name);
+//                                itemViewHolder.tvUnit.setText(goodsBean.UnitPrice + "/" + valueEntity.Name);
                                 itemViewHolder.tvCount.setText(quantity + valueEntity.Name);
                             }
                         }
@@ -84,21 +83,25 @@ public class ItemGoodsListAdapter extends AbsRecyclerViewAdapter {
 
     public class ItemViewHolder extends ClickableViewHolder {
 
-        ImageView itemImg;
+//        ImageView itemImg;
         TextView tvName;
-        TextView tvUnit;
+//        TextView tvUnit;
         TextView tvPrice;
         TextView tvCount;
+//        TextView tvCode;
+        TextView tvPackSpec;
 
         public ItemViewHolder(View itemView) {
 
             super(itemView);
 
-            itemImg = $(R.id.item_img);
+//            itemImg = $(R.id.item_img);
             tvName = $(R.id.tv_name);
-            tvUnit = $(R.id.tv_unit);
+//            tvUnit = $(R.id.tv_unit);
             tvPrice = $(R.id.tv_price);
             tvCount = $(R.id.tvCount);
+//            tvCode = $(R.id.tv_code);
+            tvPackSpec = $(R.id.tv_packSpec);
         }
     }
 }

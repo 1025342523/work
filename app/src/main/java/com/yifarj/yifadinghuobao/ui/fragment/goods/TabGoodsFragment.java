@@ -268,6 +268,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
             @Override
             public void onLoadMore(int i) {
+                LogUtils.e("currentPage: "+i);
                 mIsRefreshing = true;
                 pageInfo.PageIndex++;
                 loadData();
@@ -443,19 +444,15 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.search_all_layout:
-                mIsRefreshing = false;
                 onTab1Click();
                 break;
             case R.id.search_name_layout:
-                mIsRefreshing = false;
                 onTab2Click();
                 break;
             case R.id.search_code_layout:
-                mIsRefreshing = false;
                 onTab3Click();
                 break;
             case R.id.search_price_layout:
-                mIsRefreshing = false;
                 onTab4Click();
                 break;
         }
@@ -463,6 +460,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     private void onTab1Click() {
         setCheckedItem(0);
+        mIsRefreshing = false;
         goodsList.clear();
         pageInfo.PageIndex = 0;
         pageInfo.SortOrder = 2;
@@ -472,6 +470,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     private void onTab2Click() {
         setCheckedItem(1);
+        mIsRefreshing = false;
         goodsList.clear();
         pageInfo.PageIndex = 0;
         pageInfo.SortOrder = 2;
@@ -481,6 +480,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     private void onTab3Click() {
         setCheckedItem(2);
+        mIsRefreshing = false;
         goodsList.clear();
         pageInfo.PageIndex = 0;
         pageInfo.SortOrder = 2;
@@ -490,6 +490,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
 
     private void onTab4Click() {
         setCheckedItem(3);
+        mIsRefreshing = false;
         goodsList.clear();
         pageInfo.PageIndex = 0;
         pageInfo.SortOrder = 2;

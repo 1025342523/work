@@ -106,25 +106,13 @@
                     app:editable="false"
                     app:name="@string/phone_number"/>
 
-
-                <RelativeLayout
+                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                    android:id="@+id/ciGoodsListCount"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/size_100"
+                    android:layout_height="wrap_content"
+                    app:editable="false"
                     android:layout_marginTop="@dimen/size_20"
-                    android:background="@color/white">
-
-                    <TextView
-                        android:id="@+id/tvName"
-                        android:layout_width="@dimen/size_150"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:gravity="end"
-                        android:text="@string/goods_list"
-                        android:textColor="#b6c3ca"
-                        android:textSize="@dimen/font_30"/>
-
-
-                </RelativeLayout>
+                    app:name="@string/goods_list"/>
 
                 <!--<View-->
                 <!--android:layout_width="match_parent"-->
@@ -132,14 +120,6 @@
                 <!--android:layout_marginLeft="@dimen/size_20"-->
                 <!--android:layout_marginStart="@dimen/size_20"-->
                 <!--android:background="@color/line_color"/>-->
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recycle"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:overScrollMode="never"
-                    android:scrollbars="none"/>
-
 
                 <com.yifarj.yifadinghuobao.view.CustomEditItem
                     android:id="@+id/ciDate"

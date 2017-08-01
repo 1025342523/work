@@ -1,11 +1,10 @@
 package com.yifarj.yifadinghuobao.ui.activity.order;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -21,7 +20,6 @@ import com.raizlabs.android.dbflow.sql.language.Delete;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.wx.wheelview.widget.WheelView;
 import com.yifarj.yifadinghuobao.R;
-import com.yifarj.yifadinghuobao.adapter.ItemGoodsListAdapter;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
@@ -44,7 +42,6 @@ import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.WheelViewBottomDialog;
 import com.yifarj.yifadinghuobao.view.listener.SimpleTextWatcher;
-import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -102,14 +99,11 @@ public class MettingOrderActivity extends BaseActivity {
     @BindView(R.id.ciPhone)
     CustomEditItem ciPhone;
 
-    @BindView(R.id.tvName)
-    TextView tvName;
+    @BindView(R.id.ciGoodsListCount)
+    CustomEditItem ciGoodsListCount;
 
     @BindView(R.id.ciDeliveryDate)
     CustomEditItem ciDeliveryDate;
-
-    @BindView(R.id.recycle)
-    RecyclerView mRecyclerView;
 
     @BindView(R.id.ciDate)
     CustomEditItem ciDate;
@@ -130,12 +124,11 @@ public class MettingOrderActivity extends BaseActivity {
     private List<ReceiveMethodListEntity.ValueEntity> receiveMethodList;
     private List<SaleGoodsItem.ValueEntity> mItemData = new ArrayList<>();
 
-    private ItemGoodsListAdapter mItemGoodsListAdapter;
-
     private boolean isCreate;
     private int mPosition;
     private int orderId;
     private boolean refresh;
+    private int orderCount,orderTotal;
 
     @Override
     public int getLayoutId() {
@@ -204,9 +197,9 @@ public class MettingOrderActivity extends BaseActivity {
                                                 mItem.DefaultLocationName = saleGoodsItemModel.DefaultLocationName;
                                                 mItem.OweRemark = saleGoodsItemModel.Remark;
                                                 mItem.BatchId = "";
+                                                mItem.Code = saleGoodsItemModel.Code;
                                                 mItemData.add(mItem);
                                                 LogUtils.e("GoodsItem数量为：" + mItemData.size());
-
 
                                                 RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class).where(GoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
                                                         .queryList()
@@ -243,13 +236,10 @@ public class MettingOrderActivity extends BaseActivity {
                         }
                     });
 
-
             getCreateOrderInfo();
         } else {
             getOrderData();
         }
-
-
     }
 
 
@@ -275,6 +265,7 @@ public class MettingOrderActivity extends BaseActivity {
                         if (!createOrderEntity.HasError && createOrderEntity.Value != null) {
                             orderInfo = createOrderEntity.Value;
                             mItemData.addAll(orderInfo.SalesOutBillItemList);
+                            LogUtils.e("GoodsItem数量为：" + mItemData.size());
                             setData(false);
                         } else {
                             showEmptyView();
@@ -292,17 +283,6 @@ public class MettingOrderActivity extends BaseActivity {
                 });
     }
 
-    @Override
-    public void initRecyclerView() {
-        mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mItemGoodsListAdapter = new ItemGoodsListAdapter(mRecyclerView, mItemData);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
-        mRecyclerView.setAdapter(mItemGoodsListAdapter);
-    }
-
-
     private void init() {
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
@@ -310,7 +290,19 @@ public class MettingOrderActivity extends BaseActivity {
                 finish();
             }
         });
+
+        ciGoodsListCount.setOnItemClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MettingOrderActivity.this,GoodsListActivity.class);
+                intent.putExtra("CreateOrder",isCreate);
+                intent.putExtra("orderId",orderId);
+                startActivity(intent);
+            }
+        });
+
         if (isCreate) {
+
             ciRemark.getEditText().addTextChangedListener(new SimpleTextWatcher() {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -514,6 +506,7 @@ public class MettingOrderActivity extends BaseActivity {
     private void getIntentExtra() {
         isCreate = getIntent().getBooleanExtra("CreateOrder", false);
         orderId = getIntent().getIntExtra("orderId", 0);
+        LogUtils.e("isCreate：" + isCreate + "，orderId："+orderId);
     }
 
     private void getCreateOrderInfo() {
@@ -594,6 +587,13 @@ public class MettingOrderActivity extends BaseActivity {
             }
         }
 
+        LogUtils.e("GoodsItem数量为：" + mItemData.size());
+        orderCount = mItemData.size();
+        for(SaleGoodsItem.ValueEntity valueEntity: mItemData){
+            orderTotal += valueEntity.Quantity;
+        }
+        ciGoodsListCount.getEditText().setText("共"+orderCount+"款，总数"+orderTotal);
+
         ciDate.getEditText().setText(DateUtil.getFormatDate(orderInfo.BillDate * 1000));
         ciDeliveryDate.getEditText().setText(DateUtil.getFormatDate(orderInfo.BillDate * 1000));
         ciName.getEditText().setText(orderInfo.TraderName);
@@ -602,8 +602,6 @@ public class MettingOrderActivity extends BaseActivity {
         ciRemark.getEditText().setText(orderInfo.Remark);
         ciContact.getEditText().setText(orderInfo.TraderContactName);
         ciPhone.getEditText().setText(orderInfo.TraderPhone);
-
-        initRecyclerView();
 
         if (isCreate) {
             titleView.setTitle("填写订单");
@@ -661,6 +659,5 @@ public class MettingOrderActivity extends BaseActivity {
         rlBottomView.setVisibility(View.VISIBLE);
         scrollView.setVisibility(View.VISIBLE);
     }
-
 
 }

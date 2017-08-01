@@ -38,6 +38,7 @@ public class SaleGoodsItem {
         public String ImagePath;
 
         public int Id;
+        public String Code = "";
         public int BillId;
         public int SalesType;
         public int WarehouseId;
@@ -138,6 +139,7 @@ public class SaleGoodsItem {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(this.Id);
+            dest.writeString(this.Code);
             dest.writeInt(this.BillId);
             dest.writeInt(this.SalesType);
             dest.writeInt(this.WarehouseId);
@@ -219,6 +221,7 @@ public class SaleGoodsItem {
 
         protected ValueEntity(Parcel in) {
             this.Id = in.readInt();
+            this.Code = in.readString();
             this.BillId = in.readInt();
             this.SalesType = in.readInt();
             this.WarehouseId = in.readInt();
