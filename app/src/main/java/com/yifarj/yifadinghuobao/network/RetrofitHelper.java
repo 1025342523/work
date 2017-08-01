@@ -16,6 +16,7 @@ import com.yifarj.yifadinghuobao.network.api.ProductCategoryListService;
 import com.yifarj.yifadinghuobao.network.api.ProductMemoryPriceService;
 import com.yifarj.yifadinghuobao.network.api.ReceiveMethodService;
 import com.yifarj.yifadinghuobao.network.api.SaveOrderService;
+import com.yifarj.yifadinghuobao.network.api.SaveTraderService;
 import com.yifarj.yifadinghuobao.network.api.StockInfoForToolTipListService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 
@@ -132,6 +133,12 @@ public class RetrofitHelper {
 
         return createApi(ProductCategoryListService.class, ApiConstants.CUrl.BASE_URL);
     }
+
+    public static SaveTraderService saveTraderApi() {
+
+        return createApi(SaveTraderService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
 
     /**
      * 根据传入的baseUrl，和api创建retrofit

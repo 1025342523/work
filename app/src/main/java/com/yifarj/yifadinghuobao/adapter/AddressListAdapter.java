@@ -22,10 +22,28 @@ import java.util.List;
  */
 public class AddressListAdapter extends AbsRecyclerViewAdapter {
     public List<TraderEntity.ValueEntity.TraderDeliveryAddressListEntity> data;
+    private DeleteClickListener mDeleteClickListener;
+    private EditClickListener mEditClickListener;
 
     public AddressListAdapter(RecyclerView recyclerView, List<TraderEntity.ValueEntity.TraderDeliveryAddressListEntity> data) {
         super(recyclerView);
         this.data = data;
+    }
+
+    public interface DeleteClickListener {
+        void deleteClick(int position);
+    }
+
+    public interface EditClickListener {
+        void editClick(int position);
+    }
+
+    public void setDeleteClickListener(DeleteClickListener l) {
+        this.mDeleteClickListener = l;
+    }
+
+    public void setEditClickListener(EditClickListener l) {
+        this.mEditClickListener = l;
     }
 
     @Override
@@ -43,14 +61,35 @@ public class AddressListAdapter extends AbsRecyclerViewAdapter {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             TraderEntity.ValueEntity.TraderDeliveryAddressListEntity goodsBean = data.get(position);
             itemViewHolder.tvAddress.setText(goodsBean.Address);
-            if (position == 0) {
-                itemViewHolder.ivDefault.setImageResource(R.drawable.ic_address);
-            }
+//            if (position == 0) {
+//                itemViewHolder.ivDefault.setImageResource(R.drawable.ic_address);
+//            }
+
+            itemViewHolder.tvDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mDeleteClickListener != null) {
+                        mDeleteClickListener.deleteClick(holder.getLayoutPosition());
+                    }
+                }
+            });
+
+            itemViewHolder.tvEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mEditClickListener != null) {
+                        mEditClickListener.editClick(holder.getLayoutPosition());
+                    }
+                }
+            });
         }
 
         super.onBindViewHolder(holder, position);
     }
 
+    public void setData(List<TraderEntity.ValueEntity.TraderDeliveryAddressListEntity> list) {
+        data = list;
+    }
 
     @Override
     public int getItemCount() {

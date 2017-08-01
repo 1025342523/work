@@ -24,9 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/size_200"
             android:background="@color/white"
-            android:gravity="center"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
 
             <EditText
@@ -34,23 +32,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/shape_edit_address"
+                android:gravity="start"
                 android:hint="输入详细地址"
-                android:paddingLeft="@dimen/size_20"
+                android:padding="@dimen/size_10"
                 android:textColor="@color/main_text2"
                 android:textSize="@dimen/font_26"/>
         </LinearLayout>
 
-
-        <TextView
-            android:id="@+id/tvSetDefault"
+        <LinearLayout
+            android:id="@+id/llSetDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/size_10"
             android:layout_marginTop="@dimen/size_20"
-            android:drawableLeft="@drawable/ic_check_default_address"
-            android:text="设为默认收货地址"
-            android:textColor="@color/text_desc"
-            android:textSize="@dimen/font_24"/>
+            android:clickable="true"
+            android:gravity="center|left"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivDefault"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/size_20"
+                android:layout_marginStart="@dimen/size_20"/>
+
+            <TextView
+                android:id="@+id/tvSetDefault"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="设为默认收货地址"
+                android:textColor="@color/text_desc"
+                android:textSize="@dimen/font_24"/>
+        </LinearLayout>
+
 
     </LinearLayout>
 
