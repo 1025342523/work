@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/whitesmoke">
+
+    <com.yifarj.yifadinghuobao.view.TitleView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:icon_left="@drawable/ic_title_back"
+        app:title_name="编辑收货地址"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/titleView"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/size_200"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shape_edit_address"
+                android:hint="输入详细地址"
+                android:paddingLeft="@dimen/size_20"
+                android:textColor="@color/main_text2"
+                android:textSize="@dimen/font_26"/>
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tvSetDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/size_10"
+            android:layout_marginTop="@dimen/size_20"
+            android:drawableLeft="@drawable/ic_check_default_address"
+            android:text="设为默认收货地址"
+            android:textColor="@color/text_desc"
+            android:textSize="@dimen/font_24"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_110"
+        android:layout_alignParentBottom="true"
+        android:background="@color/main_blue"
+        android:text="@string/title_text_save"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_30"
+        />
+
+</RelativeLayout>

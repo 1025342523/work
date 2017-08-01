@@ -23,8 +23,8 @@ public class ProductUnitEntity  {
         public int Id;
         public int ProductId;
         public String Name;
-        public int Factor;
-        public int BasicFactor = 1;
+        public double Factor;
+        public double BasicFactor = 1;
         public boolean IsBasic;//判断是否为最小单位 1为true
         public boolean IsDefault;
         public boolean BreakupNotify;
@@ -43,8 +43,8 @@ public class ProductUnitEntity  {
             dest.writeInt(this.Id);
             dest.writeInt(this.ProductId);
             dest.writeString(this.Name);
-            dest.writeInt(this.Factor);
-            dest.writeInt(this.BasicFactor);
+            dest.writeDouble(this.Factor);
+            dest.writeDouble(this.BasicFactor);
             dest.writeByte(this.IsBasic ? (byte) 1 : (byte) 0);
             dest.writeByte(this.IsDefault ? (byte) 1 : (byte) 0);
             dest.writeByte(this.BreakupNotify ? (byte) 1 : (byte) 0);
@@ -55,8 +55,8 @@ public class ProductUnitEntity  {
             this.Id = in.readInt();
             this.ProductId = in.readInt();
             this.Name = in.readString();
-            this.Factor = in.readInt();
-            this.BasicFactor = in.readInt();
+            this.Factor = in.readDouble();
+            this.BasicFactor = in.readDouble();
             this.IsBasic = in.readByte() != 0;
             this.IsDefault = in.readByte() != 0;
             this.BreakupNotify = in.readByte() != 0;

@@ -1,6 +1,7 @@
 package com.yifarj.yifadinghuobao.model.helper;
 
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
+import com.yifarj.yifadinghuobao.model.entity.TraderEntity;
 
 /**
  * DataSaver
@@ -11,6 +12,7 @@ import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
 public class DataSaver {
 
     private static MettingLoginEntity.ValueEntity mettingCustomerInfo;
+    private static TraderEntity.ValueEntity traderInfo;
     private static int mPriceSystemId;
 
     public static void setMettingCustomerInfo(MettingLoginEntity.ValueEntity customerInfo) {
@@ -28,4 +30,13 @@ public class DataSaver {
     public static int getPriceSystemId() {
         return mPriceSystemId;
     }
+
+    public static void setTraderInfo(TraderEntity.ValueEntity mTraderInfo) {
+        traderInfo = mTraderInfo;
+    }
+
+    public static TraderEntity.ValueEntity getTraderInfo() {
+        return traderInfo;
+    }
+
 }

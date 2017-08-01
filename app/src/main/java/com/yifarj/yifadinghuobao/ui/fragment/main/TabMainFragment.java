@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,13 +57,13 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class TabMainFragment extends BaseFragment {
 
-    @BindView(R.id.viewpager)
+    //    @BindView(R.id.viewpager)
     AutoScrollViewPager viewPager;
 
-    @BindView(R.id.indicator)
+    //    @BindView(R.id.indicator)
     ViewPagerIndicator indicator;
 
-    @BindView(R.id.rlPagerContainer)
+    //    @BindView(R.id.rlPagerContainer)
     RelativeLayout rlPagerContainer;
 
     @BindView(R.id.recycle)
@@ -75,13 +75,13 @@ public class TabMainFragment extends BaseFragment {
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @BindView(R.id.tvPromotion)
+    //    @BindView(R.id.tvPromotion)
     TextView tvPromotion;
-    @BindView(R.id.tvCollection)
+    //    @BindView(R.id.tvCollection)
     TextView tvCollection;
-    @BindView(R.id.tvNewProduct)
+    //    @BindView(R.id.tvNewProduct)
     TextView tvNewProduct;
-    @BindView(R.id.tvRecommend)
+    //    @BindView(R.id.tvRecommend)
     TextView tvRecommend;
 
     private boolean mIsRefreshing = false;
@@ -104,6 +104,179 @@ public class TabMainFragment extends BaseFragment {
     @Override
     protected void finishCreateView(Bundle savedInstanceState) {
         isPrepared = true;
+        lazyLoad();
+    }
+
+
+    @Override
+    protected void lazyLoad() {
+        if (!isPrepared && !isVisible) {
+            LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
+            return;
+        }
+        initRefreshLayout();
+        initRecyclerView();
+        isPrepared = false;
+    }
+
+    @Override
+    protected void initRefreshLayout() {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
+        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
+//        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+        mSwipeRefreshLayout.post(() -> {
+
+            mSwipeRefreshLayout.setRefreshing(true);
+            mIsRefreshing = true;
+            loadData();
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            pageInfo.PageIndex = 0;
+            mIsRefreshing = false;
+            goodsList.clear();
+            loadData();
+        });
+    }
+
+    @Override
+    protected void initRecyclerView() {
+        mRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, null, 0);
+        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
+//        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
+        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
+        setRecycleNoScroll();
+        createHeadView();
+        createLoadMoreView();
+        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
+
+            @Override
+            public void onLoadMore(int i) {
+                pageInfo.PageIndex++;
+                loadData();
+                loadMoreView.setVisibility(View.VISIBLE);
+            }
+        });
+        mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
+                if (holder != null && position < goodsList.size()) {
+                    Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                    intent.putExtra("shoppingId", goodsList.get(position).Id);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void loadData() {
+        LogUtils.e("loadData", "获取商品列表数据");
+        if (pageInfo == null) {
+            pageInfo = new PageInfo();
+        }
+        RetrofitHelper.getGoodsListAPI()
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(goodsListEntity -> {
+                    if (goodsListEntity.PageInfo.PageIndex * goodsListEntity.PageInfo.PageLength >= goodsListEntity.PageInfo.TotalCount) {
+                        loadMoreView.setVisibility(View.GONE);
+                        mHeaderViewRecyclerAdapter.removeFootView();
+                    }
+                })
+                .subscribe(new Observer<GoodsListEntity>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
+                        if (!goodsListEntity.HasError) {
+                            goodsList.addAll(goodsListEntity.Value);
+                            finishTask();
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        showEmptyView();
+                        loadMoreView.setVisibility(View.GONE);
+                        --pageInfo.PageIndex;
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+    }
+
+    @Override
+    protected void finishTask() {
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+        mIsRefreshing = false;
+        if (goodsList != null) {
+            if (goodsList.size() == 0) {
+                showEmptyView();
+            } else {
+                hideEmptyView();
+            }
+        }
+        loadMoreView.setVisibility(View.GONE);
+
+        if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
+            mGoodsListAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    public void showEmptyView() {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mCustomEmptyView.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+        mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
+        mCustomEmptyView.setEmptyText("暂无数据");
+    }
+
+
+    public void hideEmptyView() {
+        mCustomEmptyView.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void createLoadMoreView() {
+        loadMoreView = LayoutInflater.from(getActivity())
+                .inflate(R.layout.layout_load_more, mRecyclerView, false);
+        mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
+        loadMoreView.setVisibility(View.GONE);
+    }
+
+
+    private void createHeadView() {
+        View headView = LayoutInflater.from(getActivity())
+                .inflate(R.layout.tab_main_head_view, mRecyclerView, false);
+
+        viewPager = (AutoScrollViewPager) headView.findViewById(R.id.viewpager);
+        indicator = (ViewPagerIndicator) headView.findViewById(R.id.indicator);
+        rlPagerContainer = (RelativeLayout) headView.findViewById(R.id.rlPagerContainer);
+        tvPromotion = (TextView) headView.findViewById(R.id.tvPromotion);
+        tvCollection = (TextView) headView.findViewById(R.id.tvCollection);
+        tvNewProduct = (TextView) headView.findViewById(R.id.tvNewProduct);
+        tvRecommend = (TextView) headView.findViewById(R.id.tvRecommend);
         rlPagerContainer.getLayoutParams().height = ScreenUtil.getScreenWidth(getContext()) * 200 / 750;
         viewPager.setCurrentItem(0);
         indicator.setCount(4);
@@ -194,189 +367,33 @@ public class TabMainFragment extends BaseFragment {
         tvPromotion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(getActivity(),PromotionActivity.class);
+                Intent intent = new Intent(getActivity(), PromotionActivity.class);
                 startActivity(intent);
             }
         });
         tvCollection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(getActivity(),CollectionActivity.class);
+                Intent intent = new Intent(getActivity(), CollectionActivity.class);
                 startActivity(intent);
             }
         });
         tvNewProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(getActivity(),NewProductActivity.class);
+                Intent intent = new Intent(getActivity(), NewProductActivity.class);
                 startActivity(intent);
             }
         });
         tvRecommend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(getActivity(),RecommendActivity.class);
+                Intent intent = new Intent(getActivity(), RecommendActivity.class);
                 startActivity(intent);
             }
         });
-
-        lazyLoad();
+        mHeaderViewRecyclerAdapter.addHeaderView(headView);
     }
-
-
-    @Override
-    protected void lazyLoad() {
-        if (!isPrepared && !isVisible) {
-            LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
-            return;
-        }
-        initRefreshLayout();
-        initRecyclerView();
-        isPrepared = false;
-    }
-
-    @Override
-    protected void initRefreshLayout() {
-        if (mSwipeRefreshLayout == null) {
-            return;
-        }
-        mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
-        mSwipeRefreshLayout.post(() -> {
-
-            mSwipeRefreshLayout.setRefreshing(true);
-            mIsRefreshing = true;
-            loadData();
-        });
-
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            pageInfo.PageIndex = 0;
-            mIsRefreshing = false;
-            goodsList.clear();
-            loadData();
-        });
-    }
-
-    @Override
-    protected void initRecyclerView() {
-        mRecyclerView.setHasFixedSize(true);
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
-        mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, false,null,null,0);
-        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
-//        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
-        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
-        setRecycleNoScroll();
-        createLoadMoreView();
-        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mGridLayoutManager) {
-
-            @Override
-            public void onLoadMore(int i) {
-                pageInfo.PageIndex++;
-                loadData();
-                loadMoreView.setVisibility(View.VISIBLE);
-            }
-        });
-        mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
-                if (holder != null && position < goodsList.size()) {
-                    Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
-                    intent.putExtra("shoppingId", goodsList.get(position).Id);
-                    startActivity(intent);
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void loadData() {
-        LogUtils.e("loadData", "获取商品列表数据");
-        RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(goodsListEntity -> {
-                    if (goodsListEntity.PageInfo.PageIndex * goodsListEntity.PageInfo.PageLength >= goodsListEntity.PageInfo.TotalCount) {
-                        loadMoreView.setVisibility(View.GONE);
-                        mHeaderViewRecyclerAdapter.removeFootView();
-                    }
-                })
-                .subscribe(new Observer<GoodsListEntity>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
-                        if (!goodsListEntity.HasError) {
-                            goodsList.addAll(goodsListEntity.Value);
-                            finishTask();
-                        }
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        showEmptyView();
-                        loadMoreView.setVisibility(View.GONE);
-                        --pageInfo.PageIndex;
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-
-    }
-
-    @Override
-    protected void finishTask() {
-        if (mSwipeRefreshLayout == null) {
-            return;
-        }
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-        mIsRefreshing = false;
-        if (goodsList != null) {
-            if (goodsList.size() == 0) {
-                showEmptyView();
-            } else {
-                hideEmptyView();
-            }
-        }
-        loadMoreView.setVisibility(View.GONE);
-
-        if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
-            mGoodsListAdapter.notifyDataSetChanged();
-        }
-
-    }
-
-    public void showEmptyView() {
-        mSwipeRefreshLayout.setRefreshing(false);
-        mCustomEmptyView.setVisibility(View.VISIBLE);
-        mRecyclerView.setVisibility(View.GONE);
-        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
-        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
-    }
-
-
-    public void hideEmptyView() {
-        mCustomEmptyView.setVisibility(View.GONE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    private void createLoadMoreView() {
-        loadMoreView = LayoutInflater.from(getActivity())
-                .inflate(R.layout.layout_load_more, mRecyclerView, false);
-        mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
-        loadMoreView.setVisibility(View.GONE);
-    }
-
 
     private void setRecycleNoScroll() {
 

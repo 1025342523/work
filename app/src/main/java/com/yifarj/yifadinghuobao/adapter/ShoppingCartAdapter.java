@@ -325,7 +325,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
     /**
      * 获取记忆价格
      */
-    private void getProductMemoryPrice(SaleGoodsItemModel goodsBean,int select,int factor) {
+    private void getProductMemoryPrice(SaleGoodsItemModel goodsBean,int select,double factor) {
         String b;
         int traderId;
         if (DataSaver.getMettingCustomerInfo() != null) {

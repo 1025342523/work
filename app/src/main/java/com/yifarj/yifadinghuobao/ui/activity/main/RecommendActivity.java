@@ -330,8 +330,8 @@ public class RecommendActivity extends BaseActivity {
     public void showEmptyView() {
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
-        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
+        mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
+        mCustomEmptyView.setEmptyText("暂无数据");
     }
 
 

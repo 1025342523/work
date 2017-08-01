@@ -48,7 +48,7 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * 新品上架
- *
+ * <p>
  * Created by zydx-pc on 2017/7/19.
  */
 
@@ -161,7 +161,7 @@ public class NewProductActivity extends BaseActivity {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,NewProductActivity.this,2);
+                                GoodsListAdapter goodsListAdapter = new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, NewProductActivity.this, 2);
                                 goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
@@ -206,7 +206,7 @@ public class NewProductActivity extends BaseActivity {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null,this,2);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 2);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -330,8 +330,8 @@ public class NewProductActivity extends BaseActivity {
     public void showEmptyView() {
         mCustomEmptyView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        mCustomEmptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
-        mCustomEmptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
+        mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
+        mCustomEmptyView.setEmptyText("暂无数据");
     }
 
 

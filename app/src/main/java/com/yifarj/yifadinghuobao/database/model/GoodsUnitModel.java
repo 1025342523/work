@@ -25,10 +25,10 @@ public class GoodsUnitModel extends BaseRXModel {
     public String Name;
 
     @Column
-    public int Factor;
+    public double Factor;
 
     @Column
-    public int BasicFactor = 1;
+    public double BasicFactor = 1;
 
     @Column
     public boolean IsBasic;//判断是否为最小单位 1为true
