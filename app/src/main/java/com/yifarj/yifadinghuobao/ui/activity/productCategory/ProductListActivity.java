@@ -12,7 +12,6 @@ import android.view.View;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
@@ -117,7 +116,7 @@ public class ProductListActivity extends BaseActivity {
         searchView.setOnSearchClickListener(new SearchView.OnSearchClickListener() {
             @Override
             public void onSearch(String keyword) {
-                doSearch(keyword);
+//                doSearch(keyword);
             }
         });
         searchView.setOnCancelListener(new View.OnClickListener() {
@@ -136,7 +135,7 @@ public class ProductListActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String result = s.toString();
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {
-                    doSearch(result);
+//                    doSearch(result);
                 }
             }
 
@@ -151,48 +150,48 @@ public class ProductListActivity extends BaseActivity {
         titleView.setRightIconText(visibility, title);
     }
 
-    private void doSearch(String keyword) {
-        String body;
-        if (categoryId == 0) {
-            body = "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))";
-        } else {
-            body = "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and CategoryId = " + categoryId + ")";
-        }
-        RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<GoodsListEntity>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
-                        if (!goodsListEntity.HasError) {
-                            if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, ProductListActivity.this,0));
-                            } else {
-                                ToastUtils.showShortSafe("无结果");
-                            }
-                        } else {
-                            ToastUtils.showShortSafe("无结果");
-                        }
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
+//    private void doSearch(String keyword) {
+//        String body;
+//        if (categoryId == 0) {
+//            body = "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))";
+//        } else {
+//            body = "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and CategoryId = " + categoryId + ")";
+//        }
+//        RetrofitHelper.getGoodsListAPI()
+//                .getGoodsList("ProductList", "", body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+//                .compose(bindToLifecycle())
+//                .subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Observer<GoodsListEntity>() {
+//                    @Override
+//                    public void onSubscribe(@NonNull Disposable d) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
+//                        if (!goodsListEntity.HasError) {
+//                            if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
+//                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, ProductListActivity.this,0));
+//                            } else {
+//                                ToastUtils.showShortSafe("无结果");
+//                            }
+//                        } else {
+//                            ToastUtils.showShortSafe("无结果");
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull Throwable e) {
+//                        ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//
+//                    }
+//                });
+//    }
 
     public void lazyLoad() {
         pageInfo.PageIndex = 0;

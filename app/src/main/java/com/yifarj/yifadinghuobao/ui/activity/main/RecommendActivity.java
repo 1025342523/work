@@ -9,6 +9,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -17,6 +19,7 @@ import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
+import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
@@ -48,7 +51,7 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * 推荐商品
- *
+ * <p>
  * Created by zydx-pc on 2017/7/19.
  */
 
@@ -77,6 +80,12 @@ public class RecommendActivity extends BaseActivity {
     private PageInfo pageInfo;
 
     private int totalCount, orderCount;
+
+    private PageInfo searchPageInfo = new PageInfo();
+    private boolean searchRequesting;
+    private boolean searchMorePage = true;
+    private GoodsListEntity searchGoodsList;
+    private GoodsListViewAdapter searchGoodsListAdapter;
 
     @Override
     public int getLayoutId() {
@@ -118,6 +127,12 @@ public class RecommendActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 titleView.setVisibility(View.VISIBLE);
+                searchView.getListView().setAdapter(null);
+                searchView.getEditText().setText("");
+                searchGoodsList = null;
+                searchPageInfo.PageIndex = -1;
+                searchRequesting = false;
+                searchMorePage = true;
             }
         });
         searchView.getEditText().addTextChangedListener(new TextWatcher() {
@@ -129,6 +144,12 @@ public class RecommendActivity extends BaseActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String result = s.toString();
+                if (StringUtils.isEmpty(result)) {
+                    searchGoodsList = null;
+                    searchPageInfo.PageIndex = -1;
+                    searchRequesting = false;
+                    searchMorePage = true;
+                }
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {
                     doSearch(result);
                 }
@@ -146,8 +167,13 @@ public class RecommendActivity extends BaseActivity {
     }
 
     private void doSearch(String keyword) {
+        if (searchRequesting) {
+            return;
+        }
+        searchRequesting = true;
+        ++searchPageInfo.PageIndex;
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 128)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 128)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -158,37 +184,77 @@ public class RecommendActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
-                        if (!goodsListEntity.HasError) {
-                            if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-                                GoodsListAdapter goodsListAdapter=new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null,RecommendActivity.this,3);
-                                goodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
-                                        if (holder != null && position < goodsListEntity.Value.size()) {
+                    public void onNext(@NonNull GoodsListEntity entity) {
+                        if (searchGoodsList == null) {
+                            searchGoodsList = entity;
+                            if (!entity.HasError) {
+                                if (entity.Value != null && entity.Value.size() > 0) {
+                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 3, RecommendActivity.this, true);
+                                    searchView.getListView().setAdapter(searchGoodsListAdapter);
+                                    searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                        @Override
+                                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                             Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
-                                            intent.putExtra("shoppingId", goodsListEntity.Value.get(position).Id);
+                                            intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             startActivityForResult(intent, REQUEST_REFRESH);
+                                            searchView.clearText();
+                                            searchGoodsList = null;
+                                            searchPageInfo.PageIndex = -1;
+                                            searchRequesting = false;
+                                            searchMorePage = true;
                                         }
+                                    });
+                                    if (entity.Value.size() == 1) {
+                                        Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
+                                        intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
+                                        startActivityForResult(intent, REQUEST_REFRESH);
+                                        searchView.clearText();
+                                        searchGoodsList = null;
+                                        searchPageInfo.PageIndex = -1;
+                                        searchRequesting = false;
+                                        searchMorePage = true;
                                     }
-                                });
-                                searchView.getListView().setAdapter(goodsListAdapter);
+                                    searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
+                                        @Override
+                                        public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                        }
+
+                                        @Override
+                                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                            if ((visibleItemCount + firstVisibleItem == totalItemCount)
+                                                    && !searchRequesting && searchMorePage && searchGoodsList != null) {
+                                                doSearch(keyword);
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    ToastUtils.showShortSafe("无结果");
+                                }
                             } else {
-                                ToastUtils.showShortSafe("无结果");
+                                ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information.toString());
+                            }
+                        } else if (entity != null && entity.Value.size() > 0) {
+                            if (searchGoodsList != null && searchGoodsListAdapter != null) {
+                                searchGoodsList.Value.addAll(entity.Value);
+                                searchGoodsListAdapter.notifyDataSetChanged();
                             }
                         } else {
-                            ToastUtils.showShortSafe("无结果");
+                            searchMorePage = false;
+                            ToastUtils.showShortSafe("已全部加载");
                         }
                     }
+
 
                     @Override
                     public void onError(@NonNull Throwable e) {
                         ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
+                        searchRequesting = false;
+                        --searchPageInfo.PageIndex;
                     }
 
                     @Override
                     public void onComplete() {
-
+                        searchRequesting = false;
                     }
                 });
     }
@@ -206,7 +272,7 @@ public class RecommendActivity extends BaseActivity {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null,this,3);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 3);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);

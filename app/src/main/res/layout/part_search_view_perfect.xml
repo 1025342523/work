@@ -83,10 +83,12 @@
     </RelativeLayout>
 
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
         android:id="@+id/searchContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="none"/>
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="1px"
+        android:listSelector="@android:color/transparent"/>
 </LinearLayout>

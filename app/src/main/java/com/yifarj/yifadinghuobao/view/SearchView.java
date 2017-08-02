@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,10 +15,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.yifarj.yifadinghuobao.R;
-import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
 
 /**
@@ -30,7 +29,7 @@ public class SearchView extends LinearLayout {
 
     private Context mContext;
     private EditText etSearch;
-    private RecyclerView lvSearch;
+    private ListView lvSearch;
     private TextView tvCancel;
     private LinearLayout llContent;
     private boolean showing;
@@ -65,12 +64,10 @@ public class SearchView extends LinearLayout {
         View content = LayoutInflater.from(context).inflate(R.layout.part_search_view_perfect, this, false);
         llContent = (LinearLayout) content.findViewById(R.id.llContent);
         etSearch = (EditText) content.findViewById(R.id.etSearch);
-        lvSearch = (RecyclerView) content.findViewById(R.id.searchContent);
+        lvSearch = (ListView) content.findViewById(R.id.searchContent);
         ivLeft = (ImageView) content.findViewById(R.id.ivLeft);
         ivSearch = (ImageView) content.findViewById(R.id.ivSearch);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(context);
-        lvSearch.setLayoutManager(mLinearLayoutManager);
-        lvSearch.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         if (array != null) {
             for (int i = 0; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
@@ -133,7 +130,7 @@ public class SearchView extends LinearLayout {
         return etSearch;
     }
 
-    public RecyclerView getListView() {
+    public ListView getListView() {
         return lvSearch;
     }
 
