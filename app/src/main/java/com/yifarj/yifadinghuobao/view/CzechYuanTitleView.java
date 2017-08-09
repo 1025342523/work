@@ -22,6 +22,7 @@ public class CzechYuanTitleView extends RelativeLayout {
     private TextView ivLeft;
     private RelativeLayout rlSearch;
     private TextView tvRightIcon;
+    private ImageView ivBack;
 
     public CzechYuanTitleView(Context context) {
         super(context);
@@ -53,6 +54,7 @@ public class CzechYuanTitleView extends RelativeLayout {
         ivLeft = (TextView) contentView.findViewById(R.id.ivLeft);
         rlSearch = (RelativeLayout) contentView.findViewById(R.id.rlSearch);
         tvRightIcon = (TextView) contentView.findViewById(R.id.tvRight_icon);
+        ivBack = (ImageView) contentView.findViewById(R.id.ivBack);
         if (array != null) {
             for (int i = 0; i < array.getIndexCount(); i++) {
                 int attr = array.getIndex(i);
@@ -78,6 +80,12 @@ public class CzechYuanTitleView extends RelativeLayout {
         addView(contentView);
     }
 
+    public void setLeftBackClickListener(OnClickListener l) {
+        if (ivBack != null) {
+            ivBack.setOnClickListener(l);
+        }
+    }
+
     public void setLeftIconClickListener(OnClickListener l) {
         if (ivLeft != null) {
             ivLeft.setOnClickListener(l);
@@ -100,6 +108,12 @@ public class CzechYuanTitleView extends RelativeLayout {
     public void setImageRight(int resId) {
         if (ivRight != null) {
             ivRight.setImageResource(resId);
+        }
+    }
+
+    public void setLeftBackVisibility(int visibility) {
+        if (ivBack != null) {
+            ivBack.setVisibility(visibility);
         }
     }
 

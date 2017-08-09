@@ -157,7 +157,7 @@ public class CollectionActivity extends BaseActivity {
                         CzechYuanDialog mDialog = new CzechYuanDialog(CollectionActivity.this, R.style.CzechYuanDialog);
                         mDialog.setContent("确定清空收藏夹？");
                         mDialog.setConfirmClickListener(view1 -> {
-//                            FlowManager.getDatabase(AppDatabase.class).reset(CollectionActivity.this);
+                            //                            FlowManager.getDatabase(AppDatabase.class).reset(CollectionActivity.this);
                             Delete.table(CollectionItemModel.class);
                             ToastUtils.showShortSafe("收藏夹已清空");
                             showEmptyView();
@@ -297,7 +297,7 @@ public class CollectionActivity extends BaseActivity {
                             searchGoodsList = entity;
                             if (!entity.HasError) {
                                 if (entity.Value != null && entity.Value.size() > 0) {
-                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 0, CollectionActivity.this, true);
+                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 0, CollectionActivity.this, true, 0);
                                     searchView.getListView().setAdapter(searchGoodsListAdapter);
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
@@ -305,11 +305,11 @@ public class CollectionActivity extends BaseActivity {
                                             Intent intent = new Intent(CollectionActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             startActivityForResult(intent, REQUEST_REFRESH);
-                                            searchView.clearText();
-                                            searchGoodsList = null;
-                                            searchPageInfo.PageIndex = -1;
-                                            searchRequesting = false;
-                                            searchMorePage = true;
+//                                            searchView.clearText();
+//                                            searchGoodsList = null;
+//                                            searchPageInfo.PageIndex = -1;
+//                                            searchRequesting = false;
+//                                            searchMorePage = true;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {

@@ -1,4 +1,4 @@
-package com.yifarj.yifadinghuobao.ui.fragment.order;
+package com.yifarj.yifadinghuobao.ui.activity.me;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,15 +15,15 @@ import com.yifarj.yifadinghuobao.adapter.OrderListAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
-import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.model.entity.SaleOrderListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.order.MettingOrderActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
-import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.TitleView;
@@ -41,12 +41,10 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * TabOrderFragment
- *
- * @auther Czech.Yuan
- * @date 2017/5/22 9:02
+ * Created by zydx-pc on 2017/8/4.
  */
-public class TabOrderFragment extends BaseFragment {
+
+public class ReturnFormActivity extends BaseActivity {
     private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.titleView)
@@ -78,28 +76,36 @@ public class TabOrderFragment extends BaseFragment {
     private int orderCount = 0;
 
     @Override
-    public int getLayoutResId() {
+    public int getLayoutId() {
         return R.layout.fragment_order;
     }
 
     @Override
-    protected void finishCreateView(Bundle savedInstanceState) {
+    public void initViews(Bundle savedInstanceState) {
+        titleView.setTitle("退货单");
+        titleView.setImageLeft(R.drawable.ic_title_back);
+        titleView.setLeftImageVisibility(View.VISIBLE);
+        titleView.setLeftIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               finish();
+            }
+        });
         pageInfo.SortedColumn = "BillDate";
         pageInfo.SortOrder = 2;
-        isPrepared = true;
         lazyLoad();
         titleView.setRightIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
-                intent.putExtra("saleType", 0);
+                Intent intent = new Intent(ReturnFormActivity.this, ShoppingCartActivity.class);
+                intent.putExtra("saleType", 1);
                 startActivityForResult(intent, REQUEST_REFRESH);
             }
         });
     }
 
     @Override
-    protected void finishTask() {
+    public void finishTask() {
         //        if (mSwipeRefreshLayout == null) {
         //            return;
         //        }
@@ -122,13 +128,13 @@ public class TabOrderFragment extends BaseFragment {
     }
 
     @Override
-    protected void initRecyclerView() {
+    public void initRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mOrderListAdapter = new OrderListAdapter(mRecyclerView, mSaleOrderList);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mOrderListAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         setRecycleNoScroll();
         createLoadMoreView();
@@ -145,9 +151,9 @@ public class TabOrderFragment extends BaseFragment {
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
                 if (holder != null) {
-                    Intent intent = new Intent(getActivity(), MettingOrderActivity.class);
+                    Intent intent = new Intent(ReturnFormActivity.this, MettingOrderActivity.class);
                     intent.putExtra("orderId", mSaleOrderList.get(position).Id);
-                    intent.putExtra("saleType", 0);
+                    intent.putExtra("saleType", 1);
                     startActivity(intent);
                 }
             }
@@ -176,31 +182,26 @@ public class TabOrderFragment extends BaseFragment {
     //        });
     //    }
 
-    @Override
-    protected void lazyLoad() {
-        if (!isPrepared && !isVisible) {
-            LogUtils.e("TabOrderFragment", "lazyLoad（） false");
-            return;
-        }
+    public void lazyLoad() {
+
         //        initRefreshLayout();
         pageInfo.PageIndex = 0;
         mIsRefreshing = false;
         mSaleOrderList.clear();
         loadData();
         initRecyclerView();
-        isPrepared = false;
     }
 
     @Override
-    protected void loadData() {
-        // 查询购物车商品
-        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+    public void loadData() {
+        // 查询退货清单商品
+        RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where())
                 .queryList()
-                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                .subscribe(new Consumer<List<ReturnListItemModel>>() {
                     @Override
-                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
-                        orderCount = saleGoodsItemModels.size();
+                    public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
+                        LogUtils.e("returnListItemModels：" + returnListItemModels.size());
+                        orderCount = returnListItemModels.size();
                         if (orderCount > 0) {
                             titleView.setRightIconText(View.VISIBLE, orderCount);
                             LogUtils.e("orderCount：" + orderCount);
@@ -236,7 +237,7 @@ public class TabOrderFragment extends BaseFragment {
                     public void onNext(@NonNull SaleOrderListEntity saleOrderListEntity) {
                         if (!saleOrderListEntity.HasError) {
                             for (SaleOrderListEntity.ValueEntity valueEntity : saleOrderListEntity.Value) {
-                                if (!(valueEntity.SalesTypeName.equals("退"))) {
+                                if (valueEntity.SalesTypeName.equals("退")) {
                                     mSaleOrderList.add(valueEntity);
                                 }
                             }
@@ -293,7 +294,7 @@ public class TabOrderFragment extends BaseFragment {
     }
 
     private void createLoadMoreView() {
-        loadMoreView = LayoutInflater.from(getActivity())
+        loadMoreView = LayoutInflater.from(this)
                 .inflate(R.layout.layout_load_more, mRecyclerView, false);
         mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
         loadMoreView.setVisibility(View.GONE);

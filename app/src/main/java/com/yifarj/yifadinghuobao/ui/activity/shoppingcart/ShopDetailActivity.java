@@ -21,6 +21,10 @@ import com.yifarj.yifadinghuobao.database.model.CollectionItemModel;
 import com.yifarj.yifadinghuobao.database.model.CollectionItemModel_Table;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
+import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel_Table;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.loader.GlideImageLoader;
@@ -101,6 +105,8 @@ public class ShopDetailActivity extends BaseActivity {
     LinearLayout addShopCart;
     @BindView(R.id.shopDetail_collection)
     ImageView collection;
+    @BindView(R.id.shopDetail_tvAddShoppingCart)
+    TextView shopDetail_tvAddShoppingCart;
 
     private GoodsListEntity.ValueEntity goodsBean;
     private Banner banner;
@@ -119,6 +125,7 @@ public class ShopDetailActivity extends BaseActivity {
     private double basicUnitPrice;
     private int orderCount = 0;
     private boolean isCollection = false;
+    private int saleType = 0;
 
     private static final int REQUEST_REFRESH = 10;
 
@@ -138,52 +145,96 @@ public class ShopDetailActivity extends BaseActivity {
     @Override
     public void loadData() {
         shoppingId = getIntent().getIntExtra("shoppingId", 0);
+        saleType = getIntent().getIntExtra("saleType", 0);
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else {
             return;
         }
 
-        // 查询购物车商品
-        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
-                .queryList()
-                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                    @Override
-                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                        orderCount = saleGoodsItemModels.size();
-                        if (orderCount > 0) {
-                            shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
-                            LogUtils.e("orderCount：" + orderCount);
-                        } else if (orderCount == 0) {
-                            shopDetail_titleView.setRightIconText(View.GONE, 0);
-                            LogUtils.e("orderCount：" + orderCount);
+        if (saleType == 1) {
+            // 查询退货清单
+            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where())
+                    .queryList()
+                    .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
+                            orderCount = returnListItemModels.size();
+                            if (orderCount > 0) {
+                                shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("退货清单中的商品数量为：" + orderCount);
+                            } else if (orderCount == 0) {
+                                shopDetail_titleView.setRightIconText(View.GONE, 0);
+                                LogUtils.e("退货清单中的商品数量为：" + orderCount);
+                            }
+                            LogUtils.e("returnListItemModels：" + returnListItemModels.size());
                         }
-                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
-                    }
-                });
-
-
-        // 查询购物车里是否有当前商品
-        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where(SaleGoodsItemModel_Table.ProductId.eq(shoppingId)))
-                .queryList()
-                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                    @Override
-                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
-                        if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
-                            LogUtils.e("购物车有此商品" + saleGoodsItemModel.get(0).ProductName);
-                            quantity = saleGoodsItemModel.get(0).Quantity;
-                            unitName = saleGoodsItemModel.get(0).ProductUnitName;
-                            totalPrice = saleGoodsItemModel.get(0).TotalPrice;
-                            unitId = saleGoodsItemModel.get(0).UnitId;
-                            unitPrice = saleGoodsItemModel.get(0).UnitPrice;
-                            basicUnitName = saleGoodsItemModel.get(0).BasicUnitName;
-                            tempUnitName = saleGoodsItemModel.get(0).ProductUnitName;
-                            basicUnitPrice = saleGoodsItemModel.get(0).BasicUnitPrice;
-                            basicUnitId = saleGoodsItemModel.get(0).BasicUnitId;
-                            isExist = true;
+                    });
+            // 查询退货清单中是否有当前商品
+            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where(ReturnListItemModel_Table.ProductId.eq(shoppingId)))
+                    .queryList()
+                    .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
+                            if (returnListItemModels != null && returnListItemModels.size() > 0) {
+                                LogUtils.e("退货清单中有此商品：" + returnListItemModels.get(0).ProductName);
+                                quantity = returnListItemModels.get(0).Quantity;
+                                unitName = returnListItemModels.get(0).ProductUnitName;
+                                totalPrice = returnListItemModels.get(0).TotalPrice;
+                                unitId = returnListItemModels.get(0).UnitId;
+                                unitPrice = returnListItemModels.get(0).UnitPrice;
+                                basicUnitName = returnListItemModels.get(0).BasicUnitName;
+                                tempUnitName = returnListItemModels.get(0).ProductUnitName;
+                                basicUnitPrice = returnListItemModels.get(0).BasicUnitPrice;
+                                basicUnitId = returnListItemModels.get(0).BasicUnitId;
+                                isExist = true;
+                            } else {
+                                LogUtils.e("退货清单中没有此商品");
+                            }
                         }
-                    }
-                });
+                    });
+        } else {
+            // 查询购物车商品
+            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+                    .queryList()
+                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                            orderCount = saleGoodsItemModels.size();
+                            if (orderCount > 0) {
+                                shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("购物车中的商品数量为：" + orderCount);
+                            } else if (orderCount == 0) {
+                                shopDetail_titleView.setRightIconText(View.GONE, 0);
+                                LogUtils.e("购物车中的商品数量为：" + orderCount);
+                            }
+                            LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
+                        }
+                    });
+            // 查询购物车中是否有当前商品
+            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where(SaleGoodsItemModel_Table.ProductId.eq(shoppingId)))
+                    .queryList()
+                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
+                            if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
+                                LogUtils.e("购物车有此商品：" + saleGoodsItemModel.get(0).ProductName);
+                                quantity = saleGoodsItemModel.get(0).Quantity;
+                                unitName = saleGoodsItemModel.get(0).ProductUnitName;
+                                totalPrice = saleGoodsItemModel.get(0).TotalPrice;
+                                unitId = saleGoodsItemModel.get(0).UnitId;
+                                unitPrice = saleGoodsItemModel.get(0).UnitPrice;
+                                basicUnitName = saleGoodsItemModel.get(0).BasicUnitName;
+                                tempUnitName = saleGoodsItemModel.get(0).ProductUnitName;
+                                basicUnitPrice = saleGoodsItemModel.get(0).BasicUnitPrice;
+                                basicUnitId = saleGoodsItemModel.get(0).BasicUnitId;
+                                isExist = true;
+                            } else {
+                                LogUtils.e("购物车没有此商品");
+                            }
+                        }
+                    });
+        }
 
         // 查询收藏商品中是否有当前商品
         RXSQLite.rx(SQLite.select().from(CollectionItemModel.class).where(CollectionItemModel_Table.ProductId.eq(shoppingId)))
@@ -192,9 +243,11 @@ public class ShopDetailActivity extends BaseActivity {
                     @Override
                     public void accept(@NonNull List<CollectionItemModel> collectionItemModel) throws Exception {
                         if (collectionItemModel != null && collectionItemModel.size() > 0) {
-                            LogUtils.e("收藏夹中有此商品" + collectionItemModel.get(0).ProductName);
+                            LogUtils.e("收藏夹中有此商品：" + collectionItemModel.get(0).ProductName);
                             isCollection = true;
                             collection.setSelected(true);
+                        } else {
+                            LogUtils.e("收藏夹中没有此商品");
                         }
                     }
                 });
@@ -243,10 +296,12 @@ public class ShopDetailActivity extends BaseActivity {
                                             if (!chosen) {
                                                 //没有找到对应的仓库
                                                 shopDetail_Inventory.setText("");
+                                                LogUtils.e("没有找到对应的仓库");
                                             }
                                         } else {
                                             //没有找到对应的仓库
                                             shopDetail_Inventory.setText("");
+                                            LogUtils.e("没有找到对应的仓库");
                                         }
                                     }
 
@@ -279,7 +334,7 @@ public class ShopDetailActivity extends BaseActivity {
                                 list.add(AppInfoUtil.genPicUrl(unit.Path));
                                 LogUtils.e(goodsBean.Name + "图片Url：" + AppInfoUtil.genPicUrl(unit.Path));
                             }
-                            if(list.size()==0){
+                            if (list.size() == 0) {
                                 list.add("http://img4.imgtn.bdimg.com/it/u=1007043693,2735869963&fm=26&gp=0.jpg");
                             }
                             banner.setImages(list);
@@ -383,6 +438,7 @@ public class ShopDetailActivity extends BaseActivity {
                                     }
                                 }
                             });
+
                             //订购数量的编辑事件
                             shopDetail_orderNum.setOnNumberEditClickListener(new View.OnClickListener() {
                                 @Override
@@ -611,6 +667,10 @@ public class ShopDetailActivity extends BaseActivity {
     }
 
     private void init() {
+        if (saleType == 1) {
+            shopDetail_tvAddShoppingCart.setText("确定退货");
+        }
+
         shopDetail_titleView.setLeftIconClickListener(view -> {
             setResult(RESULT_OK);
             finish();
@@ -619,6 +679,7 @@ public class ShopDetailActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ShopDetailActivity.this, ShoppingCartActivity.class);
+                intent.putExtra("saleType", saleType);
                 startActivityForResult(intent, REQUEST_REFRESH);
             }
         });
@@ -626,13 +687,13 @@ public class ShopDetailActivity extends BaseActivity {
         collection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isCollection){
-                    isCollection=false;
+                if (isCollection) {
+                    isCollection = false;
                     collection.setSelected(false);
                     deleteCollection();
                     Toast.makeText(ShopDetailActivity.this, "取消收藏成功", Toast.LENGTH_SHORT).show();
-                }else {
-                    isCollection=true;
+                } else {
+                    isCollection = true;
                     collection.setSelected(true);
                     addCollection(goodsBean);
                     Toast.makeText(ShopDetailActivity.this, "收藏成功", Toast.LENGTH_SHORT).show();
@@ -640,67 +701,137 @@ public class ShopDetailActivity extends BaseActivity {
             }
         });
 
-        //加入购物车
-        RxView.clicks(shopDetail_addShoppingCart)
-                .compose(bindToLifecycle())
-                .throttleFirst(2, TimeUnit.SECONDS)
-                .subscribe(new Consumer<Object>() {
-                    @Override
-                    public void accept(@NonNull Object o) throws Exception {
-                        if (quantity > 0) {
-                            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
-                                    .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
-                                    .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                                @Override
-                                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                                    LogUtils.e("saleGoodsItemModels.size()：" + saleGoodsItemModels.size());
-                                    if (saleGoodsItemModels.size() > 0) {
-                                        SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
-                                        mItem.delete().subscribe(new Consumer<Boolean>() {
+        if (saleType == 1) {
+            //加入退货清单
+            RxView.clicks(shopDetail_addShoppingCart)
+                    .compose(bindToLifecycle())
+                    .throttleFirst(2, TimeUnit.SECONDS)
+                    .subscribe(new Consumer<Object>() {
+                        @Override
+                        public void accept(@NonNull Object o) throws Exception {
+                            if (quantity > 0) {
+                                RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class)
+                                        .where(ReturnListItemModel_Table.ProductId.eq(goodsBean.Id)))
+                                        .queryList().subscribe(new Consumer<List<ReturnListItemModel>>() {
+                                    @Override
+                                    public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
+                                        LogUtils.e("returnListItemModel.size()：" + returnListItemModels.size());
+                                        if (returnListItemModels.size() > 0) {
+                                            isExist = true;
+                                            ReturnListItemModel mItem = returnListItemModels.get(0);
+                                            mItem.delete().subscribe(new Consumer<Boolean>() {
+                                                @Override
+                                                public void accept(@NonNull Boolean aBean) throws Exception {
+                                                    LogUtils.e(mItem.ProductName + "：删除\n" + aBean);
+                                                }
+                                            });
+                                        } else {
+                                            isExist = false;
+                                        }
+
+                                    }
+                                });
+                                RXSQLite.rx(SQLite.select().from(ReturnGoodsUnitModel.class)
+                                        .where(ReturnGoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
+                                        .queryList()
+                                        .subscribe(new Consumer<List<ReturnGoodsUnitModel>>() {
                                             @Override
-                                            public void accept(@NonNull Boolean aBean) throws Exception {
-                                                LogUtils.e(mItem.ProductName + "：删除\n" + aBean);
+                                            public void accept(@NonNull List<ReturnGoodsUnitModel> returnGoodsUnitModels) throws Exception {
+                                                if (returnGoodsUnitModels != null && returnGoodsUnitModels.size() > 0) {
+                                                    Flowable.fromIterable(returnGoodsUnitModels)
+                                                            .forEach(new Consumer<ReturnGoodsUnitModel>() {
+                                                                @Override
+                                                                public void accept(@NonNull ReturnGoodsUnitModel returnGoodsUnitModel) throws Exception {
+                                                                    ReturnGoodsUnitModel mUnitModel = returnGoodsUnitModel;
+                                                                    mUnitModel.delete().subscribe(new Consumer<Boolean>() {
+                                                                        @Override
+                                                                        public void accept(@NonNull Boolean aBoolean) throws Exception {
+                                                                            LogUtils.e("单位：" + mUnitModel.Name + "删除成功");
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                    LogUtils.e("删除成功");
+                                                }
                                             }
                                         });
-                                    }
-
+                                addReturnList(goodsBean, quantity, unitName, unitId, unitPrice, totalPrice, basicUnitPrice);
+                                if (!isExist) {
+                                    orderCount = orderCount + 1;
+                                    shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
+                                    LogUtils.e("退货数量：" + orderCount);
                                 }
-                            });
-                            RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
-                                    .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
-                                    .queryList()
-                                    .subscribe(new Consumer<List<GoodsUnitModel>>() {
-                                        @Override
-                                        public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
-                                            if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
-                                                Flowable.fromIterable(goodsUnitModels)
-                                                        .forEach(new Consumer<GoodsUnitModel>() {
-                                                            @Override
-                                                            public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
-                                                                GoodsUnitModel mUnitModel = goodsUnitModel;
-                                                                mUnitModel.delete().subscribe(new Consumer<Boolean>() {
-                                                                    @Override
-                                                                    public void accept(@NonNull Boolean aBoolean) throws Exception {
-                                                                        LogUtils.e("单位：" + mUnitModel.Name + "删除成功");
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                                LogUtils.e("删除成功");
-                                            }
-                                        }
-                                    });
-                            add(goodsBean, quantity, unitName, unitId, unitPrice, totalPrice, basicUnitPrice);
-                            if (!isExist) {
-                                orderCount = orderCount + 1;
-                                shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
-                                LogUtils.e("orderCount：" + orderCount);
+                            } else {
+                                Toast.makeText(ShopDetailActivity.this, "请输入退货数量", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(ShopDetailActivity.this, "请输入订购数量", Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
+                    });
+        } else {
+            //加入购物车
+            RxView.clicks(shopDetail_addShoppingCart)
+                    .compose(bindToLifecycle())
+                    .throttleFirst(2, TimeUnit.SECONDS)
+                    .subscribe(new Consumer<Object>() {
+                        @Override
+                        public void accept(@NonNull Object o) throws Exception {
+                            if (quantity > 0) {
+                                RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                                        .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                                        .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                                    @Override
+                                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                                        LogUtils.e("saleGoodsItemModels.size()：" + saleGoodsItemModels.size());
+                                        if (saleGoodsItemModels.size() > 0) {
+                                            isExist = true;
+                                            SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                                            mItem.delete().subscribe(new Consumer<Boolean>() {
+                                                @Override
+                                                public void accept(@NonNull Boolean aBean) throws Exception {
+                                                    LogUtils.e(mItem.ProductName + "：删除\n" + aBean);
+                                                }
+                                            });
+                                        } else {
+                                            isExist = false;
+                                        }
+
+                                    }
+                                });
+                                RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
+                                        .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
+                                        .queryList()
+                                        .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                                            @Override
+                                            public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                                                if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
+                                                    Flowable.fromIterable(goodsUnitModels)
+                                                            .forEach(new Consumer<GoodsUnitModel>() {
+                                                                @Override
+                                                                public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
+                                                                    GoodsUnitModel mUnitModel = goodsUnitModel;
+                                                                    mUnitModel.delete().subscribe(new Consumer<Boolean>() {
+                                                                        @Override
+                                                                        public void accept(@NonNull Boolean aBoolean) throws Exception {
+                                                                            LogUtils.e("单位：" + mUnitModel.Name + "删除成功");
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                    LogUtils.e("删除成功");
+                                                }
+                                            }
+                                        });
+                                add(goodsBean, quantity, unitName, unitId, unitPrice, totalPrice, basicUnitPrice);
+                                if (!isExist) {
+                                    orderCount = orderCount + 1;
+                                    shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
+                                    LogUtils.e("订购数量：" + orderCount);
+                                }
+                            } else {
+                                Toast.makeText(ShopDetailActivity.this, "请输入订购数量", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
     }
 
     private void add(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
@@ -778,6 +909,81 @@ public class ShopDetailActivity extends BaseActivity {
                 });
     }
 
+    private void addReturnList(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
+        ReturnListItemModel itemModel = new ReturnListItemModel();
+        itemModel.CurrentPrice = totalPrice;
+        if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
+            itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
+        }
+        itemModel.PriceSystemId = DataSaver.getPriceSystemId();
+        itemModel.PackSpec = goodsBean.PackSpec;
+        itemModel.Code = goodsBean.Code;
+        itemModel.ProductName = goodsBean.Name;
+        itemModel.BasicUnitName = basicUnitName;
+        itemModel.ProductUnitName = unitName;
+        itemModel.BasicUnitPrice = basicUnitPrice;
+        itemModel.UnitPrice = unitPrice;
+        itemModel.Discount = 1.0f;
+        itemModel.SalesType = 2;
+        itemModel.TaxRate = 1.0;
+        itemModel.UnitId = unitId;
+        itemModel.Quantity = count;
+        itemModel.WarehouseId = goodsBean.DefaultWarehouseId;
+        itemModel.ProductId = goodsBean.Id;
+        itemModel.LocationId = goodsBean.DefaultLocationId;
+        itemModel.PackSpec = goodsBean.PackSpec;
+        itemModel.Price0 = goodsBean.Price0;
+        itemModel.Price1 = goodsBean.Price1;
+        itemModel.Price2 = goodsBean.Price2;
+        itemModel.Price3 = goodsBean.Price3;
+        itemModel.Price4 = goodsBean.Price4;
+        itemModel.Price5 = goodsBean.Price5;
+        itemModel.Price6 = goodsBean.Price6;
+        itemModel.Price7 = goodsBean.Price7;
+        itemModel.Price8 = goodsBean.Price8;
+        itemModel.Price9 = goodsBean.Price9;
+        itemModel.Price10 = goodsBean.Price10;
+        itemModel.MinSalesQuantity = goodsBean.MinSalesQuantity;
+        itemModel.MaxSalesQuantity = goodsBean.MaxSalesQuantity;
+        itemModel.MinSalesPrice = goodsBean.MinSalesPrice;
+        itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
+        itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
+        itemModel.OweRemark = goodsBean.Remark;
+        itemModel.insert()
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(@NonNull Long aLong) throws Exception {
+                        Toast.makeText(ShopDetailActivity.this, "已添加到退货清单", Toast.LENGTH_SHORT).show();
+                        LogUtils.e("Item插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                    }
+                });
+        itemModel.save().subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(@NonNull Boolean aBoolean) throws Exception {
+                LogUtils.e("Item保存数据成功");
+            }
+        });
+        Flowable.fromIterable(goodsBean.ProductUnitList)
+                .forEach(valueEntity -> {
+                    ReturnGoodsUnitModel goodsUnitModel = new ReturnGoodsUnitModel();
+                    goodsUnitModel.Id = valueEntity.Id;
+                    goodsUnitModel.ProductId = valueEntity.ProductId;
+                    goodsUnitModel.Name = valueEntity.Name;
+                    goodsUnitModel.Factor = valueEntity.Factor;
+                    goodsUnitModel.BasicFactor = valueEntity.BasicFactor;
+                    goodsUnitModel.IsBasic = valueEntity.IsBasic;
+                    goodsUnitModel.IsDefault = valueEntity.IsDefault;
+                    goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
+                    goodsUnitModel.Ordinal = valueEntity.Ordinal;
+                    goodsUnitModel.insert().subscribe(new Consumer<Long>() {
+                        @Override
+                        public void accept(@NonNull Long aLong) throws Exception {
+                            LogUtils.e("Unit插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                        }
+                    });
+                });
+    }
+
     private void addCollection(GoodsListEntity.ValueEntity goodsBean) {
         CollectionItemModel itemModel = new CollectionItemModel();
         itemModel.CurrentPrice = basicUnitPrice;
@@ -833,7 +1039,7 @@ public class ShopDetailActivity extends BaseActivity {
         });
     }
 
-    public void deleteCollection(){
+    public void deleteCollection() {
         RXSQLite.rx(SQLite.select().from(CollectionItemModel.class)
                 .where(CollectionItemModel_Table.ProductId.eq(goodsBean.Id)))
                 .queryList().subscribe(new Consumer<List<CollectionItemModel>>() {

@@ -23,6 +23,7 @@ import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
@@ -79,7 +80,7 @@ public class RecommendActivity extends BaseActivity {
 
     private PageInfo pageInfo;
 
-    private int totalCount, orderCount;
+    private int totalCount, orderCount, saleType = 0;
 
     private PageInfo searchPageInfo = new PageInfo();
     private boolean searchRequesting;
@@ -97,6 +98,8 @@ public class RecommendActivity extends BaseActivity {
         pageInfo = new PageInfo();
         goodsList = new ArrayList<>();
 
+        saleType = getIntent().getIntExtra("saleType", 0);
+
         lazyLoad();
 
         titleView.setLeftIconClickListener(new View.OnClickListener() {
@@ -107,6 +110,7 @@ public class RecommendActivity extends BaseActivity {
         });
         titleView.setRightIconClickListener(view -> {
             Intent intent = new Intent(this, ShoppingCartActivity.class);
+            intent.putExtra("saleType", saleType);
             startActivityForResult(intent, REQUEST_REFRESH);
         });
         titleView.setRightLeftIconClickListener(new View.OnClickListener() {
@@ -189,19 +193,20 @@ public class RecommendActivity extends BaseActivity {
                             searchGoodsList = entity;
                             if (!entity.HasError) {
                                 if (entity.Value != null && entity.Value.size() > 0) {
-                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 3, RecommendActivity.this, true);
+                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 3, RecommendActivity.this, true, saleType);
                                     searchView.getListView().setAdapter(searchGoodsListAdapter);
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                             Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
+                                            intent.putExtra("saleType", saleType);
                                             startActivityForResult(intent, REQUEST_REFRESH);
-                                            searchView.clearText();
-                                            searchGoodsList = null;
-                                            searchPageInfo.PageIndex = -1;
-                                            searchRequesting = false;
-                                            searchMorePage = true;
+//                                            searchView.clearText();
+//                                            searchGoodsList = null;
+//                                            searchPageInfo.PageIndex = -1;
+//                                            searchRequesting = false;
+//                                            searchMorePage = true;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
@@ -214,15 +219,16 @@ public class RecommendActivity extends BaseActivity {
                                         searchRequesting = false;
                                         searchMorePage = true;
                                     }
-                                    searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
+                                    searchView.getListView().
+
+                                    setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override
                                         public void onScrollStateChanged(AbsListView view, int scrollState) {
                                         }
 
                                         @Override
                                         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                            if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                    && !searchRequesting && searchMorePage && searchGoodsList != null) {
+                                            if ((visibleItemCount + firstVisibleItem == totalItemCount) && !searchRequesting && searchMorePage && searchGoodsList != null) {
                                                 doSearch(keyword);
                                             }
                                         }
@@ -230,7 +236,9 @@ public class RecommendActivity extends BaseActivity {
                                 } else {
                                     ToastUtils.showShortSafe("无结果");
                                 }
-                            } else {
+                            } else
+
+                            {
                                 ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information.toString());
                             }
                         } else if (entity != null && entity.Value.size() > 0) {
@@ -272,7 +280,7 @@ public class RecommendActivity extends BaseActivity {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 3);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 3, saleType);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -303,6 +311,7 @@ public class RecommendActivity extends BaseActivity {
                 if (holder != null && position < goodsList.size()) {
                     Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
+                    intent.putExtra("saleType", saleType);
                     startActivityForResult(intent, REQUEST_REFRESH);
                 }
             }
@@ -311,23 +320,43 @@ public class RecommendActivity extends BaseActivity {
 
     @Override
     public void loadData() {
-        // 查询购物车商品
-        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
-                .queryList()
-                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                    @Override
-                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                        orderCount = saleGoodsItemModels.size();
-                        if (orderCount > 0) {
-                            titleView.setRightIconText(View.VISIBLE, orderCount);
-                            LogUtils.e("orderCount：" + orderCount);
-                        } else if (orderCount == 0) {
-                            titleView.setRightIconText(View.GONE, 0);
-                            LogUtils.e("orderCount：" + orderCount);
+        if (saleType == 1) {
+            // 查询退货清单
+            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where())
+                    .queryList()
+                    .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<ReturnListItemModel> returnListItemModel) throws Exception {
+                            orderCount = returnListItemModel.size();
+                            if (orderCount > 0) {
+                                titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("orderCount：" + orderCount);
+                            } else if (orderCount == 0) {
+                                titleView.setRightIconText(View.GONE, 0);
+                                LogUtils.e("orderCount：" + orderCount);
+                            }
+                            LogUtils.e("returnListItemModel：" + returnListItemModel.size());
                         }
-                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
-                    }
-                });
+                    });
+        } else {
+            // 查询购物车商品
+            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+                    .queryList()
+                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                            orderCount = saleGoodsItemModels.size();
+                            if (orderCount > 0) {
+                                titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("orderCount：" + orderCount);
+                            } else if (orderCount == 0) {
+                                titleView.setRightIconText(View.GONE, 0);
+                                LogUtils.e("orderCount：" + orderCount);
+                            }
+                            LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
+                        }
+                    });
+        }
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status = 128", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())

@@ -77,7 +77,7 @@ public class ProductCategoryActivity extends BaseActivity {
     private List<ProductCategoryListEntity.ValueEntity> childData = new ArrayList<>();
     private ProductCategoryChildAdapter mProductCategoryChildAdapter;
     private int mPosition;
-
+    private int saleType = 0;
 
     @Override
     public int getLayoutId() {
@@ -86,6 +86,7 @@ public class ProductCategoryActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        saleType = getIntent().getIntExtra("saleType", 0);
         loadData();
     }
 
@@ -105,6 +106,7 @@ public class ProductCategoryActivity extends BaseActivity {
                             intent.putExtra("CategoryId", 0);
                             intent.putExtra("CategoryName", "全部货品");
                         }
+                        intent.putExtra("saleType", saleType);
                         startActivity(intent);
                     }
                 });
@@ -116,6 +118,7 @@ public class ProductCategoryActivity extends BaseActivity {
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
                         Intent intent = new Intent(ProductCategoryActivity.this, NewProductActivity.class);
+                        intent.putExtra("saleType", saleType);
                         startActivity(intent);
                     }
                 });
@@ -126,6 +129,7 @@ public class ProductCategoryActivity extends BaseActivity {
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
                         Intent intent = new Intent(ProductCategoryActivity.this, RecommendActivity.class);
+                        intent.putExtra("saleType", saleType);
                         startActivity(intent);
                     }
                 });
@@ -136,12 +140,14 @@ public class ProductCategoryActivity extends BaseActivity {
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
                         Intent intent = new Intent(ProductCategoryActivity.this, PromotionActivity.class);
+                        intent.putExtra("saleType", saleType);
                         startActivity(intent);
                     }
                 });
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setResult(RESULT_OK);
                 finish();
             }
         });
@@ -212,7 +218,7 @@ public class ProductCategoryActivity extends BaseActivity {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mProductCategoryAdapter = new ProductCategoryAdapter(mRecyclerView, parentData);
-//        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
+        //        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mProductCategoryAdapter);
 
         recycleViewChild.setHasFixedSize(true);
@@ -255,6 +261,7 @@ public class ProductCategoryActivity extends BaseActivity {
                                     Intent intent = new Intent(ProductCategoryActivity.this, ProductListActivity.class);
                                     intent.putExtra("CategoryId", childData.get(position).Id);
                                     intent.putExtra("CategoryName", childData.get(position).Name);
+                                    intent.putExtra("saleType", saleType);
                                     startActivity(intent);
                                 }
                             });
@@ -263,6 +270,7 @@ public class ProductCategoryActivity extends BaseActivity {
                             Intent intent = new Intent(ProductCategoryActivity.this, ProductListActivity.class);
                             intent.putExtra("CategoryId", parentData.get(position).Id);
                             intent.putExtra("CategoryName", parentData.get(position).Name);
+                            intent.putExtra("saleType", saleType);
                             startActivity(intent);
                             llAll.setVisibility(View.GONE);
                             recycleViewChild.setVisibility(View.GONE);

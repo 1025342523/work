@@ -22,6 +22,9 @@ import com.wx.wheelview.widget.WheelView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
+import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel_Table;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.CreateOrderEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
@@ -128,7 +131,7 @@ public class MettingOrderActivity extends BaseActivity {
     private int mPosition;
     private int orderId;
     private boolean refresh;
-    private int orderCount,orderTotal;
+    private int orderCount, orderTotal, saleType = 0;
 
     @Override
     public int getLayoutId() {
@@ -147,95 +150,182 @@ public class MettingOrderActivity extends BaseActivity {
     public void loadData() {
         getIntentExtra();
         if (isCreate) {
+            if (saleType == 1) {
+                RXSQLite.rx(SQLite.select()
+                        .from(ReturnListItemModel.class))
+                        .queryList()
+                        .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                            @Override
+                            public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
+                                if (returnListItemModels != null && returnListItemModels.size() > 0) {
+                                    Flowable.fromIterable(returnListItemModels)
+                                            .forEach(new Consumer<ReturnListItemModel>() {
+                                                @Override
+                                                public void accept(@NonNull ReturnListItemModel returnListItemModel) throws Exception {
+                                                    SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
+                                                    mItem.PriceSystemId = returnListItemModel.PriceSystemId;
+                                                    mItem.CurrentPrice = returnListItemModel.CurrentPrice;
+                                                    mItem.TotalPrice = returnListItemModel.CurrentPrice;
+                                                    mItem.ImagePath = returnListItemModel.Path;
+                                                    mItem.ProductName = returnListItemModel.ProductName;
+                                                    mItem.ActualPrice = returnListItemModel.UnitPrice;
+                                                    mItem.ActualUnitPrice = returnListItemModel.BasicUnitPrice;
+                                                    mItem.ProductUnitName = returnListItemModel.ProductUnitName;
+                                                    mItem.BasicUnitPrice = returnListItemModel.BasicUnitPrice;
+                                                    mItem.UnitPrice = returnListItemModel.UnitPrice;
+                                                    mItem.Discount = returnListItemModel.Discount;
+                                                    mItem.SalesType = returnListItemModel.SalesType;
+                                                    mItem.TaxRate = returnListItemModel.TaxRate;
+                                                    mItem.UnitId = returnListItemModel.UnitId;
+                                                    mItem.Quantity = returnListItemModel.Quantity;
+                                                    mItem.WarehouseId = returnListItemModel.WarehouseId;
+                                                    mItem.ProductId = returnListItemModel.ProductId;
+                                                    mItem.LocationId = returnListItemModel.LocationId;
+                                                    mItem.PackSpec = returnListItemModel.PackSpec;
+                                                    mItem.Price0 = returnListItemModel.Price0;
+                                                    mItem.Price1 = returnListItemModel.Price1;
+                                                    mItem.Price2 = returnListItemModel.Price2;
+                                                    mItem.Price3 = returnListItemModel.Price3;
+                                                    mItem.Price4 = returnListItemModel.Price4;
+                                                    mItem.Price5 = returnListItemModel.Price5;
+                                                    mItem.Price6 = returnListItemModel.Price6;
+                                                    mItem.Price7 = returnListItemModel.Price7;
+                                                    mItem.Price8 = returnListItemModel.Price8;
+                                                    mItem.Price9 = returnListItemModel.Price9;
+                                                    mItem.Price10 = returnListItemModel.Price10;
+                                                    mItem.MinSalesQuantity = returnListItemModel.MinSalesQuantity;
+                                                    mItem.MaxSalesQuantity = returnListItemModel.MaxSalesQuantity;
+                                                    mItem.MinSalesPrice = returnListItemModel.MinSalesPrice;
+                                                    mItem.MaxPurchasePrice = returnListItemModel.MaxPurchasePrice;
+                                                    mItem.DefaultLocationName = returnListItemModel.DefaultLocationName;
+                                                    mItem.OweRemark = returnListItemModel.Remark;
+                                                    mItem.BatchId = "";
+                                                    mItem.Code = returnListItemModel.Code;
+                                                    mItemData.add(mItem);
+                                                    LogUtils.e("GoodsItem数量为：" + mItemData.size());
 
-            RXSQLite.rx(SQLite.select()
-                    .from(SaleGoodsItemModel.class))
-                    .queryList()
-                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                        @Override
-                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                            if (saleGoodsItemModels != null && saleGoodsItemModels.size() > 0) {
-                                Flowable.fromIterable(saleGoodsItemModels)
-                                        .forEach(new Consumer<SaleGoodsItemModel>() {
-                                            @Override
-                                            public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
-                                                SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
-                                                mItem.PriceSystemId = saleGoodsItemModel.PriceSystemId;
-                                                mItem.CurrentPrice = saleGoodsItemModel.CurrentPrice;
-                                                mItem.TotalPrice = saleGoodsItemModel.CurrentPrice;
-                                                mItem.ImagePath = saleGoodsItemModel.Path;
-                                                mItem.ProductName = saleGoodsItemModel.ProductName;
-                                                mItem.ActualPrice = saleGoodsItemModel.UnitPrice;
-                                                mItem.ActualUnitPrice = saleGoodsItemModel.BasicUnitPrice;
-                                                mItem.ProductUnitName = saleGoodsItemModel.ProductUnitName;
-                                                mItem.BasicUnitPrice = saleGoodsItemModel.BasicUnitPrice;
-                                                mItem.UnitPrice = saleGoodsItemModel.UnitPrice;
-                                                mItem.Discount = saleGoodsItemModel.Discount;
-                                                mItem.SalesType = saleGoodsItemModel.SalesType;
-                                                mItem.TaxRate = saleGoodsItemModel.TaxRate;
-                                                mItem.UnitId = saleGoodsItemModel.UnitId;
-                                                mItem.Quantity = saleGoodsItemModel.Quantity;
-                                                mItem.WarehouseId = saleGoodsItemModel.WarehouseId;
-                                                mItem.ProductId = saleGoodsItemModel.ProductId;
-                                                mItem.LocationId = saleGoodsItemModel.LocationId;
-                                                mItem.PackSpec = saleGoodsItemModel.PackSpec;
-                                                mItem.Price0 = saleGoodsItemModel.Price0;
-                                                mItem.Price1 = saleGoodsItemModel.Price1;
-                                                mItem.Price2 = saleGoodsItemModel.Price2;
-                                                mItem.Price3 = saleGoodsItemModel.Price3;
-                                                mItem.Price4 = saleGoodsItemModel.Price4;
-                                                mItem.Price5 = saleGoodsItemModel.Price5;
-                                                mItem.Price6 = saleGoodsItemModel.Price6;
-                                                mItem.Price7 = saleGoodsItemModel.Price7;
-                                                mItem.Price8 = saleGoodsItemModel.Price8;
-                                                mItem.Price9 = saleGoodsItemModel.Price9;
-                                                mItem.Price10 = saleGoodsItemModel.Price10;
-                                                mItem.MinSalesQuantity = saleGoodsItemModel.MinSalesQuantity;
-                                                mItem.MaxSalesQuantity = saleGoodsItemModel.MaxSalesQuantity;
-                                                mItem.MinSalesPrice = saleGoodsItemModel.MinSalesPrice;
-                                                mItem.MaxPurchasePrice = saleGoodsItemModel.MaxPurchasePrice;
-                                                mItem.DefaultLocationName = saleGoodsItemModel.DefaultLocationName;
-                                                mItem.OweRemark = saleGoodsItemModel.Remark;
-                                                mItem.BatchId = "";
-                                                mItem.Code = saleGoodsItemModel.Code;
-                                                mItemData.add(mItem);
-                                                LogUtils.e("GoodsItem数量为：" + mItemData.size());
-
-                                                RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class).where(GoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
-                                                        .queryList()
-                                                        .subscribe(new Consumer<List<GoodsUnitModel>>() {
-                                                            @Override
-                                                            public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
-                                                                if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
-                                                                    for (GoodsUnitModel mModel : goodsUnitModels) {
-                                                                        if (mModel.ProductId == mItem.ProductId) {
-                                                                            ProductUnitEntity.ValueEntity mUnitData = new ProductUnitEntity.ValueEntity();
-                                                                            mUnitData.Id = mModel.Id;
-                                                                            mUnitData.ProductId = mModel.ProductId;
-                                                                            mUnitData.Name = mModel.Name;
-                                                                            mUnitData.Factor = mModel.Factor;
-                                                                            mUnitData.BasicFactor = mModel.BasicFactor;
-                                                                            mUnitData.IsBasic = mModel.IsBasic;
-                                                                            mUnitData.IsDefault = mModel.IsDefault;
-                                                                            mUnitData.BreakupNotify = mModel.BreakupNotify;
-                                                                            mUnitData.Ordinal = mModel.Ordinal;
-                                                                            mItem.ProductUnitList.add(mUnitData);
+                                                    RXSQLite.rx(SQLite.select().from(ReturnGoodsUnitModel.class).where(ReturnGoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
+                                                            .queryList()
+                                                            .subscribe(new Consumer<List<ReturnGoodsUnitModel>>() {
+                                                                @Override
+                                                                public void accept(@NonNull List<ReturnGoodsUnitModel> goodsUnitModels) throws Exception {
+                                                                    if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
+                                                                        for (ReturnGoodsUnitModel mModel : goodsUnitModels) {
+                                                                            if (mModel.ProductId == mItem.ProductId) {
+                                                                                ProductUnitEntity.ValueEntity mUnitData = new ProductUnitEntity.ValueEntity();
+                                                                                mUnitData.Id = mModel.Id;
+                                                                                mUnitData.ProductId = mModel.ProductId;
+                                                                                mUnitData.Name = mModel.Name;
+                                                                                mUnitData.Factor = mModel.Factor;
+                                                                                mUnitData.BasicFactor = mModel.BasicFactor;
+                                                                                mUnitData.IsBasic = mModel.IsBasic;
+                                                                                mUnitData.IsDefault = mModel.IsDefault;
+                                                                                mUnitData.BreakupNotify = mModel.BreakupNotify;
+                                                                                mUnitData.Ordinal = mModel.Ordinal;
+                                                                                mItem.ProductUnitList.add(mUnitData);
+                                                                            }
                                                                         }
+                                                                    } else {
+                                                                        LogUtils.e("单位List为空");
                                                                     }
-                                                                } else {
-                                                                    LogUtils.e("单位List为空");
                                                                 }
-                                                            }
-                                                        });
+                                                            });
 
+                                                }
+                                            });
 
-                                            }
-                                        });
-
+                                }
                             }
-                        }
-                    });
+                        });
+            } else {
+                RXSQLite.rx(SQLite.select()
+                        .from(SaleGoodsItemModel.class))
+                        .queryList()
+                        .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                            @Override
+                            public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                                if (saleGoodsItemModels != null && saleGoodsItemModels.size() > 0) {
+                                    Flowable.fromIterable(saleGoodsItemModels)
+                                            .forEach(new Consumer<SaleGoodsItemModel>() {
+                                                @Override
+                                                public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
+                                                    SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
+                                                    mItem.PriceSystemId = saleGoodsItemModel.PriceSystemId;
+                                                    mItem.CurrentPrice = saleGoodsItemModel.CurrentPrice;
+                                                    mItem.TotalPrice = saleGoodsItemModel.CurrentPrice;
+                                                    mItem.ImagePath = saleGoodsItemModel.Path;
+                                                    mItem.ProductName = saleGoodsItemModel.ProductName;
+                                                    mItem.ActualPrice = saleGoodsItemModel.UnitPrice;
+                                                    mItem.ActualUnitPrice = saleGoodsItemModel.BasicUnitPrice;
+                                                    mItem.ProductUnitName = saleGoodsItemModel.ProductUnitName;
+                                                    mItem.BasicUnitPrice = saleGoodsItemModel.BasicUnitPrice;
+                                                    mItem.UnitPrice = saleGoodsItemModel.UnitPrice;
+                                                    mItem.Discount = saleGoodsItemModel.Discount;
+                                                    mItem.SalesType = saleGoodsItemModel.SalesType;
+                                                    mItem.TaxRate = saleGoodsItemModel.TaxRate;
+                                                    mItem.UnitId = saleGoodsItemModel.UnitId;
+                                                    mItem.Quantity = saleGoodsItemModel.Quantity;
+                                                    mItem.WarehouseId = saleGoodsItemModel.WarehouseId;
+                                                    mItem.ProductId = saleGoodsItemModel.ProductId;
+                                                    mItem.LocationId = saleGoodsItemModel.LocationId;
+                                                    mItem.PackSpec = saleGoodsItemModel.PackSpec;
+                                                    mItem.Price0 = saleGoodsItemModel.Price0;
+                                                    mItem.Price1 = saleGoodsItemModel.Price1;
+                                                    mItem.Price2 = saleGoodsItemModel.Price2;
+                                                    mItem.Price3 = saleGoodsItemModel.Price3;
+                                                    mItem.Price4 = saleGoodsItemModel.Price4;
+                                                    mItem.Price5 = saleGoodsItemModel.Price5;
+                                                    mItem.Price6 = saleGoodsItemModel.Price6;
+                                                    mItem.Price7 = saleGoodsItemModel.Price7;
+                                                    mItem.Price8 = saleGoodsItemModel.Price8;
+                                                    mItem.Price9 = saleGoodsItemModel.Price9;
+                                                    mItem.Price10 = saleGoodsItemModel.Price10;
+                                                    mItem.MinSalesQuantity = saleGoodsItemModel.MinSalesQuantity;
+                                                    mItem.MaxSalesQuantity = saleGoodsItemModel.MaxSalesQuantity;
+                                                    mItem.MinSalesPrice = saleGoodsItemModel.MinSalesPrice;
+                                                    mItem.MaxPurchasePrice = saleGoodsItemModel.MaxPurchasePrice;
+                                                    mItem.DefaultLocationName = saleGoodsItemModel.DefaultLocationName;
+                                                    mItem.OweRemark = saleGoodsItemModel.Remark;
+                                                    mItem.BatchId = "";
+                                                    mItem.Code = saleGoodsItemModel.Code;
+                                                    mItemData.add(mItem);
+                                                    LogUtils.e("GoodsItem数量为：" + mItemData.size());
 
+                                                    RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class).where(GoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
+                                                            .queryList()
+                                                            .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                                                                @Override
+                                                                public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                                                                    if (goodsUnitModels != null && goodsUnitModels.size() > 0) {
+                                                                        for (GoodsUnitModel mModel : goodsUnitModels) {
+                                                                            if (mModel.ProductId == mItem.ProductId) {
+                                                                                ProductUnitEntity.ValueEntity mUnitData = new ProductUnitEntity.ValueEntity();
+                                                                                mUnitData.Id = mModel.Id;
+                                                                                mUnitData.ProductId = mModel.ProductId;
+                                                                                mUnitData.Name = mModel.Name;
+                                                                                mUnitData.Factor = mModel.Factor;
+                                                                                mUnitData.BasicFactor = mModel.BasicFactor;
+                                                                                mUnitData.IsBasic = mModel.IsBasic;
+                                                                                mUnitData.IsDefault = mModel.IsDefault;
+                                                                                mUnitData.BreakupNotify = mModel.BreakupNotify;
+                                                                                mUnitData.Ordinal = mModel.Ordinal;
+                                                                                mItem.ProductUnitList.add(mUnitData);
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        LogUtils.e("单位List为空");
+                                                                    }
+                                                                }
+                                                            });
+
+                                                }
+                                            });
+
+                                }
+                            }
+                        });
+
+            }
             getCreateOrderInfo();
         } else {
             getOrderData();
@@ -294,9 +384,10 @@ public class MettingOrderActivity extends BaseActivity {
         ciGoodsListCount.setOnItemClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(MettingOrderActivity.this,GoodsListActivity.class);
-                intent.putExtra("CreateOrder",isCreate);
-                intent.putExtra("orderId",orderId);
+                Intent intent = new Intent(MettingOrderActivity.this, GoodsListActivity.class);
+                intent.putExtra("CreateOrder", isCreate);
+                intent.putExtra("orderId", orderId);
+                intent.putExtra("saleType", saleType);
                 startActivity(intent);
             }
         });
@@ -416,54 +507,106 @@ public class MettingOrderActivity extends BaseActivity {
         }
         orderInfo.SalesOutBillItemList = mItemData;
         LogUtils.e(JsonUtils.serialize(orderInfo));
-        RetrofitHelper
-                .getSaveOrderApi()
-                .saveOrderInfo("SalesOutBill", "", JsonUtils.serialize(orderInfo), AppInfoUtil.getToken())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CreateOrderEntity>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
 
-                    }
+        if (saleType == 1) {
+            RetrofitHelper
+                    .getSaveOrderApi()
+                    .saveOrderInfo("SalesOutBill", "", JsonUtils.serialize(orderInfo), AppInfoUtil.getToken())
+                    .compose(bindToLifecycle())
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<CreateOrderEntity>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
 
-                    @Override
-                    public void onNext(@NonNull CreateOrderEntity createOrderEntity) {
-                        if (!createOrderEntity.HasError && createOrderEntity.Value != null) {
-                            orderInfo = createOrderEntity.Value;
-//                            ToastUtils.showShortSafe("创建订单成功！");
-                            LogUtils.e("创建订单成功！");
-                            new AlertDialog.Builder(MettingOrderActivity.this)
-                                    .setTitle("提示")
-                                    .setMessage("创建订单成功！")
-                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            finish();
-                                            //清空购物车
-//                                            FlowManager.getDatabase(AppDatabase.class).reset(MettingOrderActivity.this);
-                                            Delete.table(SaleGoodsItemModel.class);
-                                        }
-                                    })
-                                    .setCancelable(false)
-                                    .show();
-                        } else {
-                            ToastUtils.showShortSafe("创建订单失败！");
                         }
-                    }
 
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        ToastUtils.showShortSafe(e.getMessage());
-                        LogUtils.e("创建订单失败！onError");
-                    }
+                        @Override
+                        public void onNext(@NonNull CreateOrderEntity createOrderEntity) {
+                            if (!createOrderEntity.HasError && createOrderEntity.Value != null) {
+                                orderInfo = createOrderEntity.Value;
+                                //                            ToastUtils.showShortSafe("创建订单成功！");
+                                LogUtils.e("创建退货单成功！");
+                                new AlertDialog.Builder(MettingOrderActivity.this)
+                                        .setTitle("提示")
+                                        .setMessage("创建退货单成功！")
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                finish();
+                                                //清空退货清单
+                                                Delete.table(ReturnListItemModel.class);
+                                            }
+                                        })
+                                        .setCancelable(false)
+                                        .show();
+                            } else {
+                                ToastUtils.showShortSafe("创建退货单失败！");
+                            }
+                        }
 
-                    @Override
-                    public void onComplete() {
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            ToastUtils.showShortSafe(e.getMessage());
+                            LogUtils.e("创建退货单失败！onError");
+                        }
 
-                    }
-                });
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        } else {
+            RetrofitHelper
+                    .getSaveOrderApi()
+                    .saveOrderInfo("SalesOutBill", "", JsonUtils.serialize(orderInfo), AppInfoUtil.getToken())
+                    .compose(bindToLifecycle())
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<CreateOrderEntity>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@NonNull CreateOrderEntity createOrderEntity) {
+                            if (!createOrderEntity.HasError && createOrderEntity.Value != null) {
+                                orderInfo = createOrderEntity.Value;
+                                //                            ToastUtils.showShortSafe("创建订单成功！");
+                                LogUtils.e("创建订单成功！");
+                                new AlertDialog.Builder(MettingOrderActivity.this)
+                                        .setTitle("提示")
+                                        .setMessage("创建订单成功！")
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                finish();
+                                                //清空购物车
+                                                //     FlowManager.getDatabase(AppDatabase.class).reset(MettingOrderActivity.this);
+                                                Delete.table(SaleGoodsItemModel.class);
+                                            }
+                                        })
+                                        .setCancelable(false)
+                                        .show();
+                            } else {
+                                ToastUtils.showShortSafe("创建订单失败！");
+                            }
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            ToastUtils.showShortSafe(e.getMessage());
+                            LogUtils.e("创建订单失败！onError");
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+        }
+
     }
 
     private void showReceiveMethodDialog(List<ReceiveMethodListEntity.ValueEntity> receiveMethodListEntity) {
@@ -506,7 +649,11 @@ public class MettingOrderActivity extends BaseActivity {
     private void getIntentExtra() {
         isCreate = getIntent().getBooleanExtra("CreateOrder", false);
         orderId = getIntent().getIntExtra("orderId", 0);
-        LogUtils.e("isCreate：" + isCreate + "，orderId："+orderId);
+        saleType = getIntent().getIntExtra("saleType", 0);
+        if (saleType == 1) {
+            titleView.setTitle("退单详情");
+        }
+        LogUtils.e("isCreate：" + isCreate + "，orderId：" + orderId + "，saleType：" + saleType);
     }
 
     private void getCreateOrderInfo() {
@@ -523,13 +670,21 @@ public class MettingOrderActivity extends BaseActivity {
                 .subscribe(new Observer<CreateOrderEntity>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        LogUtils.e("创建销售单 订阅");
+                        if (saleType == 1) {
+                            LogUtils.e("创建退货单 订阅");
+                        } else {
+                            LogUtils.e("创建销售单 订阅");
+                        }
                     }
 
                     @Override
                     public void onNext(@NonNull CreateOrderEntity createOrderEntity) {
                         if (!createOrderEntity.HasError) {
-                            LogUtils.e("创建销售单成功");
+                            if (saleType == 1) {
+                                LogUtils.e("创建退货单成功");
+                            } else {
+                                LogUtils.e("创建销售单成功");
+                            }
                             orderInfo = createOrderEntity.Value;
                             setData(true);
                         } else {
@@ -589,10 +744,10 @@ public class MettingOrderActivity extends BaseActivity {
 
         LogUtils.e("GoodsItem数量为：" + mItemData.size());
         orderCount = mItemData.size();
-        for(SaleGoodsItem.ValueEntity valueEntity: mItemData){
+        for (SaleGoodsItem.ValueEntity valueEntity : mItemData) {
             orderTotal += valueEntity.Quantity;
         }
-        ciGoodsListCount.getEditText().setText("共"+orderCount+"款，总数"+orderTotal);
+        ciGoodsListCount.getEditText().setText("共" + orderCount + "款，总数" + orderTotal);
 
         ciDate.getEditText().setText(DateUtil.getFormatDate(orderInfo.BillDate * 1000));
         ciDeliveryDate.getEditText().setText(DateUtil.getFormatDate(orderInfo.BillDate * 1000));
@@ -604,7 +759,11 @@ public class MettingOrderActivity extends BaseActivity {
         ciPhone.getEditText().setText(orderInfo.TraderPhone);
 
         if (isCreate) {
-            titleView.setTitle("填写订单");
+            if (saleType == 1) {
+                titleView.setTitle("填写退单");
+            } else {
+                titleView.setTitle("填写订单");
+            }
             tvSave.setText("提交");
             RxView.clicks(rlSave)
                     .compose(bindToLifecycle())

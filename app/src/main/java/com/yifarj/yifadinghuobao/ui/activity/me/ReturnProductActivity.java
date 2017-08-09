@@ -1,4 +1,4 @@
-package com.yifarj.yifadinghuobao.ui.fragment.goods;
+package com.yifarj.yifadinghuobao.ui.activity.me;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,16 +18,16 @@ import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
-import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.productCategory.ProductCategoryActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
-import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.CzechYuanTitleView;
@@ -44,12 +44,11 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * TabGoodsFragment
- *
- * @auther Czech.Yuan
- * @date 2017/5/12 15:07
+ * Created by zydx-pc on 2017/8/4.
  */
-public class TabGoodsFragment extends BaseFragment implements View.OnClickListener {
+
+public class ReturnProductActivity extends BaseActivity implements View.OnClickListener {
+
     private static final int REQUEST_REFRESH = 10;
 
     @BindView(R.id.lvContent)
@@ -76,7 +75,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     @BindView(R.id.search_price_layout)
     LinearLayout rlTab4;
 
-
     private int orderCount;
 
     private PageInfo pageInfo = new PageInfo();
@@ -92,24 +90,14 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     private GoodsListViewAdapter searchGoodsListAdapter;
 
     @Override
-    public int getLayoutResId() {
+    public int getLayoutId() {
         return R.layout.fragment_goods;
     }
 
     @Override
-    protected void lazyLoad() {
-        if (!isPrepared && !isVisible) {
-            return;
-        }
+    public void initViews(Bundle savedInstanceState) {
         loadData();
         init();
-        isPrepared = false;
-    }
-
-    @Override
-    protected void finishCreateView(Bundle savedInstanceState) {
-        isPrepared = true;
-        lazyLoad();
     }
 
     private void init() {
@@ -118,16 +106,23 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         rlTab3.setOnClickListener(this);
         rlTab4.setOnClickListener(this);
 
+        titleView.setLeftBackVisibility(View.VISIBLE);
+        titleView.setLeftBackClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         titleView.setRightIconClickListener(view -> {
-            Intent intent = new Intent(getActivity(), ShoppingCartActivity.class);
-            intent.putExtra("saleType", 0);
+            Intent intent = new Intent(ReturnProductActivity.this, ShoppingCartActivity.class);
+            intent.putExtra("saleType", 1);
             startActivityForResult(intent, REQUEST_REFRESH);
         });
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ProductCategoryActivity.class);
-                intent.putExtra("saleType", 0);
+                Intent intent = new Intent(ReturnProductActivity.this, ProductCategoryActivity.class);
+                intent.putExtra("saleType", 1);
                 startActivityForResult(intent, REQUEST_REFRESH);
             }
         });
@@ -209,26 +204,26 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                             searchGoodsList = entity;
                             if (!entity.HasError) {
                                 if (entity.Value != null && entity.Value.size() > 0) {
-                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, TabGoodsFragment.this, 0, null, true, 0);
+                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 0, ReturnProductActivity.this, true, 1);
                                     searchView.getListView().setAdapter(searchGoodsListAdapter);
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                            Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                                            Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
-                                            intent.putExtra("saleType", 0);
+                                            intent.putExtra("saleType", 1);
                                             startActivityForResult(intent, REQUEST_REFRESH);
-                                            /*searchView.clearText();
-                                            searchGoodsList = null;
-                                            searchPageInfo.PageIndex = -1;
-                                            searchRequesting = false;
-                                            searchMorePage = true;*/
+//                                            searchView.clearText();
+//                                            searchGoodsList = null;
+//                                            searchPageInfo.PageIndex = -1;
+//                                            searchRequesting = false;
+//                                            searchMorePage = true;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
-                                        Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                                        Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
-                                        intent.putExtra("saleType", 0);
+                                        intent.putExtra("saleType", 1);
                                         startActivityForResult(intent, REQUEST_REFRESH);
                                         searchView.clearText();
                                         searchGoodsList = null;
@@ -310,15 +305,14 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     //    }
 
     @Override
-    protected void loadData() {
-        // 查询购物车商品
-        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+    public void loadData() {
+        // 查询退货清单商品
+        RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where())
                 .queryList()
-                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                .subscribe(new Consumer<List<ReturnListItemModel>>() {
                     @Override
-                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-
-                        orderCount = saleGoodsItemModels.size();
+                    public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
+                        orderCount = returnListItemModels.size();
                         if (orderCount > 0) {
                             titleView.setRightIconText(View.VISIBLE, orderCount);
                             LogUtils.e("orderCount：" + orderCount);
@@ -326,7 +320,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                             titleView.setRightIconText(View.GONE, 0);
                             LogUtils.e("orderCount：" + orderCount);
                         }
-                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
+                        LogUtils.e("returnListItemModels：" + returnListItemModels.size());
                     }
                 });
         LogUtils.e("loadData", "获取商品列表数据");
@@ -356,13 +350,13 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                         if (goodsList == null) {
                             goodsList = goodsListEntity;
                             if (!goodsList.HasError) {
-                                goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, TabGoodsFragment.this, 0, null, true, 0);
+                                goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 0, ReturnProductActivity.this, true, 1);
                                 lvContent.setAdapter(goodsListAdapter);
                                 lvContent.setOnItemClickListener((parent, view, position, id) -> {
                                     if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
-                                        Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                                        Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
-                                        intent.putExtra("saleType", 0);
+                                        intent.putExtra("saleType", 1);
                                         startActivityForResult(intent, REQUEST_REFRESH);
                                     }
                                 });
@@ -516,4 +510,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                 break;
         }
     }
+
 }
+

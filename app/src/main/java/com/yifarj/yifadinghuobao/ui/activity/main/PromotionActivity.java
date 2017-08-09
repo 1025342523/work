@@ -23,6 +23,7 @@ import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
@@ -81,7 +82,7 @@ public class PromotionActivity extends BaseActivity {
 
     private PageInfo pageInfo;
 
-    private int totalCount, orderCount;
+    private int totalCount, orderCount, saleType = 0;
 
     private PageInfo searchPageInfo = new PageInfo();
     private boolean searchRequesting;
@@ -99,6 +100,8 @@ public class PromotionActivity extends BaseActivity {
         pageInfo = new PageInfo();
         goodsList = new ArrayList<>();
 
+        saleType = getIntent().getIntExtra("saleType", 0);
+
         lazyLoad();
 
         titleView.setLeftIconClickListener(new View.OnClickListener() {
@@ -109,6 +112,7 @@ public class PromotionActivity extends BaseActivity {
         });
         titleView.setRightIconClickListener(view -> {
             Intent intent = new Intent(this, ShoppingCartActivity.class);
+            intent.putExtra("saleType", saleType);
             startActivityForResult(intent, REQUEST_REFRESH);
         });
         titleView.setRightLeftIconClickListener(new View.OnClickListener() {
@@ -177,7 +181,7 @@ public class PromotionActivity extends BaseActivity {
         searchRequesting = true;
         ++searchPageInfo.PageIndex;
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList",  JsonUtils.serialize(searchPageInfo), "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 64)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 64)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -193,19 +197,20 @@ public class PromotionActivity extends BaseActivity {
                             searchGoodsList = entity;
                             if (!entity.HasError) {
                                 if (entity.Value != null && entity.Value.size() > 0) {
-                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 1, PromotionActivity.this, true);
+                                    searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 1, PromotionActivity.this, true, saleType);
                                     searchView.getListView().setAdapter(searchGoodsListAdapter);
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                             Intent intent = new Intent(PromotionActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
+                                            intent.putExtra("saleType", saleType);
                                             startActivityForResult(intent, REQUEST_REFRESH);
-                                            searchView.clearText();
-                                            searchGoodsList = null;
-                                            searchPageInfo.PageIndex = -1;
-                                            searchRequesting = false;
-                                            searchMorePage = true;
+//                                            searchView.clearText();
+//                                            searchGoodsList = null;
+//                                            searchPageInfo.PageIndex = -1;
+//                                            searchRequesting = false;
+//                                            searchMorePage = true;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
@@ -276,7 +281,7 @@ public class PromotionActivity extends BaseActivity {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 1);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 1, saleType);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
@@ -307,6 +312,7 @@ public class PromotionActivity extends BaseActivity {
                 if (holder != null && position < goodsList.size()) {
                     Intent intent = new Intent(PromotionActivity.this, ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
+                    intent.putExtra("saleType", saleType);
                     startActivityForResult(intent, REQUEST_REFRESH);
                 }
             }
@@ -315,23 +321,43 @@ public class PromotionActivity extends BaseActivity {
 
     @Override
     public void loadData() {
-        // 查询购物车商品
-        RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
-                .queryList()
-                .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                    @Override
-                    public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                        orderCount = saleGoodsItemModels.size();
-                        if (orderCount > 0) {
-                            titleView.setRightIconText(View.VISIBLE, orderCount);
-                            LogUtils.e("orderCount：" + orderCount);
-                        } else if (orderCount == 0) {
-                            titleView.setRightIconText(View.GONE, 0);
-                            LogUtils.e("orderCount：" + orderCount);
+        if (saleType == 1) {
+            // 查询退货清单
+            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where())
+                    .queryList()
+                    .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<ReturnListItemModel> returnListItemModel) throws Exception {
+                            orderCount = returnListItemModel.size();
+                            if (orderCount > 0) {
+                                titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("orderCount：" + orderCount);
+                            } else if (orderCount == 0) {
+                                titleView.setRightIconText(View.GONE, 0);
+                                LogUtils.e("orderCount：" + orderCount);
+                            }
+                            LogUtils.e("returnListItemModel：" + returnListItemModel.size());
                         }
-                        LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
-                    }
-                });
+                    });
+        } else {
+            // 查询购物车商品
+            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
+                    .queryList()
+                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                            orderCount = saleGoodsItemModels.size();
+                            if (orderCount > 0) {
+                                titleView.setRightIconText(View.VISIBLE, orderCount);
+                                LogUtils.e("orderCount：" + orderCount);
+                            } else if (orderCount == 0) {
+                                titleView.setRightIconText(View.GONE, 0);
+                                LogUtils.e("orderCount：" + orderCount);
+                            }
+                            LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
+                        }
+                    });
+        }
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status = 64", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())

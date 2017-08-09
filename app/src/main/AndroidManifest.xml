@@ -107,17 +107,22 @@
             android:windowSoftInputMode="stateHidden"/>
 
         <activity
-            android:name=".ui.activity.me.ShippingAddressActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden"/>
-
-        <activity
             android:name=".ui.activity.customer.DeliveryAddressActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
 
         <activity
             android:name=".ui.activity.customer.EditAddressActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name=".ui.activity.me.ReturnFormActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name=".ui.activity.me.ReturnProductActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
     </application>

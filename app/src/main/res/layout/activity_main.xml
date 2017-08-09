@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
+              android:orientation="vertical"
                 android:layout_height="match_parent">
 
 
@@ -8,14 +9,12 @@
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="@dimen/bottom_tab_height"/>
+        android:layout_weight="1"/>
 
     <android.support.v4.app.FragmentTabHost
         android:id="@+id/tabHost"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_tab_height"
-        android:layout_alignParentBottom="true">
+        android:layout_height="@dimen/bottom_tab_height">
 
         <FrameLayout
             android:id="@android:id/tabcontent"
@@ -25,4 +24,4 @@
     </android.support.v4.app.FragmentTabHost>
 
 
-</RelativeLayout>
+</LinearLayout>

@@ -17,15 +17,25 @@
         android:padding="@dimen/size_10"
         android:scaleType="fitXY"/>
 
+    <ImageView
+        android:id="@+id/ivBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/size_10"
+        android:layout_marginLeft="@dimen/size_12"
+        android:layout_marginRight="@dimen/size_10"
+        android:background="@drawable/ic_title_back"
+        android:scaleType="fitXY"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/ivLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/size_20"
-        android:layout_marginStart="@dimen/size_20"
-        android:padding="@dimen/size_10"
+        android:layout_toRightOf="@id/ivBack"
+        android:padding="@dimen/size_8"
         android:text="分类"
         android:textColor="@color/white"
         android:textSize="@dimen/font_20"/>

@@ -38,6 +38,7 @@ import com.yifarj.yifadinghuobao.utils.ScreenUtil;
 import com.yifarj.yifadinghuobao.view.AutoScrollViewPager;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.ViewPagerIndicator;
+import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +126,7 @@ public class TabMainFragment extends BaseFragment {
             return;
         }
         mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
+        //        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
         mSwipeRefreshLayout.post(() -> {
 
             mSwipeRefreshLayout.setRefreshing(true);
@@ -146,9 +147,9 @@ public class TabMainFragment extends BaseFragment {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, null, 0);
+        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, null, 0, 0);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
-//        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
         mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
         setRecycleNoScroll();
         createHeadView();
@@ -168,6 +169,7 @@ public class TabMainFragment extends BaseFragment {
                 if (holder != null && position < goodsList.size()) {
                     Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
+                    intent.putExtra("saleType", 0);
                     startActivity(intent);
                 }
             }
