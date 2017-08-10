@@ -57,6 +57,7 @@ import io.reactivex.schedulers.Schedulers;
  * @date 2017/5/12 15:07
  */
 public class TabMainFragment extends BaseFragment {
+    private static final int REQUEST_ITEM = 11;
 
     //    @BindView(R.id.viewpager)
     AutoScrollViewPager viewPager;
@@ -96,6 +97,8 @@ public class TabMainFragment extends BaseFragment {
     private PageInfo pageInfo = new PageInfo();
 
     private GoodsListAdapter mGoodsListAdapter;
+
+    private int itemPosition;
 
     @Override
     public int getLayoutResId() {
@@ -167,10 +170,11 @@ public class TabMainFragment extends BaseFragment {
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
                 if (holder != null && position < goodsList.size()) {
+                    itemPosition = position;
                     Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
                     intent.putExtra("shoppingId", goodsList.get(position).Id);
                     intent.putExtra("saleType", 0);
-                    startActivity(intent);
+                    startActivityForResult(intent, REQUEST_ITEM);
                 }
             }
         });
@@ -398,7 +402,12 @@ public class TabMainFragment extends BaseFragment {
     }
 
     private void setRecycleNoScroll() {
-
         mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mGoodsListAdapter.notifyItemChanged(itemPosition);
     }
 }

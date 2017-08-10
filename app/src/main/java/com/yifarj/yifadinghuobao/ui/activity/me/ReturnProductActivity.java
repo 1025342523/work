@@ -50,6 +50,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ReturnProductActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int REQUEST_REFRESH = 10;
+    private static final int REQUEST_ITEM = 11;
 
     @BindView(R.id.lvContent)
     ListView lvContent;
@@ -88,6 +89,8 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
     private boolean searchMorePage = true;
     private GoodsListEntity searchGoodsList;
     private GoodsListViewAdapter searchGoodsListAdapter;
+
+    private int shopQuantity = 0, itemPosition, itemType, shopId;
 
     @Override
     public int getLayoutId() {
@@ -209,10 +212,13 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                            itemPosition = position;
+                                            itemType = 0;
+                                            shopId = searchGoodsList.Value.get(position).Id;
                                             Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             intent.putExtra("saleType", 1);
-                                            startActivityForResult(intent, REQUEST_REFRESH);
+                                            startActivityForResult(intent, REQUEST_ITEM);
 //                                            searchView.clearText();
 //                                            searchGoodsList = null;
 //                                            searchPageInfo.PageIndex = -1;
@@ -221,15 +227,18 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
+                                        itemPosition = 0;
+                                        itemType = 0;
+                                        shopId = searchGoodsList.Value.get(0).Id;
                                         Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
                                         intent.putExtra("saleType", 1);
-                                        startActivityForResult(intent, REQUEST_REFRESH);
-                                        searchView.clearText();
-                                        searchGoodsList = null;
-                                        searchPageInfo.PageIndex = -1;
-                                        searchRequesting = false;
-                                        searchMorePage = true;
+                                        startActivityForResult(intent, REQUEST_ITEM);
+//                                        searchView.clearText();
+//                                        searchGoodsList = null;
+//                                        searchPageInfo.PageIndex = -1;
+//                                        searchRequesting = false;
+//                                        searchMorePage = true;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override
@@ -354,10 +363,13 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                                 lvContent.setAdapter(goodsListAdapter);
                                 lvContent.setOnItemClickListener((parent, view, position, id) -> {
                                     if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
+                                        itemPosition = position;
+                                        itemType = 1;
+                                        shopId = goodsList.Value.get(position).Id;
                                         Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
                                         intent.putExtra("saleType", 1);
-                                        startActivityForResult(intent, REQUEST_REFRESH);
+                                        startActivityForResult(intent, REQUEST_ITEM);
                                     }
                                 });
                                 lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -424,7 +436,17 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        onTab1Click();
+        if (requestCode == REQUEST_REFRESH) {
+            onTab1Click();
+        } else if (requestCode == REQUEST_ITEM) {
+//            searchSQlite(shopId);
+            if (itemType == 0) {
+                LogUtils.e("itemPostition:"+itemPosition);
+//                searchGoodsListAdapter.updataView(itemPosition, searchView.getListView());
+            } else {
+//                goodsListAdapter.updataView(itemPosition, lvContent);
+            }
+        }
     }
 
 

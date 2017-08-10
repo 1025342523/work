@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -150,7 +151,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
         int tempUnitId = unitId;
         if (type) {
             if (saleType == 1) {
-                // 查询商品清单中是否有当前商品
+                // 查询退货清单中是否有当前商品
                 RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class)
                         .where(ReturnListItemModel_Table.ProductId.eq(goodsBean.Id)))
                         .queryList()
@@ -706,6 +707,20 @@ public class GoodsListViewAdapter extends BaseAdapter {
         TextView tvCode;
         AnimShopButton btnEle;
         TextView tvIcon;
+    }
+
+    public void updataView(int position,int quantity, ListView mListView) {
+        //得到第一个可显示控件的位置
+        int visibleFirstPosition = mListView.getFirstVisiblePosition();
+        int visibleLastPosition = mListView.getLastVisiblePosition();
+        //只有当要更新的view在可见的位置时才更新，不可见时，跳过不更新
+                if(position >= visibleFirstPosition && position <= visibleLastPosition){
+                    //得到要更新的item的view
+                    View view = mListView.getChildAt(position - visibleFirstPosition);
+                    ViewHolder holder= (ViewHolder) view.getTag();
+                    holder.btnEle.setCount(quantity);
+//                    getView(position,view,mListView);
+                }
     }
 
 }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -701,4 +702,5 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             tvIcon = $(R.id.tv_icon);
         }
     }
+
 }

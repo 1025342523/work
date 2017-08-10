@@ -316,11 +316,12 @@ public class CollectionActivity extends BaseActivity {
                                         Intent intent = new Intent(CollectionActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
                                         startActivityForResult(intent, REQUEST_REFRESH);
-                                        searchView.clearText();
-                                        searchGoodsList = null;
-                                        searchPageInfo.PageIndex = -1;
-                                        searchRequesting = false;
-                                        searchMorePage = true;
+
+//                                        searchView.clearText();
+//                                        searchGoodsList = null;
+//                                        searchPageInfo.PageIndex = -1;
+//                                        searchRequesting = false;
+//                                        searchMorePage = true;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override

@@ -23,12 +23,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+       <!-- <android.support.v7.widget.RecyclerView
             android:id="@+id/recycle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:scrollbars="none"/>
+            android:scrollbars="none"/>-->
+
+        <ListView
+            android:id="@+id/lvContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="1px"
+            android:listSelector="@android:color/transparent"/>
 
         <com.yifarj.yifadinghuobao.view.CustomEmptyView
             android:id="@+id/empty_view"

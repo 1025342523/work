@@ -2,15 +2,12 @@ package com.yifarj.yifadinghuobao.ui.activity.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -18,11 +15,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
-import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
 import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
-import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
-import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
-import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
@@ -37,9 +30,7 @@ import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.SearchView;
 import com.yifarj.yifadinghuobao.view.TitleView;
-import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -58,9 +49,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public class NewProductActivity extends BaseActivity {
     private static final int REQUEST_REFRESH = 10;
+    private static final int REQUEST_ITEM = 11;
 
-    @BindView(R.id.recycle)
-    RecyclerView mRecyclerView;
+    @BindView(R.id.lvContent)
+    ListView lvContent;
     @BindView(R.id.empty_view)
     CustomEmptyView mCustomEmptyView;
     @BindView(R.id.newproduct_titleView)
@@ -68,24 +60,20 @@ public class NewProductActivity extends BaseActivity {
     @BindView(R.id.searchView)
     SearchView searchView;
 
-    private boolean mIsRefreshing = false;
-
-    private View loadMoreView;
-
-    private HeaderViewRecyclerAdapter mHeaderViewRecyclerAdapter;
-
-    private GoodsListAdapter mGoodsListAdapter;
-
-    private List<GoodsListEntity.ValueEntity> goodsList;
-
-    private PageInfo pageInfo;
+    private PageInfo pageInfo = new PageInfo();
+    private boolean requesting;
+    private boolean morePage = true;
+    private GoodsListEntity goodsList;
+    private GoodsListViewAdapter goodsListAdapter;
 
     private PageInfo searchPageInfo = new PageInfo();
     private boolean searchRequesting;
     private boolean searchMorePage = true;
     private GoodsListEntity searchGoodsList;
     private GoodsListViewAdapter searchGoodsListAdapter;
-    private int totalCount, orderCount, saleType = 0;
+
+    private int orderCount, saleType = 0;
+    private int shopQuantity = 0, itemPosition, itemType, shopId;
 
     @Override
     public int getLayoutId() {
@@ -95,7 +83,6 @@ public class NewProductActivity extends BaseActivity {
     @Override
     public void initViews(Bundle savedInstanceState) {
         pageInfo = new PageInfo();
-        goodsList = new ArrayList<>();
 
         saleType = getIntent().getIntExtra("saleType", 0);
 
@@ -198,10 +185,12 @@ public class NewProductActivity extends BaseActivity {
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                            itemPosition = position;
+                                            itemType = 0;
                                             Intent intent = new Intent(NewProductActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             intent.putExtra("saleType", saleType);
-                                            startActivityForResult(intent, REQUEST_REFRESH);
+                                            startActivityForResult(intent, REQUEST_ITEM);
 //                                            searchView.clearText();
 //                                            searchGoodsList = null;
 //                                            searchPageInfo.PageIndex = -1;
@@ -210,14 +199,17 @@ public class NewProductActivity extends BaseActivity {
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
+                                        itemPosition = 0;
+                                        itemType = 0;
                                         Intent intent = new Intent(NewProductActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
-                                        startActivityForResult(intent, REQUEST_REFRESH);
-                                        searchView.clearText();
-                                        searchGoodsList = null;
-                                        searchPageInfo.PageIndex = -1;
-                                        searchRequesting = false;
-                                        searchMorePage = true;
+                                        intent.putExtra("saleType", saleType);
+                                        startActivityForResult(intent, REQUEST_ITEM);
+//                                        searchView.clearText();
+//                                        searchGoodsList = null;
+//                                        searchPageInfo.PageIndex = -1;
+//                                        searchRequesting = false;
+//                                        searchMorePage = true;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override
@@ -266,54 +258,11 @@ public class NewProductActivity extends BaseActivity {
 
 
     public void lazyLoad() {
-        pageInfo.PageIndex = 0;
+        goodsList = null;
+        pageInfo.PageIndex = -1;
         pageInfo.SortOrder = 1;
-        mIsRefreshing = false;
-        goodsList.clear();
+        morePage = true;
         loadData();
-        initRecyclerView();
-    }
-
-    public void initRecyclerView() {
-        mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this, 2, saleType);
-        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
-        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
-        setRecycleNoScroll();
-        createLoadMoreView();
-
-        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLinearLayoutManager) {
-
-            @Override
-            public void onLoadMore(int i) {
-                mIsRefreshing = true;
-                pageInfo.PageIndex++;
-                loadData();
-                loadMoreView.setVisibility(View.VISIBLE);
-            }
-        });
-
-        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return mIsRefreshing;
-            }
-        });
-
-        mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
-                if (holder != null && position < goodsList.size()) {
-                    Intent intent = new Intent(NewProductActivity.this, ShopDetailActivity.class);
-                    intent.putExtra("shoppingId", goodsList.get(position).Id);
-                    intent.putExtra("saleType", saleType);
-                    startActivityForResult(intent, REQUEST_REFRESH);
-                }
-            }
-        });
     }
 
     @Override
@@ -355,18 +304,21 @@ public class NewProductActivity extends BaseActivity {
                         }
                     });
         }
+        getGoodsList();
+    }
+
+    public void getGoodsList() {
+        if (requesting) {
+            return;
+        }
+        requesting = true;
+        ++pageInfo.PageIndex;
         LogUtils.e("loadData", "获取商品列表数据");
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status = 1", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(goodsListEntity -> {
-                    if (goodsListEntity.PageInfo.PageIndex * goodsListEntity.PageInfo.PageLength >= goodsListEntity.PageInfo.TotalCount) {
-                        loadMoreView.setVisibility(View.GONE);
-                        mHeaderViewRecyclerAdapter.removeFootView();
-                    }
-                })
                 .subscribe(new Observer<GoodsListEntity>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
@@ -375,84 +327,96 @@ public class NewProductActivity extends BaseActivity {
 
                     @Override
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
-                        if (!goodsListEntity.HasError) {
-                            goodsList.addAll(goodsListEntity.Value);
-                            finishTask();
+                        if (goodsList == null) {
+                            goodsList = goodsListEntity;
+                            if (!goodsList.HasError) {
+                                goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 0, NewProductActivity.this, true, 0);
+                                lvContent.setAdapter(goodsListAdapter);
+                                lvContent.setOnItemClickListener((parent, view, position, id) -> {
+                                    if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
+                                        itemPosition = position;
+                                        itemType = 1;
+                                        shopId = goodsList.Value.get(position).Id;
+
+                                        Intent intent = new Intent(NewProductActivity.this, ShopDetailActivity.class);
+                                        intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
+                                        intent.putExtra("saleType", saleType);
+                                        startActivityForResult(intent, REQUEST_ITEM);
+
+                                    }
+                                });
+                                lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
+                                    @Override
+                                    public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                    }
+
+                                    @Override
+                                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                        if ((visibleItemCount + firstVisibleItem == totalItemCount)
+                                                && !requesting && morePage && goodsList != null) {
+                                            getGoodsList();
+                                        }
+                                    }
+                                });
+                            } else {
+                                ToastUtils.showShortSafe("请求超时");
+                            }
+                        } else if (goodsListEntity != null && goodsListEntity.Value.size() > 0) {
+                            goodsList.Value.addAll(goodsListEntity.Value);
+                            goodsListAdapter.notifyDataSetChanged();
+                        } else {
+                            morePage = false;
+                            ToastUtils.showShortSafe("已全部加载");
                         }
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
                         LogUtils.e("获取商品列表数据失败", e.getMessage());
+                        requesting = false;
                         showEmptyView();
-                        loadMoreView.setVisibility(View.GONE);
                         --pageInfo.PageIndex;
                     }
 
                     @Override
                     public void onComplete() {
-
+                        requesting = false;
                     }
                 });
-
-    }
-
-    public void finishTask() {
-        //        if (mSwipeRefreshLayout.isRefreshing()) {
-        //            mSwipeRefreshLayout.setRefreshing(false);
-        //        }
-        mIsRefreshing = false;
-        if (goodsList != null) {
-            if (goodsList.size() == 0) {
-                showEmptyView();
-            } else {
-                hideEmptyView();
-            }
-        }
-        loadMoreView.setVisibility(View.GONE);
-        LogUtils.e("Page：" + pageInfo.PageIndex);
-        LogUtils.e("ListSize" + goodsList.size());
-        if (!mGoodsListAdapter.onbind) {
-            if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
-                mGoodsListAdapter.notifyDataSetChanged();
-            }
-        }
     }
 
     public void showEmptyView() {
+        if (mCustomEmptyView == null || lvContent == null) {
+            return;
+        }
         mCustomEmptyView.setVisibility(View.VISIBLE);
-        mRecyclerView.setVisibility(View.GONE);
+        lvContent.setVisibility(View.GONE);
         mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
         mCustomEmptyView.setEmptyText("暂无数据");
     }
 
 
     public void hideEmptyView() {
-        if (mCustomEmptyView == null || mRecyclerView == null) {
+        if (mCustomEmptyView == null || lvContent == null) {
             return;
         }
         mCustomEmptyView.setVisibility(View.GONE);
-        mRecyclerView.setVisibility(View.VISIBLE);
+        lvContent.setVisibility(View.VISIBLE);
     }
-
-    private void createLoadMoreView() {
-        loadMoreView = LayoutInflater.from(this)
-                .inflate(R.layout.layout_load_more, mRecyclerView, false);
-        mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
-        loadMoreView.setVisibility(View.GONE);
-    }
-
-
-    private void setRecycleNoScroll() {
-        mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        pageInfo.PageIndex = 0;
-        goodsList.clear();
-        loadData();
+
+        if (requestCode == REQUEST_REFRESH) {
+            lazyLoad();
+        } else if (requestCode == REQUEST_ITEM) {
+            if (itemType == 0) {
+                //                searchGoodsListAdapter.updataView(itemPosition, searchView.getListView());
+            } else {
+                //                mGoodsListAdapter.notifyItemChanged(itemPosition);
+            }
+        }
     }
+
 }

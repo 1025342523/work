@@ -824,7 +824,7 @@ public class ShopDetailActivity extends BaseActivity {
                                 if (!isExist) {
                                     orderCount = orderCount + 1;
                                     shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
-                                    LogUtils.e("订购数量：" + orderCount);
+                                    LogUtils.e("购物车数量：" + orderCount);
                                 }
                             } else {
                                 Toast.makeText(ShopDetailActivity.this, "请输入订购数量", Toast.LENGTH_SHORT).show();
