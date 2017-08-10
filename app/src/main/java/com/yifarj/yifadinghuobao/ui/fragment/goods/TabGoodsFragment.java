@@ -269,7 +269,9 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                         } else if (entity != null && entity.Value.size() > 0) {
                             if (searchGoodsList != null && searchGoodsListAdapter != null) {
                                 searchGoodsList.Value.addAll(entity.Value);
-                                searchGoodsListAdapter.notifyDataSetChanged();
+                                if (!searchGoodsListAdapter.onbind) {
+                                    searchGoodsListAdapter.notifyDataSetChanged();
+                                }
                             }
                         } else {
                             searchMorePage = false;
@@ -400,7 +402,9 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                             }
                         } else if (goodsListEntity != null && goodsListEntity.Value.size() > 0) {
                             goodsList.Value.addAll(goodsListEntity.Value);
-                            goodsListAdapter.notifyDataSetChanged();
+                            if (!goodsListAdapter.onbind) {
+                                goodsListAdapter.notifyDataSetChanged();
+                            }
                         } else {
                             morePage = false;
                             ToastUtils.showShortSafe("已全部加载");
@@ -453,7 +457,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                             LogUtils.e("购物车有此商品：" + saleGoodsItemModel.get(0).ProductName);
                             shopQuantity = saleGoodsItemModel.get(0).Quantity;
                         } else {
-                            shopQuantity=0;
+                            shopQuantity = 0;
                             LogUtils.e("购物车没有此商品");
                         }
                     }
@@ -469,10 +473,10 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         } else if (requestCode == REQUEST_ITEM) {
             searchSQlite(shopId);
             if (itemType == 0) {
-                LogUtils.e("itemPostition:"+itemPosition);
-                searchGoodsListAdapter.updataView(itemPosition,shopQuantity, searchView.getListView());
+                LogUtils.e("itemPostition:" + itemPosition);
+                searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
             } else {
-                goodsListAdapter.updataView(itemPosition,shopQuantity, lvContent);
+                goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
             }
         }
 

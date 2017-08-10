@@ -39,6 +39,7 @@ import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
 import com.yifarj.yifadinghuobao.utils.NumberUtil;
+import com.yifarj.yifadinghuobao.utils.ZipUtil;
 import com.yifarj.yifadinghuobao.view.CustomEditItem;
 import com.yifarj.yifadinghuobao.view.CustomEditItemUnderline;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
@@ -511,7 +512,7 @@ public class MettingOrderActivity extends BaseActivity {
         if (saleType == 1) {
             RetrofitHelper
                     .getSaveOrderApi()
-                    .saveOrderInfo("SalesOutBill", "", JsonUtils.serialize(orderInfo), AppInfoUtil.getToken())
+                    .saveOrderInfo("SalesOutBill", "", ZipUtil.gzip(JsonUtils.serialize(orderInfo)), AppInfoUtil.getToken())
                     .compose(bindToLifecycle())
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -559,7 +560,7 @@ public class MettingOrderActivity extends BaseActivity {
         } else {
             RetrofitHelper
                     .getSaveOrderApi()
-                    .saveOrderInfo("SalesOutBill", "", JsonUtils.serialize(orderInfo), AppInfoUtil.getToken())
+                    .saveOrderInfo("SalesOutBill", "", ZipUtil.gzip(JsonUtils.serialize(orderInfo)), AppInfoUtil.getToken())
                     .compose(bindToLifecycle())
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())

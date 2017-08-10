@@ -23,6 +23,7 @@ import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.ZipUtil;
 import com.yifarj.yifadinghuobao.view.TitleView;
 
 import java.util.concurrent.TimeUnit;
@@ -190,7 +191,7 @@ public class EditAddressActivity extends BaseActivity {
     private void saveAddress() {
         RetrofitHelper
                 .saveTraderApi()
-                .saveTrader("Trader", JsonUtils.serialize(DataSaver.getTraderInfo()), "", AppInfoUtil.getToken())
+                .saveTrader("Trader", ZipUtil.gzip(JsonUtils.serialize(DataSaver.getTraderInfo())), "", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

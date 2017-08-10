@@ -1,6 +1,8 @@
 package com.yifarj.yifadinghuobao.network;
 
+import com.facebook.stetho.common.LogUtil;
 import com.google.gson.TypeAdapter;
+import com.yifarj.yifadinghuobao.utils.ZipUtil;
 
 import java.io.IOException;
 
@@ -25,6 +27,13 @@ public class YifaResponseBodyConverter<T> implements Converter<ResponseBody, T> 
         String responseBody = value.string();
         if (responseBody != null && responseBody.length() > 76) {
             responseBody = responseBody.substring(76, responseBody.length() - 9);
+            if (!responseBody.contains("{")) {
+                try {
+                    responseBody = ZipUtil.ungzip(responseBody);
+                } catch (Exception e) {
+                    LogUtil.e("解压失败", "-------------");
+                }
+            }
         }
         return adapter.fromJson(responseBody);
     }

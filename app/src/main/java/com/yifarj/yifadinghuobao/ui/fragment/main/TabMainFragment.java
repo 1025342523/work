@@ -245,7 +245,9 @@ public class TabMainFragment extends BaseFragment {
         loadMoreView.setVisibility(View.GONE);
 
         if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
-            mGoodsListAdapter.notifyDataSetChanged();
+            if (!mGoodsListAdapter.onbind) {
+                mGoodsListAdapter.notifyDataSetChanged();
+            }
         }
 
     }
