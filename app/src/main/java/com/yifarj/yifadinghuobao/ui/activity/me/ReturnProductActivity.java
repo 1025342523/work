@@ -19,6 +19,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel_Table;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
@@ -219,11 +220,11 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             intent.putExtra("saleType", 1);
                                             startActivityForResult(intent, REQUEST_ITEM);
-//                                            searchView.clearText();
-//                                            searchGoodsList = null;
-//                                            searchPageInfo.PageIndex = -1;
-//                                            searchRequesting = false;
-//                                            searchMorePage = true;
+                                            //                                            searchView.clearText();
+                                            //                                            searchGoodsList = null;
+                                            //                                            searchPageInfo.PageIndex = -1;
+                                            //                                            searchRequesting = false;
+                                            //                                            searchMorePage = true;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
@@ -234,11 +235,11 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
                                         intent.putExtra("saleType", 1);
                                         startActivityForResult(intent, REQUEST_ITEM);
-//                                        searchView.clearText();
-//                                        searchGoodsList = null;
-//                                        searchPageInfo.PageIndex = -1;
-//                                        searchRequesting = false;
-//                                        searchMorePage = true;
+                                        //                                        searchView.clearText();
+                                        //                                        searchGoodsList = null;
+                                        //                                        searchPageInfo.PageIndex = -1;
+                                        //                                        searchRequesting = false;
+                                        //                                        searchMorePage = true;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override
@@ -262,7 +263,9 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                         } else if (entity != null && entity.Value.size() > 0) {
                             if (searchGoodsList != null && searchGoodsListAdapter != null) {
                                 searchGoodsList.Value.addAll(entity.Value);
-                                searchGoodsListAdapter.notifyDataSetChanged();
+                                if (!searchGoodsListAdapter.onbind) {
+                                    searchGoodsListAdapter.notifyDataSetChanged();
+                                }
                             }
                         } else {
                             searchMorePage = false;
@@ -359,38 +362,44 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
                         if (goodsList == null) {
                             goodsList = goodsListEntity;
                             if (!goodsList.HasError) {
-                                goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 0, ReturnProductActivity.this, true, 1);
-                                lvContent.setAdapter(goodsListAdapter);
-                                lvContent.setOnItemClickListener((parent, view, position, id) -> {
-                                    if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
-                                        itemPosition = position;
-                                        itemType = 1;
-                                        shopId = goodsList.Value.get(position).Id;
-                                        Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
-                                        intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
-                                        intent.putExtra("saleType", 1);
-                                        startActivityForResult(intent, REQUEST_ITEM);
-                                    }
-                                });
-                                lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
-                                    @Override
-                                    public void onScrollStateChanged(AbsListView view, int scrollState) {
-                                    }
-
-                                    @Override
-                                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                        if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                && !requesting && morePage && goodsList != null) {
-                                            getGoodsList();
+                                if (goodsList.Value != null && goodsList.Value.size() > 0) {
+                                    goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 0, ReturnProductActivity.this, true, 1);
+                                    lvContent.setAdapter(goodsListAdapter);
+                                    lvContent.setOnItemClickListener((parent, view, position, id) -> {
+                                        if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
+                                            itemPosition = position;
+                                            itemType = 1;
+                                            shopId = goodsList.Value.get(position).Id;
+                                            Intent intent = new Intent(ReturnProductActivity.this, ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
+                                            intent.putExtra("saleType", 1);
+                                            startActivityForResult(intent, REQUEST_ITEM);
                                         }
-                                    }
-                                });
+                                    });
+                                    lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
+                                        @Override
+                                        public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                        }
+
+                                        @Override
+                                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                            if ((visibleItemCount + firstVisibleItem == totalItemCount)
+                                                    && !requesting && morePage && goodsList != null) {
+                                                getGoodsList();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    showEmptyView();
+                                }
                             } else {
                                 ToastUtils.showShortSafe("请求超时");
                             }
                         } else if (goodsListEntity != null && goodsListEntity.Value.size() > 0) {
                             goodsList.Value.addAll(goodsListEntity.Value);
-                            goodsListAdapter.notifyDataSetChanged();
+                            if (!goodsListAdapter.onbind) {
+                                goodsListAdapter.notifyDataSetChanged();
+                            }
                         } else {
                             morePage = false;
                             ToastUtils.showShortSafe("已全部加载");
@@ -432,6 +441,23 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
         lvContent.setVisibility(View.VISIBLE);
     }
 
+    public void searchSQlite(int productId) {
+        // 查询退货清单中是否有当前商品
+        RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where(ReturnListItemModel_Table.ProductId.eq(productId)))
+                .queryList()
+                .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                    @Override
+                    public void accept(@NonNull List<ReturnListItemModel> returnListItemModel) throws Exception {
+                        if (returnListItemModel != null && returnListItemModel.size() > 0) {
+                            LogUtils.e("退货清单中有此商品：" + returnListItemModel.get(0).ProductName);
+                            shopQuantity = returnListItemModel.get(0).Quantity;
+                        } else {
+                            shopQuantity = 0;
+                            LogUtils.e("退货清单中没有此商品");
+                        }
+                    }
+                });
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -439,12 +465,11 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
         if (requestCode == REQUEST_REFRESH) {
             onTab1Click();
         } else if (requestCode == REQUEST_ITEM) {
-//            searchSQlite(shopId);
+            searchSQlite(shopId);
             if (itemType == 0) {
-                LogUtils.e("itemPostition:"+itemPosition);
-//                searchGoodsListAdapter.updataView(itemPosition, searchView.getListView());
+                searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
             } else {
-//                goodsListAdapter.updataView(itemPosition, lvContent);
+                goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
             }
         }
     }

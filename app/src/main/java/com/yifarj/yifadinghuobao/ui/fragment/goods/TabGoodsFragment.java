@@ -369,34 +369,38 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                         if (goodsList == null) {
                             goodsList = goodsListEntity;
                             if (!goodsList.HasError) {
-                                goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, TabGoodsFragment.this, 0, null, true, 0);
-                                lvContent.setAdapter(goodsListAdapter);
-                                lvContent.setOnItemClickListener((parent, view, position, id) -> {
-                                    if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
-                                        itemPosition = position;
-                                        itemType = 1;
-                                        shopId = goodsList.Value.get(position).Id;
+                                if (goodsList.Value != null && goodsList.Value.size() > 0) {
+                                    goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, TabGoodsFragment.this, 0, null, true, 0);
+                                    lvContent.setAdapter(goodsListAdapter);
+                                    lvContent.setOnItemClickListener((parent, view, position, id) -> {
+                                        if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
+                                            itemPosition = position;
+                                            itemType = 1;
+                                            shopId = goodsList.Value.get(position).Id;
 
-                                        Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
-                                        intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
-                                        intent.putExtra("saleType", 0);
-                                        startActivityForResult(intent, REQUEST_ITEM);
+                                            Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
+                                            intent.putExtra("saleType", 0);
+                                            startActivityForResult(intent, REQUEST_ITEM);
 
-                                    }
-                                });
-                                lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
-                                    @Override
-                                    public void onScrollStateChanged(AbsListView view, int scrollState) {
-                                    }
-
-                                    @Override
-                                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                        if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                && !requesting && morePage && goodsList != null) {
-                                            getGoodsList();
                                         }
-                                    }
-                                });
+                                    });
+                                    lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
+                                        @Override
+                                        public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                        }
+
+                                        @Override
+                                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                            if ((visibleItemCount + firstVisibleItem == totalItemCount)
+                                                    && !requesting && morePage && goodsList != null) {
+                                                getGoodsList();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    showEmptyView();
+                                }
                             } else {
                                 ToastUtils.showShortSafe("请求超时");
                             }
@@ -473,7 +477,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         } else if (requestCode == REQUEST_ITEM) {
             searchSQlite(shopId);
             if (itemType == 0) {
-                LogUtils.e("itemPostition:" + itemPosition);
                 searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
             } else {
                 goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);

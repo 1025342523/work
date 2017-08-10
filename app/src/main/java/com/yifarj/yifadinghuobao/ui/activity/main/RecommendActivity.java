@@ -17,7 +17,9 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
+import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
+import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
@@ -72,7 +74,7 @@ public class RecommendActivity extends BaseActivity {
     private GoodsListEntity searchGoodsList;
     private GoodsListViewAdapter searchGoodsListAdapter;
 
-    private int totalCount, orderCount, saleType = 0;
+    private int orderCount, saleType = 0;
     private int shopQuantity = 0, itemPosition, itemType, shopId;
 
     @Override
@@ -214,18 +216,18 @@ public class RecommendActivity extends BaseActivity {
                                     }
                                     searchView.getListView().
 
-                                    setOnScrollListener(new AbsListView.OnScrollListener() {
-                                        @Override
-                                        public void onScrollStateChanged(AbsListView view, int scrollState) {
-                                        }
+                                            setOnScrollListener(new AbsListView.OnScrollListener() {
+                                                @Override
+                                                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                                }
 
-                                        @Override
-                                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                            if ((visibleItemCount + firstVisibleItem == totalItemCount) && !searchRequesting && searchMorePage && searchGoodsList != null) {
-                                                doSearch(keyword);
-                                            }
-                                        }
-                                    });
+                                                @Override
+                                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                                    if ((visibleItemCount + firstVisibleItem == totalItemCount) && !searchRequesting && searchMorePage && searchGoodsList != null) {
+                                                        doSearch(keyword);
+                                                    }
+                                                }
+                                            });
                                 } else {
                                     ToastUtils.showShortSafe("无结果");
                                 }
@@ -237,7 +239,9 @@ public class RecommendActivity extends BaseActivity {
                         } else if (entity != null && entity.Value.size() > 0) {
                             if (searchGoodsList != null && searchGoodsListAdapter != null) {
                                 searchGoodsList.Value.addAll(entity.Value);
-                                searchGoodsListAdapter.notifyDataSetChanged();
+                                if (!searchGoodsListAdapter.onbind) {
+                                    searchGoodsListAdapter.notifyDataSetChanged();
+                                }
                             }
                         } else {
                             searchMorePage = false;
@@ -333,40 +337,46 @@ public class RecommendActivity extends BaseActivity {
                         if (goodsList == null) {
                             goodsList = goodsListEntity;
                             if (!goodsList.HasError) {
-                                goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 0, RecommendActivity.this, true, 0);
-                                lvContent.setAdapter(goodsListAdapter);
-                                lvContent.setOnItemClickListener((parent, view, position, id) -> {
-                                    if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
-                                        itemPosition = position;
-                                        itemType = 1;
-                                        shopId = goodsList.Value.get(position).Id;
+                                if (goodsList.Value != null && goodsList.Value.size() > 0) {
+                                    goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 3, RecommendActivity.this, true, saleType);
+                                    lvContent.setAdapter(goodsListAdapter);
+                                    lvContent.setOnItemClickListener((parent, view, position, id) -> {
+                                        if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
+                                            itemPosition = position;
+                                            itemType = 1;
+                                            shopId = goodsList.Value.get(position).Id;
 
-                                        Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
-                                        intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
-                                        intent.putExtra("saleType", saleType);
-                                        startActivityForResult(intent, REQUEST_ITEM);
+                                            Intent intent = new Intent(RecommendActivity.this, ShopDetailActivity.class);
+                                            intent.putExtra("shoppingId", goodsList.Value.get(position).Id);
+                                            intent.putExtra("saleType", saleType);
+                                            startActivityForResult(intent, REQUEST_ITEM);
 
-                                    }
-                                });
-                                lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
-                                    @Override
-                                    public void onScrollStateChanged(AbsListView view, int scrollState) {
-                                    }
-
-                                    @Override
-                                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                        if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                && !requesting && morePage && goodsList != null) {
-                                            getGoodsList();
                                         }
-                                    }
-                                });
+                                    });
+                                    lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
+                                        @Override
+                                        public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                        }
+
+                                        @Override
+                                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                            if ((visibleItemCount + firstVisibleItem == totalItemCount)
+                                                    && !requesting && morePage && goodsList != null) {
+                                                getGoodsList();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    showEmptyView();
+                                }
                             } else {
                                 ToastUtils.showShortSafe("请求超时");
                             }
                         } else if (goodsListEntity != null && goodsListEntity.Value.size() > 0) {
                             goodsList.Value.addAll(goodsListEntity.Value);
-                            goodsListAdapter.notifyDataSetChanged();
+                            if (!goodsListAdapter.onbind) {
+                                goodsListAdapter.notifyDataSetChanged();
+                            }
                         } else {
                             morePage = false;
                             ToastUtils.showShortSafe("已全部加载");
@@ -407,6 +417,42 @@ public class RecommendActivity extends BaseActivity {
         lvContent.setVisibility(View.VISIBLE);
     }
 
+    public void searchSQlite(int productId, int saleType) {
+        if (saleType == 1) {
+            // 查询退货清单中是否有当前商品
+            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where(ReturnListItemModel_Table.ProductId.eq(productId)))
+                    .queryList()
+                    .subscribe(new Consumer<List<ReturnListItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<ReturnListItemModel> returnListItemModel) throws Exception {
+                            if (returnListItemModel != null && returnListItemModel.size() > 0) {
+                                LogUtils.e("退货清单中有此商品：" + returnListItemModel.get(0).ProductName);
+                                shopQuantity = returnListItemModel.get(0).Quantity;
+                            } else {
+                                shopQuantity = 0;
+                                LogUtils.e("退货清单中没有此商品");
+                            }
+                        }
+                    });
+        } else {
+            // 查询购物车中是否有当前商品
+            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where(SaleGoodsItemModel_Table.ProductId.eq(productId)))
+                    .queryList()
+                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                        @Override
+                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
+                            if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
+                                LogUtils.e("购物车有此商品：" + saleGoodsItemModel.get(0).ProductName);
+                                shopQuantity = saleGoodsItemModel.get(0).Quantity;
+                            } else {
+                                shopQuantity = 0;
+                                LogUtils.e("购物车没有此商品");
+                            }
+                        }
+                    });
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -414,11 +460,11 @@ public class RecommendActivity extends BaseActivity {
         if (requestCode == REQUEST_REFRESH) {
             lazyLoad();
         } else if (requestCode == REQUEST_ITEM) {
+            searchSQlite(shopId, saleType);
             if (itemType == 0) {
-                LogUtils.e("itemPostition:"+itemPosition);
-//                searchGoodsListAdapter.updataView(itemPosition, searchView.getListView());
+                searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
             } else {
-//                mGoodsListAdapter.notifyItemChanged(itemPosition);
+                goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
             }
         }
     }
