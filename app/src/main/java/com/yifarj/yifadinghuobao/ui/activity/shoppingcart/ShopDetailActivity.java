@@ -38,6 +38,7 @@ import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
 import com.yifarj.yifadinghuobao.utils.NumberUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.utils.ProductPictureUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.CzechYuanEditDialog;
@@ -149,7 +150,7 @@ public class ShopDetailActivity extends BaseActivity {
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else {
-            return;
+            traderId = PreferencesUtil.getInt("TraderId", 0);
         }
 
         if (saleType == 1) {

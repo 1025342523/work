@@ -30,6 +30,7 @@ import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.main.CollectionActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.DateUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 
 import java.util.HashMap;
@@ -306,9 +307,10 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
                 LogUtils.e("Item保存数据成功");
             }
         });
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         //获取当前商品的详细信息
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", "", "Id =" + goodsBean.ProductId, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", "", "Id =" + goodsBean.ProductId, "[" + traderId + "]", AppInfoUtil.getToken())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GoodsListEntity>() {

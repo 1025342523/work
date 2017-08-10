@@ -20,7 +20,6 @@ import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
-import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
@@ -29,6 +28,7 @@ import com.yifarj.yifadinghuobao.ui.activity.productCategory.ProductCategoryActi
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.CzechYuanTitleView;
 import com.yifarj.yifadinghuobao.view.SearchView;
@@ -190,8 +190,9 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
         }
         searchRequesting = true;
         ++searchPageInfo.PageIndex;
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))", "[" + traderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -343,8 +344,9 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
         }
         requesting = true;
         ++pageInfo.PageIndex;
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + traderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -441,7 +443,7 @@ public class ReturnProductActivity extends BaseActivity implements View.OnClickL
         } else if (requestCode == REQUEST_ITEM) {
 //            searchSQlite(shopId);
             if (itemType == 0) {
-                LogUtils.e("itemPostition:"+itemPosition);
+                LogUtils.e("itemPostition:" + itemPosition);
 //                searchGoodsListAdapter.updataView(itemPosition, searchView.getListView());
             } else {
 //                goodsListAdapter.updataView(itemPosition, lvContent);

@@ -277,6 +277,9 @@ public class LoginActivity extends BaseActivity {
                         if (!mettingLoginEntity.HasError) {
                             LogUtils.e("mettingLoginEntity success!");
                             DataSaver.setMettingCustomerInfo(mettingLoginEntity.Value);
+                            PreferencesUtil.putInt("TraderId", mettingLoginEntity.Value.TraderId);
+                            PreferencesUtil.putInt("Id", mettingLoginEntity.Value.Id);
+                            PreferencesUtil.putString("ContactName", mettingLoginEntity.Value.ContactName);
                             String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
                             if (!StringUtils.isEmpty(userName)) {
                                 if (!userName.equals(name)) {

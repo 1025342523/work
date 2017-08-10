@@ -25,6 +25,7 @@ import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.NumberUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 import com.yifarj.yifadinghuobao.view.CzechYuanEditDialog;
 import com.yifarj.yifadinghuobao.view.NumberAddSubView;
@@ -302,7 +303,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         goodsBean.ProductUnitName = unitName.get(select);
                         goodsBean.UnitId = itemUnit.get(position).get(select).Id;
                         LogUtils.e(itemUnit.get(position).get(select).BasicFactor);
-                        getProductMemoryPrice(goodsBean,select,itemUnit.get(position).get(select).BasicFactor);
+                        getProductMemoryPrice(goodsBean, select, itemUnit.get(position).get(select).BasicFactor);
 //                        goodsBean.UnitPrice = itemUnit.get(position).get(select).BasicFactor * goodsBean.BasicUnitPrice;
 //                        goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
 
@@ -325,13 +326,13 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
     /**
      * 获取记忆价格
      */
-    private void getProductMemoryPrice(SaleGoodsItemModel goodsBean,int select,double factor) {
+    private void getProductMemoryPrice(SaleGoodsItemModel goodsBean, int select, double factor) {
         String b;
         int traderId;
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else {
-            return;
+            traderId = PreferencesUtil.getInt("TraderId", 0);
         }
         b = "ProductId=" + goodsBean.ProductId + " and " +
                 "TraderId=" + traderId + " and " +
@@ -360,23 +361,23 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                                     if (entity.Value.PriceSystemId == item.Id) {
                                         selected = true;
                                         selectedPriceSystem = item;
-                                        LogUtils.e("selectedPriceSystem"+selectedPriceSystem);
+                                        LogUtils.e("selectedPriceSystem" + selectedPriceSystem);
                                     }
                                 }
                                 //存在默认价格
                                 memoryPrice = entity.Value.Price;
-                                LogUtils.e(goodsBean.ProductName+"存在记忆价格,记忆价格为:" + memoryPrice);
+                                LogUtils.e(goodsBean.ProductName + "存在记忆价格,记忆价格为:" + memoryPrice);
                             } else if (DataSaver.getPriceSystemId() != 0) {
                                 for (PriceSystem.PriceSystemListEntity item :
                                         PriceSystemGenerator.getInstance().PriceSystemList) {
                                     if (item.Id == DataSaver.getPriceSystemId()) {
                                         selected = true;
                                         selectedPriceSystem = item;
-                                        LogUtils.e("selectedPriceSystem"+selectedPriceSystem);
+                                        LogUtils.e("selectedPriceSystem" + selectedPriceSystem);
                                     }
                                 }
                                 //没有记忆价格,但是有默认价格体系
-                                LogUtils.e(goodsBean.ProductName+"不存在记忆价格");
+                                LogUtils.e(goodsBean.ProductName + "不存在记忆价格");
                             }
                             if (!selected || DataSaver.getPriceSystemId() == 0) {
                                 selectedPriceSystem = PriceSystemGenerator.getInstance().PriceSystemList.get(0);
@@ -390,7 +391,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                             double price = 0;
                             double basicPrice = 0;
                             if (memoryPrice > 0) {//有记忆价格
-                                if (select==0) {
+                                if (select == 0) {
                                     basicPrice = memoryPrice;
                                     price = basicPrice;
                                 } else {
@@ -455,7 +456,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                                         mItem.update().subscribe(new Consumer<Boolean>() {
                                             @Override
                                             public void accept(@NonNull Boolean aBean) throws Exception {
-                                                LogUtils.e(mItem.ProductName + "：修改单位"+mItem.ProductUnitName);
+                                                LogUtils.e(mItem.ProductName + "：修改单位" + mItem.ProductUnitName);
                                             }
                                         });
                                     }
@@ -476,7 +477,6 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                     }
                 });
     }
-
 
 
     @Override

@@ -21,7 +21,6 @@ import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
-import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
@@ -29,6 +28,7 @@ import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.SearchView;
 import com.yifarj.yifadinghuobao.view.TitleView;
@@ -73,7 +73,7 @@ public class ProductListActivity extends BaseActivity {
 
 
     private int totalCount, orderCount;
-    private int categoryId,saleType=0;
+    private int categoryId, saleType = 0;
     private int shopQuantity = 0, itemPosition, itemType, shopId;
 
     private PageInfo pageInfo = new PageInfo();
@@ -97,7 +97,7 @@ public class ProductListActivity extends BaseActivity {
     public void initViews(Bundle savedInstanceState) {
         pageInfo = new PageInfo();
         goodsList = null;
-        saleType=getIntent().getIntExtra("saleType",0);
+        saleType = getIntent().getIntExtra("saleType", 0);
         String CategoryName = getIntent().getStringExtra("CategoryName");
         categoryId = getIntent().getIntExtra("CategoryId", 0);
         lazyLoad();
@@ -186,8 +186,9 @@ public class ProductListActivity extends BaseActivity {
         } else {
             body = "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and CategoryId = " + categoryId + ")";
         }
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), body, "[" + traderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -328,7 +329,7 @@ public class ProductListActivity extends BaseActivity {
         }
     }
 
-    public void getGoodsList(){
+    public void getGoodsList() {
         if (requesting) {
             return;
         }
@@ -341,8 +342,9 @@ public class ProductListActivity extends BaseActivity {
         } else {
             body = "CategoryId = " + categoryId;
         }
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), body, "[" + traderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

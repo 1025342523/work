@@ -23,6 +23,7 @@ import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.utils.ZipUtil;
 import com.yifarj.yifadinghuobao.view.TitleView;
 
@@ -144,7 +145,7 @@ public class EditAddressActivity extends BaseActivity {
                     TraderEntity.ValueEntity.TraderDeliveryAddressListEntity traderDeliveryAddress = new TraderEntity.ValueEntity.TraderDeliveryAddressListEntity();
                     traderDeliveryAddress.Address = address;
                     traderDeliveryAddress.Id = 0;
-                    traderDeliveryAddress.TraderId = DataSaver.getMettingCustomerInfo().TraderId;
+                    traderDeliveryAddress.TraderId = PreferencesUtil.getInt("TraderId", 0);
 //                    if (isSelected) {
 //                        List<Integer> idList = new ArrayList<>();
 //                        for (TraderEntity.ValueEntity.TraderDeliveryAddressListEntity item : DataSaver.getTraderInfo().TraderDeliveryAddressList) {

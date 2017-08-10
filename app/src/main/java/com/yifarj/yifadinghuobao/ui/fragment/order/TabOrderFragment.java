@@ -17,7 +17,6 @@ import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.SaleOrderListEntity;
-import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
@@ -25,6 +24,7 @@ import com.yifarj.yifadinghuobao.ui.activity.order.MettingOrderActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
@@ -210,7 +210,7 @@ public class TabOrderFragment extends BaseFragment {
                         }
                     }
                 });
-        int contactId = DataSaver.getMettingCustomerInfo().Id;
+        int contactId = PreferencesUtil.getInt("Id", 0);
         RetrofitHelper
                 .getOrderListApi()
                 .getOrderList("SalesOutBillInfoList", JsonUtils.serialize(pageInfo), "ContactId = " + contactId, "", AppInfoUtil.getToken())

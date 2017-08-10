@@ -19,7 +19,6 @@ import com.yifarj.yifadinghuobao.adapter.GoodsListViewAdapter;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
-import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
@@ -27,6 +26,7 @@ import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.SearchView;
 import com.yifarj.yifadinghuobao.view.TitleView;
@@ -162,8 +162,9 @@ public class RecommendActivity extends BaseActivity {
         }
         searchRequesting = true;
         ++searchPageInfo.PageIndex;
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 128)", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(searchPageInfo), "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and  status = 128)", "[" + traderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -214,18 +215,18 @@ public class RecommendActivity extends BaseActivity {
                                     }
                                     searchView.getListView().
 
-                                    setOnScrollListener(new AbsListView.OnScrollListener() {
-                                        @Override
-                                        public void onScrollStateChanged(AbsListView view, int scrollState) {
-                                        }
+                                            setOnScrollListener(new AbsListView.OnScrollListener() {
+                                                @Override
+                                                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                                                }
 
-                                        @Override
-                                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                            if ((visibleItemCount + firstVisibleItem == totalItemCount) && !searchRequesting && searchMorePage && searchGoodsList != null) {
-                                                doSearch(keyword);
-                                            }
-                                        }
-                                    });
+                                                @Override
+                                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                                    if ((visibleItemCount + firstVisibleItem == totalItemCount) && !searchRequesting && searchMorePage && searchGoodsList != null) {
+                                                        doSearch(keyword);
+                                                    }
+                                                }
+                                            });
                                 } else {
                                     ToastUtils.showShortSafe("无结果");
                                 }
@@ -317,8 +318,9 @@ public class RecommendActivity extends BaseActivity {
         requesting = true;
         ++pageInfo.PageIndex;
         LogUtils.e("loadData", "获取商品列表数据");
+        int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status = 128", "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
+                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status = 128", "[" + traderId + "]", AppInfoUtil.getToken())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -415,7 +417,7 @@ public class RecommendActivity extends BaseActivity {
             lazyLoad();
         } else if (requestCode == REQUEST_ITEM) {
             if (itemType == 0) {
-                LogUtils.e("itemPostition:"+itemPosition);
+                LogUtils.e("itemPostition:" + itemPosition);
 //                searchGoodsListAdapter.updataView(itemPosition, searchView.getListView());
             } else {
 //                mGoodsListAdapter.notifyItemChanged(itemPosition);
