@@ -208,6 +208,7 @@ public class CollectionActivity extends BaseActivity {
                     searchPageInfo.PageIndex = -1;
                     searchRequesting = false;
                     searchMorePage = true;
+                    searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {
                     doSearch(result);
@@ -295,9 +296,9 @@ public class CollectionActivity extends BaseActivity {
                     @Override
                     public void onNext(@NonNull GoodsListEntity entity) {
                         if (searchGoodsList == null) {
-                            searchGoodsList = entity;
                             if (!entity.HasError) {
                                 if (entity.Value != null && entity.Value.size() > 0) {
+                                    searchGoodsList = entity;
                                     searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 0, CollectionActivity.this, true, 0);
                                     searchView.getListView().setAdapter(searchGoodsListAdapter);
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -332,7 +333,7 @@ public class CollectionActivity extends BaseActivity {
                                         @Override
                                         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                                             if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                    && !searchRequesting && searchMorePage && searchGoodsList != null) {
+                                                    && !searchRequesting && searchMorePage && searchGoodsList != null && !searchGoodsListAdapter.onbind) {
                                                 doSearch(keyword);
                                             }
                                         }
@@ -341,7 +342,7 @@ public class CollectionActivity extends BaseActivity {
                                     ToastUtils.showShortSafe("无结果");
                                 }
                             } else {
-                                ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information.toString());
+                                ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information);
                             }
                         } else if (entity != null && entity.Value.size() > 0) {
                             if (searchGoodsList != null && searchGoodsListAdapter != null) {

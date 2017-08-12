@@ -1065,8 +1065,8 @@ public class ShopDetailActivity extends BaseActivity {
         scrollView.setVisibility(View.GONE);
         emptyView.setVisibility(View.VISIBLE);
         addShopCart.setVisibility(View.GONE);
-        emptyView.setEmptyImage(R.drawable.img_tips_error_load_error);
-        emptyView.setEmptyText("加载失败~(≧▽≦)~啦啦啦.");
+        emptyView.setEmptyImage(R.drawable.ic_data_empty);
+        emptyView.setEmptyText("暂无数据");
     }
 
     @Override

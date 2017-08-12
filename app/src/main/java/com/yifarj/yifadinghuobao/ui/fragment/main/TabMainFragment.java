@@ -120,6 +120,7 @@ public class TabMainFragment extends BaseFragment {
         }
         initRefreshLayout();
         initRecyclerView();
+        mRecyclerView.scrollToPosition(0);
         isPrepared = false;
     }
 
@@ -138,10 +139,11 @@ public class TabMainFragment extends BaseFragment {
         });
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            pageInfo.PageIndex = 0;
-            mIsRefreshing = false;
-            goodsList.clear();
-            loadData();
+            mSwipeRefreshLayout.setRefreshing(false);
+//            goodsList.clear();
+//            pageInfo.PageIndex = 0;
+//            mIsRefreshing = true;
+//            loadData();
         });
     }
 
@@ -149,6 +151,7 @@ public class TabMainFragment extends BaseFragment {
     protected void initRecyclerView() {
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setNestedScrollingEnabled(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, null, 0, 0);
         mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
@@ -161,9 +164,9 @@ public class TabMainFragment extends BaseFragment {
 
             @Override
             public void onLoadMore(int i) {
-                pageInfo.PageIndex++;
-                loadData();
                 loadMoreView.setVisibility(View.VISIBLE);
+                mIsRefreshing = true;
+                loadData();
             }
         });
         mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
@@ -183,9 +186,10 @@ public class TabMainFragment extends BaseFragment {
     @Override
     protected void loadData() {
         LogUtils.e("loadData", "获取商品列表数据");
-        if (pageInfo == null) {
+        if (null == pageInfo) {
             pageInfo = new PageInfo();
         }
+        ++pageInfo.PageIndex;
         int traderId = PreferencesUtil.getInt("TraderId", 0);
         RetrofitHelper.getGoodsListAPI()
                 .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), "status  not in (4,8)", "[" + traderId + "]", AppInfoUtil.getToken())
@@ -217,11 +221,12 @@ public class TabMainFragment extends BaseFragment {
                         showEmptyView();
                         loadMoreView.setVisibility(View.GONE);
                         --pageInfo.PageIndex;
+                        mIsRefreshing = false;
                     }
 
                     @Override
                     public void onComplete() {
-
+                        mIsRefreshing = false;
                     }
                 });
 
@@ -246,7 +251,7 @@ public class TabMainFragment extends BaseFragment {
         loadMoreView.setVisibility(View.GONE);
 
         if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
-            if (!mGoodsListAdapter.onbind) {
+            if (!mGoodsListAdapter.onbind && goodsList != null && goodsList.size() > 0) {
                 mGoodsListAdapter.notifyDataSetChanged();
             }
         }

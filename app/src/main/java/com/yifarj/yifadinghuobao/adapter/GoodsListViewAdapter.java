@@ -1,6 +1,7 @@
 package com.yifarj.yifadinghuobao.adapter;
 
 import android.content.Context;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
     private BaseActivity activity;
     private Context currentContext;
     private int saleType = 0;
+    private SparseArray<View> vmap = new SparseArray<View>();
 
     public GoodsListViewAdapter(List<GoodsListEntity.ValueEntity> data, TabGoodsFragment context, int icon, BaseActivity activity, boolean type, int saleType) {
         this.data = data;
@@ -62,7 +64,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
         this.context = context;
         this.icon = icon;
         this.activity = activity;
-        currentContext = context == null ? activity.getApplicationContext() : context.getContext();
+        currentContext = context == null ? activity.getBaseContext() : context.getContext();
         this.saleType = saleType;
     }
 
@@ -86,7 +88,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         final GoodsListEntity.ValueEntity goodsBean = data.get(position);
-        if (convertView == null) {
+        if (vmap.get(position) == null) {
             holder = new ViewHolder();
             convertView = LayoutInflater.from(currentContext).inflate(R.layout.item_goods_list, parent, false);
             holder.itemImg = (ImageView) convertView.findViewById(R.id.item_img);
@@ -97,7 +99,9 @@ public class GoodsListViewAdapter extends BaseAdapter {
             holder.btnEle = (AnimShopButton) convertView.findViewById(R.id.btnEle);
             holder.tvIcon = (TextView) convertView.findViewById(R.id.tv_icon);
             convertView.setTag(holder);
+            vmap.put(position, convertView);
         } else {
+            convertView = vmap.get(position);
             holder = (ViewHolder) convertView.getTag();
         }
         onbind = true;
@@ -709,18 +713,18 @@ public class GoodsListViewAdapter extends BaseAdapter {
         TextView tvIcon;
     }
 
-    public void updataView(int position,int quantity, ListView mListView) {
+    public void updataView(int position, int quantity, ListView mListView) {
         //得到第一个可显示控件的位置
         int visibleFirstPosition = mListView.getFirstVisiblePosition();
         int visibleLastPosition = mListView.getLastVisiblePosition();
         //只有当要更新的view在可见的位置时才更新，不可见时，跳过不更新
-                if(position >= visibleFirstPosition && position <= visibleLastPosition){
-                    //得到要更新的item的view
-                    View view = mListView.getChildAt(position - visibleFirstPosition);
-                    ViewHolder holder= (ViewHolder) view.getTag();
-                    holder.btnEle.setCount(quantity);
+        if (position >= visibleFirstPosition && position <= visibleLastPosition) {
+            //得到要更新的item的view
+            View view = mListView.getChildAt(position - visibleFirstPosition);
+            ViewHolder holder = (ViewHolder) view.getTag();
+            holder.btnEle.setCount(quantity);
 //                    getView(position,view,mListView);
-                }
+        }
     }
 
 }

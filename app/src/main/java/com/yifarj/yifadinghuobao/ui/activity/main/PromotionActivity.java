@@ -143,6 +143,7 @@ public class PromotionActivity extends BaseActivity {
                     searchPageInfo.PageIndex = -1;
                     searchRequesting = false;
                     searchMorePage = true;
+                    searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {
                     doSearch(result);
@@ -183,9 +184,9 @@ public class PromotionActivity extends BaseActivity {
                     @Override
                     public void onNext(@NonNull GoodsListEntity entity) {
                         if (searchGoodsList == null) {
-                            searchGoodsList = entity;
                             if (!entity.HasError) {
                                 if (entity.Value != null && entity.Value.size() > 0) {
+                                    searchGoodsList = entity;
                                     searchGoodsListAdapter = new GoodsListViewAdapter(searchGoodsList.Value, null, 1, PromotionActivity.this, true, saleType);
                                     searchView.getListView().setAdapter(searchGoodsListAdapter);
                                     searchView.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -227,7 +228,7 @@ public class PromotionActivity extends BaseActivity {
                                         @Override
                                         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                                             if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                    && !searchRequesting && searchMorePage && searchGoodsList != null) {
+                                                    && !searchRequesting && searchMorePage && searchGoodsList != null && !searchGoodsListAdapter.onbind) {
                                                 doSearch(keyword);
                                             }
                                         }
@@ -236,14 +237,12 @@ public class PromotionActivity extends BaseActivity {
                                     ToastUtils.showShortSafe("无结果");
                                 }
                             } else {
-                                ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information.toString());
+                                ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information);
                             }
                         } else if (entity != null && entity.Value.size() > 0) {
                             if (searchGoodsList != null && searchGoodsListAdapter != null) {
                                 searchGoodsList.Value.addAll(entity.Value);
-                                if (!searchGoodsListAdapter.onbind) {
-                                    searchGoodsListAdapter.notifyDataSetChanged();
-                                }
+                                searchGoodsListAdapter.notifyDataSetChanged();
                             }
                         } else {
                             searchMorePage = false;
@@ -338,9 +337,9 @@ public class PromotionActivity extends BaseActivity {
                     @Override
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (goodsList == null) {
-                            goodsList = goodsListEntity;
-                            if (!goodsList.HasError) {
-                                if (goodsList.Value != null && goodsList.Value.size() > 0) {
+                            if (!goodsListEntity.HasError) {
+                                if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
+                                    goodsList = goodsListEntity;
                                     goodsListAdapter = new GoodsListViewAdapter(goodsList.Value, null, 1, PromotionActivity.this, true, saleType);
                                     lvContent.setAdapter(goodsListAdapter);
                                     lvContent.setOnItemClickListener((parent, view, position, id) -> {
@@ -364,7 +363,7 @@ public class PromotionActivity extends BaseActivity {
                                         @Override
                                         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                                             if ((visibleItemCount + firstVisibleItem == totalItemCount)
-                                                    && !requesting && morePage && goodsList != null) {
+                                                    && !requesting && morePage && goodsList != null && !goodsListAdapter.onbind) {
                                                 getGoodsList();
                                             }
                                         }
@@ -377,9 +376,7 @@ public class PromotionActivity extends BaseActivity {
                             }
                         } else if (goodsListEntity != null && goodsListEntity.Value.size() > 0) {
                             goodsList.Value.addAll(goodsListEntity.Value);
-                            if (!goodsListAdapter.onbind) {
-                                goodsListAdapter.notifyDataSetChanged();
-                            }
+                            goodsListAdapter.notifyDataSetChanged();
                         } else {
                             morePage = false;
                             ToastUtils.showShortSafe("已全部加载");
