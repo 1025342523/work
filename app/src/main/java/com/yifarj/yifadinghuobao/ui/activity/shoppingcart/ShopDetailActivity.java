@@ -367,7 +367,7 @@ public class ShopDetailActivity extends BaseActivity {
                             tv_productName.setText(goodsBean.Name);
                             tv_code.setText(goodsBean.Code);
                             tv_packSpec.setText(goodsBean.PackSpec);
-                            switch (goodsBean.TypeId){
+                            switch (goodsBean.TypeId) {
                                 case 0:
                                     tv_type.setText("无");
                                     break;
@@ -381,14 +381,14 @@ public class ShopDetailActivity extends BaseActivity {
                                     tv_type.setText("辅料");
                                     break;
                             }
-                            if(goodsBean.CategoryName!=null){
+                            if (goodsBean.CategoryName != null) {
                                 tv_category.setText(goodsBean.CategoryName);
-                            }else {
+                            } else {
                                 tv_category.setText("无");
                             }
-                            if(goodsBean.BrandName!=null){
+                            if (goodsBean.BrandName != null) {
                                 tv_brand.setText(goodsBean.BrandName);
-                            }else {
+                            } else {
                                 tv_brand.setText("无");
                             }
 
@@ -411,6 +411,7 @@ public class ShopDetailActivity extends BaseActivity {
                                         basicUnitId = unit.Id;
                                         unitId = unit.Id;
                                         basicUnitPrice = goodsBean.MemoryPrice;
+                                        unitPrice = basicUnitPrice;
                                         getProductMemoryPrice(unitId, 0);
                                         LogUtils.e(goodsBean.Name + ",unitName:" + unitName + ",unitPrice:" + unitPrice);
                                     }
