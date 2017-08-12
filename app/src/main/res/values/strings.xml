@@ -81,4 +81,10 @@
     <string name="all">全部</string>
     <string name="new_address">新增地址</string>
     <string name="about_us">关于亿订货</string>
+    <string name="product_name">产品名称</string>
+    <string name="code">编号</string>
+    <string name="packing_specifications">包装规格</string>
+    <string name="type">类型</string>
+    <string name="category">类别</string>
+    <string name="brand">品牌</string>
 </resources>
