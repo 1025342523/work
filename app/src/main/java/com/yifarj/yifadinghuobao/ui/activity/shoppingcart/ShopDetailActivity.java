@@ -109,6 +109,20 @@ public class ShopDetailActivity extends BaseActivity {
     @BindView(R.id.shopDetail_tvAddShoppingCart)
     TextView shopDetail_tvAddShoppingCart;
 
+    @BindView(R.id.tv_productName)
+    TextView tv_productName;
+    @BindView(R.id.tv_code)
+    TextView tv_code;
+    @BindView(R.id.tv_packSpec)
+    TextView tv_packSpec;
+    @BindView(R.id.tv_type)
+    TextView tv_type;
+    @BindView(R.id.tv_category)
+    TextView tv_category;
+    @BindView(R.id.tv_brand)
+    TextView tv_brand;
+
+
     private GoodsListEntity.ValueEntity goodsBean;
     private Banner banner;
 
@@ -349,6 +363,34 @@ public class ShopDetailActivity extends BaseActivity {
                                     ProductPictureUtil.createLargeImageDialog(ShopDetailActivity.this, list.get(position));
                                 }
                             });
+
+                            tv_productName.setText(goodsBean.Name);
+                            tv_code.setText(goodsBean.Code);
+                            tv_packSpec.setText(goodsBean.PackSpec);
+                            switch (goodsBean.TypeId){
+                                case 0:
+                                    tv_type.setText("无");
+                                    break;
+                                case 1:
+                                    tv_type.setText("成品");
+                                    break;
+                                case 2:
+                                    tv_type.setText("半成品");
+                                    break;
+                                case 3:
+                                    tv_type.setText("辅料");
+                                    break;
+                            }
+                            if(goodsBean.CategoryName!=null){
+                                tv_category.setText(goodsBean.CategoryName);
+                            }else {
+                                tv_category.setText("无");
+                            }
+                            if(goodsBean.BrandName!=null){
+                                tv_brand.setText(goodsBean.BrandName);
+                            }else {
+                                tv_brand.setText("无");
+                            }
 
                             //商品名称
                             shopDetail_Name.setText(goodsBean.Name);
