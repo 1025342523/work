@@ -111,7 +111,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
             Glide.with(currentContext)
                     .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
-                    .centerCrop()
+                    .fitCenter()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.default_image)
                     .dontAnimate()

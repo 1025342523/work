@@ -40,7 +40,7 @@ public class GoodsListEntity {
         public int DefaultTraderId;
         public int PurchaserId;
         public int ManagerId;
-        public int Cost;
+        public double Cost;
         public double MinSalesQuantity;
         public double MaxSalesQuantity;
         public int CostCalcMethodId;

@@ -9,7 +9,7 @@
 
 
     <android.support.v7.widget.CardView
-        android:layout_width="140dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/size_10"
         android:layout_marginStart="@dimen/size_10"
@@ -19,9 +19,9 @@
 
         <ImageView
             android:id="@+id/item_img"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerInside"
+            android:layout_width="@dimen/size_240"
+            android:layout_height="@dimen/size_240"
+            android:scaleType="centerCrop"
             android:src="@drawable/default_image"/>
 
         <TextView

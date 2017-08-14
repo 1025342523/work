@@ -97,7 +97,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
             if (goodsBean.Path != null) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.Path))
-                        .centerCrop()
+                        .fitCenter()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.default_image)
                         .dontAnimate()

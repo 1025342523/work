@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -85,7 +84,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.ProductPictureList.get(0).Path))
-                        .centerCrop()
+                        .fitCenter()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.default_image)
                         .dontAnimate()
