@@ -141,11 +141,11 @@ public class ProductListActivity extends BaseActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String result = s.toString();
+                searchGoodsList = null;
+                searchPageInfo.PageIndex = -1;
+                searchRequesting = false;
+                searchMorePage = true;
                 if (StringUtils.isEmpty(result)) {
-                    searchGoodsList = null;
-                    searchPageInfo.PageIndex = -1;
-                    searchRequesting = false;
-                    searchMorePage = true;
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result)) {
@@ -243,9 +243,11 @@ public class ProductListActivity extends BaseActivity {
                                         }
                                     });
                                 } else {
+                                    searchView.getListView().setAdapter(null);
                                     ToastUtils.showShortSafe("无结果");
                                 }
                             } else {
+                                searchView.getListView().setAdapter(null);
                                 ToastUtils.showShortSafe(entity.Information == null ? "无结果" : entity.Information);
                             }
                         } else if (entity != null && entity.Value.size() > 0) {
