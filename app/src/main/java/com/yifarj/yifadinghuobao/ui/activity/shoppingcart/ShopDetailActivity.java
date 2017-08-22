@@ -353,16 +353,16 @@ public class ShopDetailActivity extends BaseActivity {
                                 list.add("http://img4.imgtn.bdimg.com/it/u=1007043693,2735869963&fm=26&gp=0.jpg");
                             }
                             banner.setImages(list);
-                            //banner设置方法全部调用完毕时最后调用
-                            banner.start();
-
+                            //banner点击事件要放在启动之前，否则position为0点击没反应
                             banner.setOnBannerListener(new OnBannerListener() {
                                 @Override
                                 public void OnBannerClick(int position) {
-                                    LogUtils.e(goodsBean.Name + "图片position：" + position + ",Url:" + list.get(position));
+                                    LogUtils.e(goodsBean.Name + "图片position：" + position + ",Url：" + list.get(position));
                                     ProductPictureUtil.createLargeImageDialog(ShopDetailActivity.this, list.get(position));
                                 }
                             });
+                            //banner设置方法全部调用完毕时最后调用
+                            banner.start();
 
                             tv_productName.setText(goodsBean.Name);
                             tv_code.setText(goodsBean.Code);
