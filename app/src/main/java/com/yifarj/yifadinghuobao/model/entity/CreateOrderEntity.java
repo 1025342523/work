@@ -39,7 +39,7 @@ public class CreateOrderEntity {
         public String DeliveryAddress;
         public String ReceiveMethod;
         public long ReceiveTime;
-        public int FinishedAmount;
+        public double FinishedAmount;
         public int CreatedUserId;
         public long CreatedTime;
         public String CreatedDevice = "";
@@ -62,7 +62,7 @@ public class CreateOrderEntity {
         public double TotalAmount;
         public float Discount;
         public double DiscountAmount;
-        public float ReBateAmount;
+        public double ReBateAmount;
         public String WarehouseName = "";
         public String LocationName = "";
         public int PriceSystemId;
