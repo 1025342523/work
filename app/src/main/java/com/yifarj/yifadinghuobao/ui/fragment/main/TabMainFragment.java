@@ -118,10 +118,13 @@ public class TabMainFragment extends BaseFragment {
             LogUtils.e("TabGoodsFragment", "lazyLoad（） false");
             return;
         }
+        goodsList.clear();
+        pageInfo = new PageInfo();
         initRefreshLayout();
         initRecyclerView();
         mRecyclerView.scrollToPosition(0);
         isPrepared = false;
+
     }
 
     @Override
@@ -212,6 +215,13 @@ public class TabMainFragment extends BaseFragment {
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         if (!goodsListEntity.HasError) {
                             goodsList.addAll(goodsListEntity.Value);
+                            List<GoodsListEntity.ValueEntity.PriceSystemListEntity> priceSystemList = goodsList.get(0).PriceSystemList;
+                            PreferencesUtil.putInt("PriceSystemId", -1);
+                            for (GoodsListEntity.ValueEntity.PriceSystemListEntity item : priceSystemList) {
+                                if (item.IsOrderMeetingPrice) {
+                                    PreferencesUtil.putInt("PriceSystemId", item.Id);
+                                }
+                            }
                             finishTask();
                         }
                     }
@@ -234,12 +244,6 @@ public class TabMainFragment extends BaseFragment {
 
     @Override
     protected void finishTask() {
-        if (mSwipeRefreshLayout == null) {
-            return;
-        }
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
         mIsRefreshing = false;
         if (goodsList != null) {
             if (goodsList.size() == 0) {
@@ -249,13 +253,17 @@ public class TabMainFragment extends BaseFragment {
             }
         }
         loadMoreView.setVisibility(View.GONE);
-
         if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
             if (!mGoodsListAdapter.onbind && goodsList != null && goodsList.size() > 0) {
                 mGoodsListAdapter.notifyDataSetChanged();
             }
         }
-
+        if (mSwipeRefreshLayout == null) {
+            return;
+        }
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     public void showEmptyView() {

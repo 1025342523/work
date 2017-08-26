@@ -17,13 +17,11 @@
         android:textColor="@color/main_text2"
         android:textSize="@dimen/font_30"/>
 
-    <TextView
+    <View
         android:layout_width="300dp"
         android:layout_height="1dp"
         android:layout_gravity="center_horizontal"
         android:background="#ebebeb"
-
-
         />
 
     <LinearLayout
@@ -44,7 +42,7 @@
             android:textColor="@color/text_desc"
             />
 
-        <TextView
+        <View
             android:layout_width="1dp"
             android:layout_height="30dp"
             android:layout_gravity="center_vertical"

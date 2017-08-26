@@ -168,6 +168,9 @@ public class DeliveryAddressActivity extends BaseActivity {
     @Override
     public void loadData() {
         traderInfo = DataSaver.getTraderInfo();
+        if (traderInfo == null) {
+            return;
+        }
         mItemData = traderInfo.TraderDeliveryAddressList;
     }
 

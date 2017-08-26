@@ -94,6 +94,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     private GoodsListViewAdapter searchGoodsListAdapter;
 
     private int shopQuantity = 0, itemPosition, itemType, shopId;
+    private boolean isClearText = false;
 
     @Override
     public int getLayoutResId() {
@@ -170,7 +171,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                 searchPageInfo.PageIndex = -1;
                 searchRequesting = false;
                 searchMorePage = true;
-                if (StringUtils.isEmpty(result)) {
+                if (!isClearText && StringUtils.isEmpty(result)) {
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result)) {
@@ -222,32 +223,27 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                             itemPosition = position;
                                             itemType = 0;
-                                            shopId = searchGoodsList.Value.get(position).Id;
+                                            shopId = entity.Value.get(position).Id;
                                             Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
-                                            intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
+                                            intent.putExtra("shoppingId", entity.Value.get(position).Id);
                                             intent.putExtra("saleType", 0);
                                             startActivityForResult(intent, REQUEST_ITEM);
-
-                                            /*searchView.clearText();
-                                            searchGoodsList = null;
-                                            searchPageInfo.PageIndex = -1;
-                                            searchRequesting = false;
-                                            searchMorePage = true;*/
+                                            isClearText = true;
+                                            searchView.clearText();
+                                            isClearText = false;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
                                         itemPosition = 0;
                                         itemType = 0;
-                                        shopId = searchGoodsList.Value.get(0).Id;
+                                        shopId = entity.Value.get(0).Id;
                                         Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
-                                        intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
+                                        intent.putExtra("shoppingId", entity.Value.get(0).Id);
                                         intent.putExtra("saleType", 0);
                                         startActivityForResult(intent, REQUEST_ITEM);
-                                        /*searchView.clearText();
-                                        searchGoodsList = null;
-                                        searchPageInfo.PageIndex = -1;
-                                        searchRequesting = false;
-                                        searchMorePage = true;*/
+                                        isClearText = true;
+                                        searchView.clearText();
+                                        isClearText = false;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override
@@ -401,6 +397,13 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                                             }
                                         }
                                     });
+                                    List<GoodsListEntity.ValueEntity.PriceSystemListEntity> priceSystemList = goodsList.Value.get(0).PriceSystemList;
+                                    PreferencesUtil.putInt("PriceSystemId", -1);
+                                    for (GoodsListEntity.ValueEntity.PriceSystemListEntity item : priceSystemList) {
+                                        if (item.IsOrderMeetingPrice) {
+                                            PreferencesUtil.putInt("PriceSystemId", item.Id);
+                                        }
+                                    }
                                 } else {
                                     showEmptyView();
                                 }

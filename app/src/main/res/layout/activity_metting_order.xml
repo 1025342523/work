@@ -129,7 +129,7 @@
                     android:layout_marginTop="@dimen/size_20"
                     app:name="@string/create_date"/>
 
-                <com.yifarj.yifadinghuobao.view.CustomEditItem
+                <com.yifarj.yifadinghuobao.view.CustomEditItemUnderline
                     android:id="@+id/ciAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

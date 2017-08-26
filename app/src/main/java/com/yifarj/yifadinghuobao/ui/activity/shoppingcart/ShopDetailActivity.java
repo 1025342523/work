@@ -1,10 +1,13 @@
 package com.yifarj.yifadinghuobao.ui.activity.shoppingcart;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -141,7 +144,7 @@ public class ShopDetailActivity extends BaseActivity {
     private int orderCount = 0;
     private boolean isCollection = false;
     private int saleType = 0;
-
+    private int priceSystemId;
     private static final int REQUEST_REFRESH = 10;
 
     private List<Integer> selectedUnitList = new ArrayList<>(new HashSet<>());
@@ -153,6 +156,7 @@ public class ShopDetailActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        priceSystemId = PreferencesUtil.getInt("PriceSystemId", -1);
         loadData();
         init();
     }
@@ -412,7 +416,8 @@ public class ShopDetailActivity extends BaseActivity {
                                         unitId = unit.Id;
                                         basicUnitPrice = goodsBean.MemoryPrice;
                                         unitPrice = basicUnitPrice;
-                                        getProductMemoryPrice(unitId, 0);
+//                                        getProductMemoryPrice(unitId, 0);
+                                        getSelectedUnitPrice(unitId, 0, unit.BasicFactor);
                                         LogUtils.e(goodsBean.Name + ",unitName:" + unitName + ",unitPrice:" + unitPrice);
                                     }
                                 }
@@ -449,7 +454,10 @@ public class ShopDetailActivity extends BaseActivity {
                                         }
                                         unitName = goodsBean.ProductUnitList.get(select).Name;
                                         unitId = goodsBean.ProductUnitList.get(select).Id;
-                                        getProductMemoryPrice(unitId, select);
+
+
+//                                        getProductMemoryPrice(unitId, select);
+                                        getSelectedUnitPrice(unitId, select, goodsBean.ProductUnitList.get(select).BasicFactor);
                                         LogUtils.e(goodsBean.Name + "：修改单位" + unitName);
                                     } else {
                                         setSelectedUnit(tagAdapter);
@@ -512,8 +520,16 @@ public class ShopDetailActivity extends BaseActivity {
                                                 LogUtils.e(goodsBean.Name + "：数量修改为" + count);
                                                 shopDetail_orderNum.setValue(count);
                                             }
+                                            closeKeybord(mDialog.getEditText(), ShopDetailActivity.this);
                                         }
                                     });
+                                    mDialog.setCancelClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            closeKeybord(mDialog.getEditText(), ShopDetailActivity.this);
+                                        }
+                                    });
+                                    openKeybord(mDialog.getEditText(), ShopDetailActivity.this);
                                 }
                             });
                         } else {
@@ -534,6 +550,22 @@ public class ShopDetailActivity extends BaseActivity {
                 });
     }
 
+
+    private void openKeybord(EditText mEditText, Context mContext) {
+        InputMethodManager imm = (InputMethodManager) mContext
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mEditText, InputMethodManager.RESULT_SHOWN);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+
+
+    public static void closeKeybord(EditText mEditText, Context mContext) {
+        InputMethodManager imm = (InputMethodManager) mContext.
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+    }
+
     private void setSelectedUnit(final TagAdapter<ProductUnitEntity.ValueEntity> tagAdapter) {
         selectedUnitList.clear();
         if (isExist) {
@@ -549,7 +581,8 @@ public class ShopDetailActivity extends BaseActivity {
                                 unitId = goodsBean.ProductUnitList.get(unitPosition).Id;
                                 /*unitPrice = goodsBean.ProductUnitList.get(unitPosition).BasicFactor * basicUnitPrice;
                                 totalPrice = quantity * unitPrice;*/
-                                getProductMemoryPrice(unitId, unitPosition);
+//                                getProductMemoryPrice(unitId, unitPosition);
+                                getSelectedUnitPrice(unitId, unitPosition, goodsBean.ProductUnitList.get(unitPosition).BasicFactor);
                                 shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
                                 LogUtils.e(goodsBean.Name + "：修改单位" + unitName);
                             }
@@ -562,9 +595,52 @@ public class ShopDetailActivity extends BaseActivity {
             unitId = goodsBean.ProductUnitList.get(0).Id;
             /*unitPrice = goodsBean.ProductUnitList.get(0).BasicFactor * basicUnitPrice;
             totalPrice = quantity * unitPrice;*/
-            getProductMemoryPrice(unitId, 0);
+//            getProductMemoryPrice(unitId, 0);
+            getSelectedUnitPrice(unitId, 0, goodsBean.ProductUnitList.get(0).BasicFactor);
             shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
             LogUtils.e(goodsBean.Name + "：修改单位" + unitName);
+        }
+    }
+
+    private void getSelectedUnitPrice(int productUnitId, int select, double basicFactor) {
+        if (priceSystemId == -1) {
+            getProductMemoryPrice(productUnitId, select);
+        } else {
+            switch (priceSystemId) {
+                case 1:
+                    basicUnitPrice = goodsBean.Price1;
+                    break;
+                case 2:
+                    basicUnitPrice = goodsBean.Price2;
+                    break;
+                case 3:
+                    basicUnitPrice = goodsBean.Price3;
+                    break;
+                case 4:
+                    basicUnitPrice = goodsBean.Price4;
+                    break;
+                case 5:
+                    basicUnitPrice = goodsBean.Price5;
+                    break;
+                case 6:
+                    basicUnitPrice = goodsBean.Price6;
+                    break;
+                case 7:
+                    basicUnitPrice = goodsBean.Price7;
+                    break;
+                case 8:
+                    basicUnitPrice = goodsBean.Price8;
+                    break;
+                case 9:
+                    basicUnitPrice = goodsBean.Price9;
+                    break;
+                case 10:
+                    basicUnitPrice = goodsBean.Price10;
+                    break;
+            }
+            unitPrice = basicUnitPrice * basicFactor;
+            totalPrice = quantity * unitPrice;
+            shopDetail_totalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
         }
     }
 
@@ -805,6 +881,8 @@ public class ShopDetailActivity extends BaseActivity {
                                     shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
                                     LogUtils.e("退货数量：" + orderCount);
                                 }
+                                setResult(RESULT_OK);
+                                finish();
                             } else {
                                 Toast.makeText(ShopDetailActivity.this, "请输入退货数量", Toast.LENGTH_SHORT).show();
                             }
@@ -870,6 +948,8 @@ public class ShopDetailActivity extends BaseActivity {
                                     shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
                                     LogUtils.e("购物车数量：" + orderCount);
                                 }
+                                setResult(RESULT_OK);
+                                finish();
                             } else {
                                 Toast.makeText(ShopDetailActivity.this, "请输入订购数量", Toast.LENGTH_SHORT).show();
                             }

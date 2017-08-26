@@ -30,6 +30,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.order.MettingOrderActivity;
 import com.yifarj.yifadinghuobao.utils.NumberUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 import com.yifarj.yifadinghuobao.view.TitleView;
@@ -72,11 +73,10 @@ public class ShoppingCartActivity extends BaseActivity {
     private ShoppingCartAdapter mShoppingCartAdapter;
     private ReturnListAdapter mReturnListAdapter;
     private List<SaleGoodsItemModel> mItemData = new ArrayList<>();
-    private List<GoodsUnitModel> mUnitData = new ArrayList<>();
     private List<ReturnListItemModel> returnItemData = new ArrayList<>();
     private List<ReturnGoodsUnitModel> returnUnitData = new ArrayList<>();
     private FlowContentObserver mObserver = new FlowContentObserver();
-
+    private int priceSystemId;
 
     private int totalCount = 0;
     private double totalPrice = 0;
@@ -217,6 +217,8 @@ public class ShoppingCartActivity extends BaseActivity {
 
     @Override
     public void loadData() {
+        priceSystemId = PreferencesUtil.getInt("PriceSystemId", -1);
+        LogUtils.e("订货会价格体系Id", priceSystemId + "");
         if (saleType == 1) {
             RXSQLite.rx(SQLite.select()
                     .from(ReturnListItemModel.class))
@@ -256,17 +258,6 @@ public class ShoppingCartActivity extends BaseActivity {
                             }
                         }
                     });
-            RXSQLite.rx(SQLite.select()
-                    .from(GoodsUnitModel.class))
-                    .queryList()
-                    .subscribe(new Consumer<List<GoodsUnitModel>>() {
-                        @Override
-                        public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
-                            if (goodsUnitModels != null) {
-                                mUnitData.addAll(goodsUnitModels);
-                            }
-                        }
-                    });
             initRecyclerView();
             finishTask();
             showTotalPrice(getTotalPrice(mItemData));
@@ -280,7 +271,7 @@ public class ShoppingCartActivity extends BaseActivity {
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         if (saleType == 1) {
-            mReturnListAdapter = new ReturnListAdapter(mRecyclerView, returnItemData, returnUnitData);
+            mReturnListAdapter = new ReturnListAdapter(mRecyclerView, returnItemData, priceSystemId);
             mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
             mRecyclerView.setAdapter(mReturnListAdapter);
 
@@ -298,7 +289,7 @@ public class ShoppingCartActivity extends BaseActivity {
                 }
             });
         } else {
-            mShoppingCartAdapter = new ShoppingCartAdapter(mRecyclerView, mItemData, mUnitData);
+            mShoppingCartAdapter = new ShoppingCartAdapter(mRecyclerView, mItemData, priceSystemId);
             mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
             mRecyclerView.setAdapter(mShoppingCartAdapter);
 

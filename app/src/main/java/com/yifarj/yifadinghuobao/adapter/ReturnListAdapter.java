@@ -57,14 +57,14 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ReturnListAdapter extends AbsRecyclerViewAdapter {
     private List<ReturnListItemModel> itemData;
-    private List<ReturnGoodsUnitModel> unitData;
     public static Map<Integer, Set<Integer>> selectedMap = new HashMap<Integer, Set<Integer>>();
     private static Map<Integer, List<ReturnGoodsUnitModel>> itemUnit = new HashMap<Integer, List<ReturnGoodsUnitModel>>();
+    private int mPriceSystemId;
 
-    public ReturnListAdapter(RecyclerView recyclerView, List<ReturnListItemModel> mItemData, List<ReturnGoodsUnitModel> mUnitData) {
+    public ReturnListAdapter(RecyclerView recyclerView, List<ReturnListItemModel> mItemData, int priceSystemId) {
         super(recyclerView);
         this.itemData = mItemData;
-        this.unitData = mUnitData;
+        mPriceSystemId = priceSystemId;
     }
 
 
@@ -303,10 +303,69 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                         goodsBean.ProductUnitName = unitName.get(select);
                         goodsBean.UnitId = itemUnit.get(position).get(select).Id;
                         LogUtils.e(itemUnit.get(position).get(select).BasicFactor);
-                        getProductMemoryPrice(goodsBean, select, itemUnit.get(position).get(select).BasicFactor);
+                        if (mPriceSystemId == -1) {
+                            getProductMemoryPrice(goodsBean, select, itemUnit.get(position).get(select).BasicFactor);
 //                        goodsBean.UnitPrice = itemUnit.get(position).get(select).BasicFactor * goodsBean.BasicUnitPrice;
 //                        goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
+                        } else {
+                            switch (mPriceSystemId) {
+                                case 1:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price1;
+                                    break;
+                                case 2:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price2;
+                                    break;
+                                case 3:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price3;
+                                    break;
+                                case 4:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price4;
+                                    break;
+                                case 5:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price5;
+                                    break;
+                                case 6:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price6;
+                                    break;
+                                case 7:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price7;
+                                    break;
+                                case 8:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price8;
+                                    break;
+                                case 9:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price9;
+                                    break;
+                                case 10:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price10;
+                                    break;
+                            }
+                            goodsBean.UnitPrice = itemUnit.get(position).get(select).BasicFactor * goodsBean.BasicUnitPrice;
+                            goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
+                            notifyDataSetChanged();
+                            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class)
+                                    .where(ReturnListItemModel_Table.ProductId.eq(goodsBean.ProductId)))
+                                    .queryList().subscribe(new Consumer<List<ReturnListItemModel>>() {
+                                @Override
+                                public void accept(@NonNull List<ReturnListItemModel> ReturnListItemModels) throws Exception {
+                                    LogUtils.e(ReturnListItemModels + "\n长度" + ReturnListItemModels.size());
+                                    if (ReturnListItemModels.size() > 0) {
+                                        ReturnListItemModel mItem = ReturnListItemModels.get(0);
+                                        mItem.ProductUnitName = goodsBean.ProductUnitName;
+                                        mItem.UnitId = goodsBean.UnitId;
+                                        mItem.UnitPrice = goodsBean.UnitPrice;
+                                        mItem.CurrentPrice = goodsBean.CurrentPrice;
+                                        mItem.update().subscribe(new Consumer<Boolean>() {
+                                            @Override
+                                            public void accept(@NonNull Boolean aBean) throws Exception {
+                                                LogUtils.e(mItem.ProductName + "：修改单位" + mItem.ProductUnitName);
+                                            }
+                                        });
+                                    }
 
+                                }
+                            });
+                        }
                     }
                 });
                 Flowable.fromIterable(unitName)

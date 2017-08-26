@@ -2,6 +2,7 @@ package com.yifarj.yifadinghuobao.model.helper;
 
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
 import com.yifarj.yifadinghuobao.model.entity.TraderEntity;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 
 /**
  * DataSaver
@@ -28,6 +29,10 @@ public class DataSaver {
     }
 
     public static int getPriceSystemId() {
+        int priceSystemId = PreferencesUtil.getInt("PriceSystemId", -1);
+        if (priceSystemId != -1) {
+            mPriceSystemId = priceSystemId;
+        }
         return mPriceSystemId;
     }
 
