@@ -296,6 +296,7 @@ public class TraderEntity {
             public String VerifyCode;
             public long FailureTime;
             public int CodeSendTimes;
+            public String card_password;
         }
 
         public static class PriceSystemListEntity {

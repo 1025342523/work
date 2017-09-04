@@ -52,7 +52,7 @@ public class ConnectServerActivity extends BaseActivity {
 
     private String mAccountId;
     private String mIp, mPort, mUrl, mKeyCode;
-
+    private boolean isGetId = false;
 
     @Override
     public int getLayoutId() {
@@ -74,6 +74,12 @@ public class ConnectServerActivity extends BaseActivity {
                         overridePendingTransition(R.anim.slide_in_up, R.anim.fake_fade_out);
                     }
                 });
+
+        mIp = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_IP);
+        mPort = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PORT);
+        mKeyCode = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_KEY_CODE);
+        mUrl = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN);
+        mAccountId = PreferencesUtil.getString(ApiConstants.CPreference.ACCOUNT_ID);
         RxView.clicks(llTest)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
@@ -112,7 +118,7 @@ public class ConnectServerActivity extends BaseActivity {
                     public void onNext(AccountListEntity valueEntity) {
                         LogUtils.e("onNext", valueEntity.toString());
                         if (!valueEntity.HasError) {
-//                            ToastUtils.showShortSafe("测试连接成功");
+                            //                            ToastUtils.showShortSafe("测试连接成功");
                             CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
                             mDialog.setContent("恭喜您，测试连接成功，去登录吧");
                             mDialog.setConfirmClickListener(new View.OnClickListener() {
@@ -190,6 +196,7 @@ public class ConnectServerActivity extends BaseActivity {
                         Log.e("mKeyCode", mKeyCode);
 
                         putString(ApiConstants.CPreference.LOGIN_DOMAIN, mUrl);
+                        putString(ApiConstants.CPreference.ACCOUNT_ID, mAccountId);
                         CzechYuanDialog mDialog = new CzechYuanDialog(ConnectServerActivity.this, R.style.CzechYuanDialog);
                         mDialog.setContent("获取服务器信息成功，是否测试连接？");
                         mDialog.setConfirmClickListener(new View.OnClickListener() {

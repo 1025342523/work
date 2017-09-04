@@ -37,6 +37,15 @@
         android:orientation="vertical">
 
         <com.yifarj.yifadinghuobao.view.CustomItem
+            android:id="@+id/ciSetPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/size_16"
+            app:cus_icon_left="@drawable/ic_title_set_pwd"
+            app:cus_icon_right="@drawable/ic_list_more"
+            app:cus_name="@string/password_set"/>
+
+        <com.yifarj.yifadinghuobao.view.CustomItem
             android:id="@+id/ciAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,7 +79,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/size_110"
         android:layout_marginTop="@dimen/size_20"
-        android:background="@color/white">
+        android:background="@drawable/selector_list_bg">
 
         <TextView
             android:layout_width="wrap_content"

@@ -507,6 +507,7 @@ public class MettingOrderActivity extends BaseActivity {
             return;
         }
         orderInfo.SalesOutBillItemList = mItemData;
+        orderInfo.OutTypeId = 99;
         LogUtils.e(JsonUtils.serialize(orderInfo));
 
         if (saleType == 1) {

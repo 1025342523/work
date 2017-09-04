@@ -5,6 +5,7 @@ import com.yifarj.yifadinghuobao.app.YifaApplication;
 import com.yifarj.yifadinghuobao.network.api.AccountService;
 import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
 import com.yifarj.yifadinghuobao.network.api.FetchOrderService;
+import com.yifarj.yifadinghuobao.network.api.FetchTraderContactService;
 import com.yifarj.yifadinghuobao.network.api.FetchTraderService;
 import com.yifarj.yifadinghuobao.network.api.GoodsListService;
 import com.yifarj.yifadinghuobao.network.api.LoginService;
@@ -12,10 +13,12 @@ import com.yifarj.yifadinghuobao.network.api.LogoutService;
 import com.yifarj.yifadinghuobao.network.api.MettingCodeService;
 import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
 import com.yifarj.yifadinghuobao.network.api.OrderListService;
+import com.yifarj.yifadinghuobao.network.api.PasswordLoginService;
 import com.yifarj.yifadinghuobao.network.api.ProductCategoryListService;
 import com.yifarj.yifadinghuobao.network.api.ProductMemoryPriceService;
 import com.yifarj.yifadinghuobao.network.api.ReceiveMethodService;
 import com.yifarj.yifadinghuobao.network.api.SaveOrderService;
+import com.yifarj.yifadinghuobao.network.api.SaveTraderContactService;
 import com.yifarj.yifadinghuobao.network.api.SaveTraderService;
 import com.yifarj.yifadinghuobao.network.api.StockInfoForToolTipListService;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
@@ -139,6 +142,20 @@ public class RetrofitHelper {
         return createApi(SaveTraderService.class, ApiConstants.CUrl.BASE_URL);
     }
 
+    public static FetchTraderContactService fetchTraderContactApi() {
+
+        return createApi(FetchTraderContactService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+    public static SaveTraderContactService SaveTraderContactApi() {
+
+        return createApi(SaveTraderContactService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+    public static PasswordLoginService getPasswordLoginApi() {
+
+        return createApi(PasswordLoginService.class, ApiConstants.CUrl.BASE_URL);
+    }
 
     /**
      * 根据传入的baseUrl，和api创建retrofit

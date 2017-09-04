@@ -87,4 +87,14 @@
     <string name="type">类型</string>
     <string name="category">类别</string>
     <string name="brand">品牌</string>
+    <string name="user_password">请输入您的密码</string>
+    <string name="password_login">密码登录</string>
+    <string name="verification_code_login">验证码登录</string>
+    <string name="login_password">登录密码</string>
+    <string name="set_password">设置密码</string>
+    <string name="password_set">密码设置</string>
+    <string name="modify_password">修改密码</string>
+    <string name="user_new_password">请输入新密码</string>
+    <string name="old_password_error">密码错误，请重试</string>
+    <string name="password_empty">密码不能为空</string>
 </resources>

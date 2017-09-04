@@ -74,6 +74,7 @@ public class ApiConstants {
         public static final String LOGIN = "Login";
         public static final String LOGIN_OTHER = "Login2";
         public static final String METTINGLOGIN = "MettingLogin";
+        public static final String PASSWORDLOGIN = "LoginYDH";
         /**
          * 退出登录
          */

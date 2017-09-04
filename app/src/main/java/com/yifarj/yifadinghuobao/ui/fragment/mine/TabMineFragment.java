@@ -10,6 +10,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.ui.activity.common.AboutActivity;
 import com.yifarj.yifadinghuobao.ui.activity.customer.DeliveryAddressActivity;
+import com.yifarj.yifadinghuobao.ui.activity.me.PasswordSetActivity;
 import com.yifarj.yifadinghuobao.ui.activity.me.ReturnFormActivity;
 import com.yifarj.yifadinghuobao.ui.activity.me.ReturnProductActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.base.BaseFragment;
@@ -43,6 +44,9 @@ public class TabMineFragment extends BaseFragment {
     @BindView(R.id.ciReturnOrder)
     CustomItem ciReturnOrder;
 
+    @BindView(R.id.ciSetPassword)
+    CustomItem ciSetPassword;
+
     @BindView(R.id.rl_about)
     RelativeLayout about;
 
@@ -55,6 +59,17 @@ public class TabMineFragment extends BaseFragment {
     protected void finishCreateView(Bundle savedInstanceState) {
         String name = PreferencesUtil.getString("ContactName");
         tvUserPhone.setText(name);
+        RxView.clicks(ciSetPassword)
+                .compose(bindToLifecycle())
+                .subscribe(new Consumer<Object>() {
+
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        Intent intent=new Intent(getActivity(), PasswordSetActivity.class);
+                        startActivity(intent);
+
+                    }
+                });
         RxView.clicks(about)
                 .compose(bindToLifecycle())
                 .subscribe(new Consumer<Object>() {
