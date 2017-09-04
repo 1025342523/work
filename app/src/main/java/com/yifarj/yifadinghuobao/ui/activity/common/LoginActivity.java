@@ -512,6 +512,7 @@ public class LoginActivity extends BaseActivity {
                                     }
                                 }
                                 PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, phoneNumber);
+                                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
 
                                 LogUtils.e("登录 onComplete");
                                 LogUtils.e("traderId " + passwordLoginEntity.Value.Value.TraderId);

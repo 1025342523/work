@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.yifarj.yifadinghuobao.R;
-import com.yifarj.yifadinghuobao.model.entity.TraderContactEntity;
 import com.yifarj.yifadinghuobao.model.entity.TraderEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
@@ -57,7 +56,6 @@ public class SetPasswordActivity extends BaseActivity {
     ImageView ivShowPwd;
 
     private boolean isShowPwd = false, isOldPwd;
-    private TraderContactEntity.ValueBean traderContact;
 
     @Override
     public int getLayoutId() {
@@ -72,11 +70,11 @@ public class SetPasswordActivity extends BaseActivity {
             etNewPassword.setText("******");
             etNewPassword.setEnabled(false);
             ivShowPwd.setEnabled(false);
-            tvNewPwdError.setVisibility(View.VISIBLE);
             btnOk.setVisibility(View.GONE);
         }
         isOldPwd = getIntent().getBooleanExtra("isOldPwd", false);
-        if (isOldPwd) {
+        String oldPwd = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PASSWORD);
+        if (isOldPwd || (oldPwd != null)) {
             etNewPassword.setText("******");
             etNewPassword.setEnabled(false);
             ivShowPwd.setEnabled(false);
@@ -135,7 +133,7 @@ public class SetPasswordActivity extends BaseActivity {
                         setPassword();
                     }
                 });
-}
+    }
 
     public void hideInputMethod() {
         if (getCurrentFocus() != null) {
@@ -179,6 +177,7 @@ public class SetPasswordActivity extends BaseActivity {
                             @Override
                             public void onNext(@NonNull TraderEntity traderEntity) {
                                 if (!traderEntity.HasError) {
+                                    PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
                                     ToastUtils.showShortSafe("密码设置成功");
                                     LogUtils.e("密码设置成功:" + pwd);
                                     DataSaver.setTraderInfo(traderEntity.Value);

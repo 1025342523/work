@@ -110,14 +110,19 @@ public class ModifyPasswordActivity extends BaseActivity {
             }
         });
 
-        if (DataSaver.getMettingCustomerInfo() != null) {
-            traderId = DataSaver.getMettingCustomerInfo().TraderId;
-        } else if (DataSaver.getPasswordCustomerInfo() != null) {
-            traderId = DataSaver.getMettingCustomerInfo().TraderId;
+        String oldPwd = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PASSWORD);
+        if (oldPwd != null) {
+            password = oldPwd;
         } else {
-            traderId = PreferencesUtil.getInt("TraderId", 0);
+            if (DataSaver.getMettingCustomerInfo() != null) {
+                traderId = DataSaver.getMettingCustomerInfo().TraderId;
+            } else if (DataSaver.getPasswordCustomerInfo() != null) {
+                traderId = DataSaver.getPasswordCustomerInfo().TraderId;
+            } else {
+                traderId = PreferencesUtil.getInt("TraderId", 0);
+            }
+            getOldPassword(traderId);
         }
-        getOldPassword(traderId);
 
         clicks(btnOk)
                 .compose(bindToLifecycle())
@@ -185,6 +190,7 @@ public class ModifyPasswordActivity extends BaseActivity {
                             @Override
                             public void onNext(@NonNull TraderEntity traderEntity) {
                                 if (!traderEntity.HasError) {
+                                    PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, newPassword);
                                     ToastUtils.showShortSafe("密码设置成功");
                                     LogUtils.e("密码设置成功:" + newPassword);
                                     DataSaver.setTraderInfo(traderEntity.Value);
@@ -253,81 +259,5 @@ public class ModifyPasswordActivity extends BaseActivity {
                     }
                 });
     }
-
-    /**
-     * 获取登录密码
-     *//*
-    private void getOldPassword(int traderId) {
-        RetrofitHelper.fetchTraderContactApi()
-                .fetchTraderContact("TraderContact", "Id =" + traderId, "", AppInfoUtil.getToken())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<TraderContactEntity>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull TraderContactEntity traderContactEntity) {
-                        if (!traderContactEntity.HasError && traderContactEntity.Value != null) {
-                            password = traderContactEntity.Value.card_password;
-                            LogUtils.e("旧密码获取成功" + password);
-                        } else {
-                            LogUtils.e("旧密码获取失败");
-                        }
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        LogUtils.e("旧密码获取失败");
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }
-
-    *//**
-     * 设置新密码
-     *//*
-    private void setNewPassword(String pwd) {
-        traderContact = new TraderContactEntity.ValueBean();
-        traderContact.card_password = pwd;
-        RetrofitHelper.SaveTraderContactApi()
-                .SaveTraderContact("TraderContact", "", ZipUtil.gzip(JsonUtils.serialize(traderContact)), AppInfoUtil.getToken())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<TraderContactEntity>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull TraderContactEntity traderContactEntity) {
-                        if (!traderContactEntity.HasError && traderContactEntity.Value != null && traderContactEntity.Value.card_password != null) {
-                            ToastUtils.showShortSafe("密码修改成功");
-                            finish();
-                        } else {
-                            ToastUtils.showShortSafe("密码修改失败");
-                        }
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        ToastUtils.showShortSafe("密码修改失败");
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-    }*/
 
 }

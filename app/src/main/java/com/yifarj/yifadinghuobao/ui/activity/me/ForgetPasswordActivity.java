@@ -447,6 +447,7 @@ public class ForgetPasswordActivity extends BaseActivity {
                             @Override
                             public void onNext(@NonNull TraderEntity traderEntity) {
                                 if (!traderEntity.HasError) {
+                                    PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, newPassword);
                                     ToastUtils.showShortSafe("密码设置成功");
                                     LogUtils.e("密码设置成功:" + newPassword);
                                     DataSaver.setTraderInfo(traderEntity.Value);

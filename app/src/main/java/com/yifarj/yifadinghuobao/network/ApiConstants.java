@@ -22,6 +22,10 @@ public class ApiConstants {
          */
         public static final String PASSWORD = "password";
         /**
+         * 登录密码
+         */
+        public static final String LOGIN_PASSWORD = "login_password";
+        /**
          * 账套号
          */
         public static final String ACCOUNT_ID = "account_id";
