@@ -57,7 +57,7 @@ public class ModifyPasswordActivity extends BaseActivity {
     TextView tvNewPwdError;
 
     private String password;
-    private TraderContactEntity.ValueBean traderContact;
+    private TraderContactEntity.ValueEntity traderContact;
     private int traderId = 0;
 
     @Override

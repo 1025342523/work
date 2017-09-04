@@ -16,7 +16,7 @@ public class TraderContactEntity {
      * MValue : null
      */
 
-    public ValueBean Value;
+    public ValueEntity Value;
     public boolean HasError;
     public Object Information;
     public Object PageInfo;
@@ -24,7 +24,7 @@ public class TraderContactEntity {
     public Object Tag;
     public Object MValue;
 
-    public static class ValueBean {
+    public static class ValueEntity {
         /**
          * Id : 0
          * TraderId : 0
@@ -81,7 +81,7 @@ public class TraderContactEntity {
         public String Mobile;
         public String Email;
         public String Address;
-        public Object Fax;
+        public String Fax;
         public long ModifiedTime;
         public long modify_date;
         public long oper_date;
@@ -90,34 +90,34 @@ public class TraderContactEntity {
         public long birthday;
         public long CreatedTime;
         public int card_id;
-        public Object card_flowno;
-        public Object card_type;
+        public String card_flowno;
+        public String card_type;
         public int vip_sex;
         public int card_status;
         public int oper_id;
         public double acc_num;
         public double dec_num;
         public double res_num;
-        public Object memo;
-        public Object homeplace;
-        public Object marriage;
-        public Object photo_file;
-        public Object nation;
+        public String memo;
+        public String homeplace;
+        public String marriage;
+        public String photo_file;
+        public String nation;
         public double height;
         public double weight;
-        public Object blood_type;
-        public Object favor;
-        public Object social_id;
+        public String blood_type;
+        public String favor;
+        public String social_id;
         public int use_num;
         public double consum_amt;
-        public Object degree;
-        public Object CardSerialNumbe;
+        public String degree;
+        public String CardSerialNumbe;
         public int DepartmentId;
         public int CreatedUserId;
-        public Object CreatedDevice;
+        public String CreatedDevice;
         public int ModifiedUserId;
-        public Object VerifyCode;
-        public Object FailureTime;
+        public String VerifyCode;
+        public long FailureTime;
         public int CodeSendTimes;
         public String card_password;
     }
