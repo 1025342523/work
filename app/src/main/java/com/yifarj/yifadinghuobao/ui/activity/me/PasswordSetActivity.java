@@ -50,7 +50,7 @@ public class PasswordSetActivity extends BaseActivity {
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else if (DataSaver.getPasswordCustomerInfo() != null) {
-            traderId = DataSaver.getMettingCustomerInfo().TraderId;
+            traderId = DataSaver.getPasswordCustomerInfo().TraderId;
         } else {
             traderId = PreferencesUtil.getInt("TraderId", 0);
         }
