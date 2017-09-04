@@ -1,19 +1,21 @@
 package com.yifarj.yifadinghuobao.ui.activity.order;
 
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.bruce.pickerview.popwindow.DatePickerPopWin;
+import com.facebook.stetho.common.LogUtil;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.Delete;
@@ -31,6 +33,7 @@ import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.ReceiveMethodListEntity;
 import com.yifarj.yifadinghuobao.model.entity.SaleGoodsItem;
+import com.yifarj.yifadinghuobao.model.entity.TraderEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
@@ -113,7 +116,7 @@ public class MettingOrderActivity extends BaseActivity {
     CustomEditItem ciDate;
 
     @BindView(R.id.ciAddress)
-    CustomEditItem ciAddress;
+    CustomEditItemUnderline ciAddress;
 
     @BindView(R.id.ciReceiveMethod)
     CustomEditItemUnderline ciReceiveMethod;
@@ -127,7 +130,7 @@ public class MettingOrderActivity extends BaseActivity {
     private CreateOrderEntity.ValueEntity orderInfo;
     private List<ReceiveMethodListEntity.ValueEntity> receiveMethodList;
     private List<SaleGoodsItem.ValueEntity> mItemData = new ArrayList<>();
-
+    private List<TraderEntity.ValueEntity.TraderDeliveryAddressListEntity> mAddressList = new ArrayList<>();
     private boolean isCreate;
     private int mPosition;
     private int orderId;
@@ -150,6 +153,10 @@ public class MettingOrderActivity extends BaseActivity {
     @Override
     public void loadData() {
         getIntentExtra();
+        TraderEntity.ValueEntity traderInfo = DataSaver.getTraderInfo();
+        if (traderInfo == null) {
+            mAddressList = DataSaver.getTraderInfo().TraderDeliveryAddressList;
+        }
         if (isCreate) {
             if (saleType == 1) {
                 RXSQLite.rx(SQLite.select()
@@ -407,27 +414,34 @@ public class MettingOrderActivity extends BaseActivity {
             ciDeliveryDate.setOnItemClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DatePickerPopWin pickerPopWin = new DatePickerPopWin.Builder(MettingOrderActivity.this, new DatePickerPopWin.OnDatePickedListener() {
-                        @Override
-                        public void onDatePickCompleted(int year, int month, int day, String dateDesc) {
-                            Calendar c = Calendar.getInstance(Locale.CHINA);
-                            c.set(year, month, day);
-                            ciDate.getEditText().setText(DateUtil.getFormatDate(c.getTimeInMillis()));
-                            orderInfo.DeliveryDate = c.getTimeInMillis() / 1000;
+                    if (orderInfo == null) {
+                        return;
+                    }
+                    try {
+                        Calendar c = Calendar.getInstance(Locale.CHINA);
+                        if (orderInfo != null && orderInfo.DeliveryDate != 0) {
+                            c.setTimeInMillis(orderInfo.BillDate * 1000);
+                        } else {
+                            c.setTimeInMillis(System.currentTimeMillis());
+                            orderInfo.DeliveryDate = System.currentTimeMillis() / 1000;
+                            orderInfo.CreatedTime = orderInfo.DeliveryDate;
                             orderInfo.ReceiveTime = orderInfo.DeliveryDate;
+                            orderInfo.BillDate = orderInfo.DeliveryDate;
                         }
-                    }).textConfirm("确定") //text of confirm button
-                            .textCancel("取消") //text of cancel button
-                            .btnTextSize(16) // button text size
-                            .viewTextSize(26) // pick view text size
-                            .colorCancel(Color.parseColor("#999999")) //color of cancel button
-                            .colorConfirm(Color.parseColor("#1269c5"))//color of confirm button
-                            .minYear(2010) //min year in loop
-                            .maxYear(2550) // max year in loop
-                            .showDayMonthYear(true) // shows like dd mm yyyy (default is false)
-                            .dateChose("2017-5-20") // date chose when init popwindow
-                            .build();
-                    pickerPopWin.showPopWin(MettingOrderActivity.this);
+                        DatePickerDialog dialog = new DatePickerDialog(MettingOrderActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                Calendar c = Calendar.getInstance(Locale.CHINA);
+                                c.set(year, monthOfYear, dayOfMonth);
+                                ciDeliveryDate.getEditText().setText(DateUtil.getFormatDate(c.getTimeInMillis()));
+                                orderInfo.DeliveryDate = c.getTimeInMillis() / 1000;
+                            }
+                        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+                        dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000 * 60 * 60 * 24);
+                        dialog.show();
+                    } catch (Exception e) {
+                        LogUtil.e("开单时间", "转换异常");
+                    }
                 }
             });
             ciAddress.getEditText().addTextChangedListener(new SimpleTextWatcher() {
@@ -435,6 +449,45 @@ public class MettingOrderActivity extends BaseActivity {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     if (orderInfo != null) {
                         orderInfo.DeliveryAddress = s.toString();
+                    }
+                }
+            });
+
+            ciAddress.setTitleNameOnclickListener(new View.OnClickListener() {
+                private int mPosition;
+
+                @Override
+                public void onClick(View view) {
+                    if (mAddressList.size() > 0 && orderInfo != null) {
+                        final WheelViewBottomDialog dialog = new WheelViewBottomDialog(MettingOrderActivity.this);
+                        List<String> wheelData = new ArrayList<>();
+                        for (TraderEntity.ValueEntity.TraderDeliveryAddressListEntity item : mAddressList) {
+                            wheelData.add(item.Address);
+                            if (item.Id == orderInfo.TraderId) {
+                                dialog.setIndex(mAddressList.indexOf(item));
+                            }
+                        }
+                        dialog.setWheelData(wheelData);
+                        dialog.setOnWheelItemSelectedListener(new WheelView.OnWheelItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(int position, Object o) {
+                                mPosition = position;
+                            }
+                        });
+                        dialog.setOkBtnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (orderInfo != null) {
+                                    orderInfo.DeliveryAddress = mAddressList.get(mPosition).Address;
+                                    ciAddress.getEditText().setText(orderInfo.DeliveryAddress);
+                                    ciAddress.getEditText().setSelection(orderInfo.DeliveryAddress.length());
+                                }
+                            }
+                        });
+                        dialog.setTitle(getString(R.string.wheel_dialog_title_deliveryAddress));
+                        dialog.show();
+                    } else {
+                        Toast.makeText(MettingOrderActivity.this, getString(R.string.toast_content_deliveryAddress), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -538,6 +591,7 @@ public class MettingOrderActivity extends BaseActivity {
                                                 finish();
                                                 //清空退货清单
                                                 Delete.table(ReturnListItemModel.class);
+                                                Delete.table(ReturnGoodsUnitModel.class);
                                             }
                                         })
                                         .setCancelable(false)
@@ -587,6 +641,7 @@ public class MettingOrderActivity extends BaseActivity {
                                                 //清空购物车
                                                 //     FlowManager.getDatabase(AppDatabase.class).reset(MettingOrderActivity.this);
                                                 Delete.table(SaleGoodsItemModel.class);
+                                                Delete.table(GoodsUnitModel.class);
                                             }
                                         })
                                         .setCancelable(false)

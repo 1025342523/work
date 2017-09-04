@@ -63,7 +63,7 @@ public class ProductListActivity extends BaseActivity {
     @BindView(R.id.searchView)
     SearchView searchView;
 
-    private int totalCount, orderCount;
+    private int orderCount;
     private int categoryId, saleType = 0;
     private int shopQuantity = 0, itemPosition, itemType, shopId;
 
@@ -78,6 +78,7 @@ public class ProductListActivity extends BaseActivity {
     private boolean searchMorePage = true;
     private GoodsListEntity searchGoodsList;
     private GoodsListViewAdapter searchGoodsListAdapter;
+    private boolean isClearText = false;
 
     @Override
     public int getLayoutId() {
@@ -145,7 +146,7 @@ public class ProductListActivity extends BaseActivity {
                 searchPageInfo.PageIndex = -1;
                 searchRequesting = false;
                 searchMorePage = true;
-                if (StringUtils.isEmpty(result)) {
+                if (!isClearText&&StringUtils.isEmpty(result)) {
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result)) {
@@ -208,11 +209,9 @@ public class ProductListActivity extends BaseActivity {
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             intent.putExtra("saleType", saleType);
                                             startActivityForResult(intent, REQUEST_REFRESH);
-                                            //                                            searchView.clearText();
-                                            //                                            searchGoodsList = null;
-                                            //                                            searchPageInfo.PageIndex = -1;
-                                            //                                            searchRequesting = false;
-                                            //                                            searchMorePage = true;
+                                            isClearText = true;
+                                            searchView.clearText();
+                                            isClearText = false;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
@@ -223,11 +222,9 @@ public class ProductListActivity extends BaseActivity {
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
                                         intent.putExtra("saleType", saleType);
                                         startActivityForResult(intent, REQUEST_REFRESH);
-                                        //                                        searchView.clearText();
-                                        //                                        searchGoodsList = null;
-                                        //                                        searchPageInfo.PageIndex = -1;
-                                        //                                        searchRequesting = false;
-                                        //                                        searchMorePage = true;
+                                        isClearText = true;
+                                        searchView.clearText();
+                                        isClearText = false;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override
@@ -485,244 +482,4 @@ public class ProductListActivity extends BaseActivity {
         }
     }
 
-    //    private void doSearch(String keyword) {
-    //        String body;
-    //        if (categoryId == 0) {
-    //            body = "(name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8) and  status not in(4,8))";
-    //        } else {
-    //            body = "((name like '%" + keyword + "%' or right(Code,4) like '%" + keyword + "%'" + "or Mnemonic like '%" + keyword + "%' or id in (select productid from TB_ProductBarcode where Barcode like '%" + keyword + "%' and len('" + keyword + "')>=8)) and CategoryId = " + categoryId + ")";
-    //        }
-    //        RetrofitHelper.getGoodsListAPI()
-    //                .getGoodsList("ProductList", "", body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
-    //                .compose(bindToLifecycle())
-    //                .subscribeOn(Schedulers.newThread())
-    //                .observeOn(AndroidSchedulers.mainThread())
-    //                .subscribe(new Observer<GoodsListEntity>() {
-    //                    @Override
-    //                    public void onSubscribe(@NonNull Disposable d) {
-    //
-    //                    }
-    //
-    //                    @Override
-    //                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
-    //                        if (!goodsListEntity.HasError) {
-    //                            if (goodsListEntity.Value != null && goodsListEntity.Value.size() > 0) {
-    //                                searchView.getListView().setAdapter(new GoodsListAdapter(searchView.getListView(), goodsListEntity.Value, true, null, ProductListActivity.this,0));
-    //                            } else {
-    //                                ToastUtils.showShortSafe("无结果");
-    //                            }
-    //                        } else {
-    //                            ToastUtils.showShortSafe("无结果");
-    //                        }
-    //                    }
-    //
-    //                    @Override
-    //                    public void onError(@NonNull Throwable e) {
-    //                        ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
-    //                    }
-    //
-    //                    @Override
-    //                    public void onComplete() {
-    //
-    //                    }
-    //                });
-    //    }
-
-    /*public void lazyLoad() {
-        pageInfo.PageIndex = 0;
-        pageInfo.SortOrder = 1;
-        mIsRefreshing = false;
-        goodsList.clear();
-        loadData();
-        initRecyclerView();
-    }
-
-    public void initRecyclerView() {
-        mRecyclerView.setHasFixedSize(true);
-        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mGoodsListAdapter = new GoodsListAdapter(mRecyclerView, goodsList, true, null, this,0,saleType);
-        mHeaderViewRecyclerAdapter = new HeaderViewRecyclerAdapter(mGoodsListAdapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST, R.drawable.recyclerview_divider_goods));
-        mRecyclerView.setAdapter(mHeaderViewRecyclerAdapter);
-        setRecycleNoScroll();
-        createLoadMoreView();
-
-        mRecyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLinearLayoutManager) {
-
-            @Override
-            public void onLoadMore(int i) {
-                mIsRefreshing = true;
-                pageInfo.PageIndex++;
-                loadData();
-                loadMoreView.setVisibility(View.VISIBLE);
-            }
-        });
-
-        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return mIsRefreshing;
-            }
-        });
-
-        mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
-                if (holder != null && position < goodsList.size()) {
-                    Intent intent = new Intent(ProductListActivity.this, ShopDetailActivity.class);
-                    intent.putExtra("shoppingId", goodsList.get(position).Id);
-                    intent.putExtra("saleType", saleType);
-                    startActivityForResult(intent, REQUEST_REFRESH);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void loadData() {
-        if (saleType == 1) {
-            // 查询退货清单
-            RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class).where())
-                    .queryList()
-                    .subscribe(new Consumer<List<ReturnListItemModel>>() {
-                        @Override
-                        public void accept(@NonNull List<ReturnListItemModel> returnListItemModel) throws Exception {
-                            orderCount = returnListItemModel.size();
-                            if (orderCount > 0) {
-                                titleView.setRightIconText(View.VISIBLE, orderCount);
-                                LogUtils.e("orderCount：" + orderCount);
-                            } else if (orderCount == 0) {
-                                titleView.setRightIconText(View.GONE, 0);
-                                LogUtils.e("orderCount：" + orderCount);
-                            }
-                            LogUtils.e("returnListItemModel：" + returnListItemModel.size());
-                        }
-                    });
-        } else {
-            // 查询购物车商品
-            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class).where())
-                    .queryList()
-                    .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
-                        @Override
-                        public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                            orderCount = saleGoodsItemModels.size();
-                            if (orderCount > 0) {
-                                titleView.setRightIconText(View.VISIBLE, orderCount);
-                                LogUtils.e("orderCount：" + orderCount);
-                            } else if (orderCount == 0) {
-                                titleView.setRightIconText(View.GONE, 0);
-                                LogUtils.e("orderCount：" + orderCount);
-                            }
-                            LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
-                        }
-                    });
-        }
-        LogUtils.e("loadData", "获取商品列表数据");
-        String body;
-        if (categoryId == 0) {
-            body = "status  not in (4,8)";
-        } else {
-            body = "CategoryId = " + categoryId;
-        }
-        RetrofitHelper.getGoodsListAPI()
-                .getGoodsList("ProductList", JsonUtils.serialize(pageInfo), body, "[" + DataSaver.getMettingCustomerInfo().TraderId + "]", AppInfoUtil.getToken())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(goodsListEntity -> {
-                    if (goodsListEntity.PageInfo.PageIndex * goodsListEntity.PageInfo.PageLength >= goodsListEntity.PageInfo.TotalCount) {
-                        loadMoreView.setVisibility(View.GONE);
-                        mHeaderViewRecyclerAdapter.removeFootView();
-                    }
-                })
-                .subscribe(new Observer<GoodsListEntity>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@NonNull GoodsListEntity goodsListEntity) {
-                        if (!goodsListEntity.HasError) {
-                            totalCount = goodsListEntity.PageInfo.TotalCount;
-                            goodsList.addAll(goodsListEntity.Value);
-                            finishTask();
-                        }
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        LogUtils.e("获取商品列表数据失败", e.getMessage());
-                        showEmptyView();
-                        loadMoreView.setVisibility(View.GONE);
-                        --pageInfo.PageIndex;
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-
-    }
-
-    public void finishTask() {
-        //        if (mSwipeRefreshLayout.isRefreshing()) {
-        //            mSwipeRefreshLayout.setRefreshing(false);
-        //        }
-        mIsRefreshing = false;
-        if (goodsList != null) {
-            if (goodsList.size() == 0) {
-                showEmptyView();
-            } else {
-                hideEmptyView();
-            }
-        }
-        loadMoreView.setVisibility(View.GONE);
-        LogUtils.e("Page：" + pageInfo.PageIndex);
-        LogUtils.e("ListSize" + goodsList.size());
-        if (!mGoodsListAdapter.onbind) {
-            if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
-                mGoodsListAdapter.notifyDataSetChanged();
-            }
-        }
-    }
-
-    public void showEmptyView() {
-        mCustomEmptyView.setVisibility(View.VISIBLE);
-        mRecyclerView.setVisibility(View.GONE);
-        mCustomEmptyView.setEmptyImage(R.drawable.ic_data_empty);
-        mCustomEmptyView.setEmptyText("暂无数据");
-    }
-
-
-    public void hideEmptyView() {
-        if (mCustomEmptyView == null || mRecyclerView == null) {
-            return;
-        }
-        mCustomEmptyView.setVisibility(View.GONE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    private void createLoadMoreView() {
-        loadMoreView = LayoutInflater.from(this)
-                .inflate(R.layout.layout_load_more, mRecyclerView, false);
-        mHeaderViewRecyclerAdapter.addFooterView(loadMoreView);
-        loadMoreView.setVisibility(View.GONE);
-    }
-
-
-    private void setRecycleNoScroll() {
-        mRecyclerView.setOnTouchListener((v, event) -> mIsRefreshing);
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        pageInfo.PageIndex = 0;
-        goodsList.clear();
-        loadData();
-    }*/
 }

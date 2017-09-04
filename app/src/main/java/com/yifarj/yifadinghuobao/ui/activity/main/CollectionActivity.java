@@ -91,6 +91,7 @@ public class CollectionActivity extends BaseActivity {
 
     private boolean refresh;
     private int orderCount = 0;
+    private boolean isClearText = false;
 
     @Override
     public int getLayoutId() {
@@ -207,7 +208,7 @@ public class CollectionActivity extends BaseActivity {
                 searchPageInfo.PageIndex = -1;
                 searchRequesting = false;
                 searchMorePage = true;
-                if (StringUtils.isEmpty(result)) {
+                if (!isClearText && StringUtils.isEmpty(result)) {
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {
@@ -307,23 +308,18 @@ public class CollectionActivity extends BaseActivity {
                                             Intent intent = new Intent(CollectionActivity.this, ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             startActivityForResult(intent, REQUEST_REFRESH);
-//                                            searchView.clearText();
-//                                            searchGoodsList = null;
-//                                            searchPageInfo.PageIndex = -1;
-//                                            searchRequesting = false;
-//                                            searchMorePage = true;
+                                            isClearText = true;
+                                            searchView.clearText();
+                                            isClearText = false;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
                                         Intent intent = new Intent(CollectionActivity.this, ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
                                         startActivityForResult(intent, REQUEST_REFRESH);
-
-//                                        searchView.clearText();
-//                                        searchGoodsList = null;
-//                                        searchPageInfo.PageIndex = -1;
-//                                        searchRequesting = false;
-//                                        searchMorePage = true;
+                                        isClearText = true;
+                                        searchView.clearText();
+                                        isClearText = false;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override

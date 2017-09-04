@@ -35,7 +35,6 @@ import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,14 +56,14 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
     private List<SaleGoodsItemModel> itemData;
-    private List<GoodsUnitModel> unitData;
     public static Map<Integer, Set<Integer>> selectedMap = new HashMap<Integer, Set<Integer>>();
     private static Map<Integer, List<GoodsUnitModel>> itemUnit = new HashMap<Integer, List<GoodsUnitModel>>();
+    private int mPriceSystemId;
 
-    public ShoppingCartAdapter(RecyclerView recyclerView, List<SaleGoodsItemModel> mItemData, List<GoodsUnitModel> mUnitData) {
+    public ShoppingCartAdapter(RecyclerView recyclerView, List<SaleGoodsItemModel> mItemData, int priceSystemId) {
         super(recyclerView);
         this.itemData = mItemData;
-        this.unitData = mUnitData;
+        mPriceSystemId = priceSystemId;
     }
 
 
@@ -82,7 +81,6 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
             ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
             SaleGoodsItemModel goodsBean = itemData.get(position);
             selectedMap.clear();
-
             RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
                     .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.ProductId)))
                     .queryList()
@@ -272,20 +270,12 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                 }
             });
             if (itemUnit != null) {
-                List<String> unitName = new ArrayList<>();
-                Flowable.fromIterable(itemUnit.get(position))
-                        .forEach(new Consumer<GoodsUnitModel>() {
-                            @Override
-                            public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
-                                unitName.add(goodsUnitModel.Name);
-                            }
-                        });
                 final LayoutInflater mInflater = LayoutInflater.from(getContext());
-                TagAdapter<String> tagAdapter = new TagAdapter<String>(unitName) {
+                TagAdapter<GoodsUnitModel> tagAdapter = new TagAdapter<GoodsUnitModel>(itemUnit.get(position)) {
                     @Override
-                    public View getView(FlowLayout parent, int position, String s) {
+                    public View getView(FlowLayout parent, int position, GoodsUnitModel goodsUnitModel) {
                         TextView tv = (TextView) mInflater.inflate(R.layout.tv, parent, false);
-                        tv.setText(s);
+                        tv.setText(goodsUnitModel.Name);
                         return tv;
                     }
                 };
@@ -300,21 +290,80 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                         for (Integer item : selectPosSet) {
                             select = item;
                         }
-                        goodsBean.ProductUnitName = unitName.get(select);
+                        goodsBean.ProductUnitName = itemUnit.get(position).get(select).Name;
                         goodsBean.UnitId = itemUnit.get(position).get(select).Id;
                         LogUtils.e(itemUnit.get(position).get(select).BasicFactor);
-                        getProductMemoryPrice(goodsBean, select, itemUnit.get(position).get(select).BasicFactor);
+                        if (mPriceSystemId == -1) {
+                            getProductMemoryPrice(goodsBean, select, itemUnit.get(position).get(select).BasicFactor);
 //                        goodsBean.UnitPrice = itemUnit.get(position).get(select).BasicFactor * goodsBean.BasicUnitPrice;
 //                        goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
+                        } else {
+                            switch (mPriceSystemId) {
+                                case 1:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price1;
+                                    break;
+                                case 2:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price2;
+                                    break;
+                                case 3:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price3;
+                                    break;
+                                case 4:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price4;
+                                    break;
+                                case 5:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price5;
+                                    break;
+                                case 6:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price6;
+                                    break;
+                                case 7:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price7;
+                                    break;
+                                case 8:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price8;
+                                    break;
+                                case 9:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price9;
+                                    break;
+                                case 10:
+                                    goodsBean.BasicUnitPrice = goodsBean.Price10;
+                                    break;
+                            }
+                            goodsBean.UnitPrice = itemUnit.get(position).get(select).BasicFactor * goodsBean.BasicUnitPrice;
+                            goodsBean.CurrentPrice = goodsBean.Quantity * goodsBean.UnitPrice;
+                            notifyDataSetChanged();
+                            RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
+                                    .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.ProductId)))
+                                    .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
+                                @Override
+                                public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                                    LogUtils.e(saleGoodsItemModels + "\n长度" + saleGoodsItemModels.size());
+                                    if (saleGoodsItemModels.size() > 0) {
+                                        SaleGoodsItemModel mItem = saleGoodsItemModels.get(0);
+                                        mItem.ProductUnitName = goodsBean.ProductUnitName;
+                                        mItem.UnitId = goodsBean.UnitId;
+                                        mItem.UnitPrice = goodsBean.UnitPrice;
+                                        mItem.CurrentPrice = goodsBean.CurrentPrice;
+                                        mItem.update().subscribe(new Consumer<Boolean>() {
+                                            @Override
+                                            public void accept(@NonNull Boolean aBean) throws Exception {
+                                                LogUtils.e(mItem.ProductName + "：修改单位" + mItem.ProductUnitName);
+                                            }
+                                        });
+                                    }
 
+                                }
+                            });
+                        }
                     }
                 });
-                Flowable.fromIterable(unitName)
-                        .forEach(new Consumer<String>() {
+                Flowable.fromIterable(itemUnit.get(position))
+                        .forEach(new Consumer<GoodsUnitModel>() {
                             @Override
-                            public void accept(@NonNull String s) throws Exception {
-                                if (goodsBean.ProductUnitName.equals(s)) {
-                                    tagAdapter.setSelectedList(unitName.indexOf(s));
+                            public void accept(@NonNull GoodsUnitModel goodsUnitModel) throws Exception {
+                                if (goodsBean.ProductUnitName.equals(goodsUnitModel.Name)) {
+                                    tagAdapter.setSelectedList(itemUnit.get(position).indexOf(goodsUnitModel));
                                 }
                             }
                         });

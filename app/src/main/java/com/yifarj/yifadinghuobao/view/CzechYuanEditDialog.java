@@ -80,6 +80,19 @@ public class CzechYuanEditDialog extends Dialog {
         }
     }
 
+    public void setCancelClickListener(final View.OnClickListener l) {
+        if (cancel != null) {
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (l != null) {
+                        l.onClick(v);
+                    }
+                    dismiss();
+                }
+            });
+        }
+    }
 
     public EditText getEditText() {
         return etInput;

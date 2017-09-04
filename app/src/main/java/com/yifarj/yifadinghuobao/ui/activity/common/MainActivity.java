@@ -19,6 +19,7 @@ import com.yifarj.yifadinghuobao.ui.fragment.main.TabMainFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.mine.TabMineFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.order.TabOrderFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.LoadingDialog;
 
 import butterknife.BindView;
@@ -95,6 +96,7 @@ public class MainActivity extends BaseActivity {
             ToastUtils.showShortSafe("再按一次退出");
             exitTime = System.currentTimeMillis();
         } else {
+            PreferencesUtil.putInt("PriceSystemId", -1);
             finish();
         }
     }

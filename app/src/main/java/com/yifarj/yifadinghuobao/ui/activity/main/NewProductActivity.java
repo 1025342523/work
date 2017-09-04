@@ -76,6 +76,7 @@ public class NewProductActivity extends BaseActivity {
 
     private int orderCount, saleType = 0;
     private int shopQuantity = 0, itemPosition, itemType, shopId;
+    private boolean isClearText = false;
 
     @Override
     public int getLayoutId() {
@@ -140,7 +141,7 @@ public class NewProductActivity extends BaseActivity {
                 searchPageInfo.PageIndex = -1;
                 searchRequesting = false;
                 searchMorePage = true;
-                if (StringUtils.isEmpty(result)) {
+                if (!isClearText&&StringUtils.isEmpty(result)) {
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {
@@ -196,11 +197,9 @@ public class NewProductActivity extends BaseActivity {
                                             intent.putExtra("shoppingId", searchGoodsList.Value.get(position).Id);
                                             intent.putExtra("saleType", saleType);
                                             startActivityForResult(intent, REQUEST_ITEM);
-                                            //                                            searchView.clearText();
-                                            //                                            searchGoodsList = null;
-                                            //                                            searchPageInfo.PageIndex = -1;
-                                            //                                            searchRequesting = false;
-                                            //                                            searchMorePage = true;
+                                            isClearText = true;
+                                            searchView.clearText();
+                                            isClearText = false;
                                         }
                                     });
                                     if (entity.Value.size() == 1) {
@@ -211,11 +210,9 @@ public class NewProductActivity extends BaseActivity {
                                         intent.putExtra("shoppingId", searchGoodsList.Value.get(0).Id);
                                         intent.putExtra("saleType", saleType);
                                         startActivityForResult(intent, REQUEST_ITEM);
-                                        //                                        searchView.clearText();
-                                        //                                        searchGoodsList = null;
-                                        //                                        searchPageInfo.PageIndex = -1;
-                                        //                                        searchRequesting = false;
-                                        //                                        searchMorePage = true;
+                                        isClearText = true;
+                                        searchView.clearText();
+                                        isClearText = false;
                                     }
                                     searchView.getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
                                         @Override

@@ -1,13 +1,15 @@
-package com.yifarj.yifadinghuobao.ui.activity.common;
+package com.yifarj.yifadinghuobao.ui.activity.me;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -20,18 +22,19 @@ import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.model.entity.MettingCodeEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
-import com.yifarj.yifadinghuobao.model.entity.PasswordLoginEntity;
 import com.yifarj.yifadinghuobao.model.entity.TraderEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
+import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
-import com.yifarj.yifadinghuobao.ui.activity.me.ForgetPasswordActivity;
+import com.yifarj.yifadinghuobao.ui.activity.common.ConnectServerActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
 import com.yifarj.yifadinghuobao.utils.PhoneFormatCheckUtils;
 import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
-import com.yifarj.yifadinghuobao.view.LoadingDialog;
+import com.yifarj.yifadinghuobao.utils.ZipUtil;
+import com.yifarj.yifadinghuobao.view.TitleView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -48,99 +51,77 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.jakewharton.rxbinding2.view.RxView.clicks;
 
-public class LoginActivity extends BaseActivity {
+/**
+ * Created by zydx-pc on 2017/8/30.
+ */
 
-    @BindView(R.id.ivLogo)
-    ImageView ivLogo;
-    @BindView(R.id.llInputArea)
-    LinearLayout llInputArea;
+public class ForgetPasswordActivity extends BaseActivity {
+
+    @BindView(R.id.titleView)
+    TitleView titleView;
     @BindView(R.id.etName)
     EditText etName;
     @BindView(R.id.etPwd)
     EditText etPwd;
-    @BindView(R.id.ivExperience)
-    ImageView ivExperience;
-    @BindView(R.id.ivConfigure)
-    ImageView ivConfigure;
-    @BindView(R.id.btnLogin)
-    Button btnLogin;
-    @BindView(R.id.tvForgetPwd)
-    TextView tvForgetPwd;
-    @BindView(R.id.llPwd)
-    LinearLayout llPwd;
-    @BindView(R.id.tvLoginCutover)
-    TextView tvLoginCutover;
-    @BindView(R.id.etPassword)
-    EditText etPassword;
     @BindView(R.id.tvCode)
     TextView tvCode;
-    @BindView(R.id.llPassword)
-    LinearLayout llPassword;
+    @BindView(R.id.etNewPassword)
+    EditText etNewPassword;
+    @BindView(R.id.ivShowPwd)
+    ImageView ivShowPwd;
+    @BindView(R.id.btnOk)
+    Button btnOk;
 
     private final int MAX_COUNT_TIME = 60;
     private String mettingCode;
     private Disposable mDisposable;
     private Observable<Long> mObservableCountTime;
     private Consumer<Long> mConsumerCountTime;
-    private boolean isPwdLogin = false;
-    private String loginPwd = null;
+
+    private boolean isShowPwd;
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_login;
+        return R.layout.activity_forget_password;
     }
 
     @Override
     public void initViews(Bundle savedInstanceState) {
-        String name = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
-        //        FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
-        if (name != null) {
-            etName.setText(name);
-            etName.setSelection(0, name.length());
-        }
-
-        tvLoginCutover.setOnClickListener(new View.OnClickListener() {
+        titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isPwdLogin) {
-                    isPwdLogin = true;
-                    llPwd.setVisibility(View.GONE);
-                    llPassword.setVisibility(View.VISIBLE);
-                    tvLoginCutover.setText(R.string.verification_code_login);
+                hideInputMethod();
+                finish();
+            }
+        });
+
+        ivShowPwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isShowPwd || etNewPassword.getText().toString().isEmpty()) {
+                    isShowPwd = true;
+                    ivShowPwd.setImageResource(R.drawable.ic_show_pwd);
+                    etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    etNewPassword.setSelection(etNewPassword.getText().toString().length());
                 } else {
-                    isPwdLogin = false;
-                    llPwd.setVisibility(View.VISIBLE);
-                    llPassword.setVisibility(View.GONE);
-                    tvLoginCutover.setText(R.string.password_login);
+                    isShowPwd = false;
+                    ivShowPwd.setImageResource(R.drawable.ic_hide_pwd);
+                    etNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    etNewPassword.setSelection(etNewPassword.getText().toString().length());
                 }
             }
         });
 
-        clicks(btnLogin)
+        clicks(btnOk)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
                 .subscribe(new Consumer<Object>() {
 
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
-                        if (isPwdLogin) {
-                            onPwdLogin();
-                        } else {
-                            login();
-                        }
+                        setPassword();
                     }
                 });
-
-        clicks(tvForgetPwd)
-                .compose(bindToLifecycle())
-                .throttleFirst(2, TimeUnit.SECONDS)
-                .subscribe(o -> startActivity(new Intent(LoginActivity.this, ForgetPasswordActivity.class)));
-
-        clicks(ivConfigure)
-                .compose(bindToLifecycle())
-                .throttleFirst(2, TimeUnit.SECONDS)
-                .subscribe(o -> startActivity(new Intent(LoginActivity.this, ConnectServerActivity.class)));
-
 
         mConsumerCountTime = new Consumer<Long>() {
             @Override
@@ -170,7 +151,7 @@ public class LoginActivity extends BaseActivity {
                             onConfigureClicked();
                         } else {
                             if (PhoneFormatCheckUtils.isPhoneLegal(phoneNumber)) {
-                                RetrofitHelper.getMettingCodeApi().getMettingCode(ip, port, accountId, phoneNumber, AppInfoUtil.getDeviceId(LoginActivity.this), AppInfoUtil.getIPAddress())
+                                RetrofitHelper.getMettingCodeApi().getMettingCode(ip, port, accountId, phoneNumber, AppInfoUtil.getDeviceId(ForgetPasswordActivity.this), AppInfoUtil.getIPAddress())
                                         .compose(bindToLifecycle())
                                         .subscribeOn(Schedulers.newThread())
                                         .observeOn(AndroidSchedulers.mainThread())
@@ -277,32 +258,37 @@ public class LoginActivity extends BaseActivity {
 
         mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
 
+
     }
 
     /**
-     * 登录
+     * 重置登录密码
      */
-    private void login() {
+    private void setPassword() {
         final String name = etName.getText().toString().trim();
         final String pwd = etPwd.getText().toString().trim();
+        final String newPwd = etNewPassword.getText().toString().trim();
 
-        if (!CommonUtil.isNetworkAvailable(LoginActivity.this)) {
+        if (!CommonUtil.isNetworkAvailable(ForgetPasswordActivity.this)) {
             ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
-            return;
-        }
-        if (TextUtils.isEmpty(pwd)) {
-            ToastUtils.showShortSafe("请输入验证码");
             return;
         }
         if (TextUtils.isEmpty(name)) {
             ToastUtils.showShortSafe("请输入手机号");
             return;
         }
+        if (TextUtils.isEmpty(pwd)) {
+            ToastUtils.showShortSafe("请输入验证码");
+            return;
+        }
+        if (TextUtils.isEmpty(newPwd)) {
+            ToastUtils.showShortSafe("请输入密码");
+            return;
+        }
 
         String domain = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN);
         AppInfoUtil.resetBaseUrl(domain, false);
 
-        LoadingDialog loadingDialog = new LoadingDialog(LoginActivity.this, getString(R.string.log_in));
         RetrofitHelper.getMettingLoginApi()
                 .mettingLogin(AppInfoUtil.getToken(), name, pwd)
                 .compose(bindToLifecycle())
@@ -311,7 +297,7 @@ public class LoginActivity extends BaseActivity {
                 .subscribe(new Observer<MettingLoginEntity>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        loadingDialog.show();
+
                     }
 
                     @Override
@@ -325,7 +311,7 @@ public class LoginActivity extends BaseActivity {
                             String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
                             if (!StringUtils.isEmpty(userName)) {
                                 if (!userName.equals(name)) {
-                                    FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
+                                    FlowManager.getDatabase(AppDatabase.class).reset(ForgetPasswordActivity.this);
                                 }
                             }
                             PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, name);
@@ -346,22 +332,19 @@ public class LoginActivity extends BaseActivity {
                                         @Override
                                         public void onNext(@NonNull TraderEntity traderEntity) {
                                             if (!traderEntity.HasError && traderEntity.Value != null) {
-                                                loadingDialog.dismiss();
                                                 LogUtils.e("获取Trader onNext");
                                                 DataSaver.setPriceSystemId(traderEntity.Value.DefaultPriceSystemId);
                                                 DataSaver.setTraderInfo(traderEntity.Value);
-                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                                finish();
-//                                                getPassword();
+
+                                                setNewPassword(newPwd);
                                             } else {
-                                                ToastUtils.showShortSafe(getString(R.string.login_failure) + traderEntity.Information.toString());
+                                                ToastUtils.showShortSafe("密码设置失败" + traderEntity.Information.toString());
                                                 if (mDisposable != null && !mDisposable.isDisposed()) {
                                                     //停止倒计时
                                                     mDisposable.dispose();
                                                     //重新订阅
                                                     mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                                     try {
-                                                        loadingDialog.dismiss();
                                                         RxTextView.text(tvCode).accept("发送验证码");
                                                         //按钮可点击
                                                         RxView.enabled(tvCode).accept(true);
@@ -375,14 +358,13 @@ public class LoginActivity extends BaseActivity {
                                         @Override
                                         public void onError(@NonNull Throwable e) {
                                             LogUtils.e("获取Trader onError" + e.getMessage());
-                                            ToastUtils.showShortSafe(getString(R.string.login_failure) + e.getMessage());
+                                            ToastUtils.showShortSafe("密码设置失败" + e.getMessage());
                                             if (mDisposable != null && !mDisposable.isDisposed()) {
                                                 //停止倒计时
                                                 mDisposable.dispose();
                                                 //重新订阅
                                                 mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                                 try {
-                                                    loadingDialog.dismiss();
                                                     RxTextView.text(tvCode).accept("发送验证码");
                                                     //按钮可点击
                                                     RxView.enabled(tvCode).accept(true);
@@ -394,12 +376,12 @@ public class LoginActivity extends BaseActivity {
 
                                         @Override
                                         public void onComplete() {
-                                            loadingDialog.dismiss();
+
                                         }
                                     });
 
                         } else {
-                            ToastUtils.showShortSafe(getString(R.string.login_failure) + mettingLoginEntity.Information);
+                            ToastUtils.showShortSafe("获取验证码失败，" + mettingLoginEntity.Information);
                             if (mDisposable != null && !mDisposable.isDisposed()) {
                                 //停止倒计时
                                 mDisposable.dispose();
@@ -407,7 +389,6 @@ public class LoginActivity extends BaseActivity {
                                 mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
                                 try {
                                     RxTextView.text(tvCode).accept("发送验证码");
-                                    loadingDialog.dismiss();
                                     //按钮可点击
                                     RxView.enabled(tvCode).accept(true);
                                 } catch (Exception e) {
@@ -419,8 +400,8 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        LogUtils.e("登录 onError" + e.getMessage());
-                        loadingDialog.dismiss();
+                        LogUtils.e("设置 onError" + e.getMessage());
+                        ToastUtils.showShortSafe("密码设置失败");
                         if (mDisposable != null && !mDisposable.isDisposed()) {
                             //停止倒计时
                             mDisposable.dispose();
@@ -438,11 +419,60 @@ public class LoginActivity extends BaseActivity {
 
                     @Override
                     public void onComplete() {
-                        //                        loadingDialog.dismiss();
+
                     }
                 });
     }
 
+    /**
+     * 设置登录密码
+     */
+    private void setNewPassword(String newPassword) {
+        String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
+        for (int i = 0; i < DataSaver.getTraderInfo().TraderContactList.size(); i++) {
+            if (userName.equals(DataSaver.getTraderInfo().TraderContactList.get(i).Mobile)) {
+                TraderEntity.ValueEntity.TraderContactListEntity traderContactEntity1 = DataSaver.getTraderInfo().TraderContactList.get(i);
+                traderContactEntity1.card_password = newPassword;
+                RetrofitHelper.saveTraderApi()
+                        .saveTrader("Trader", ZipUtil.gzip(JsonUtils.serialize(DataSaver.getTraderInfo())), "", AppInfoUtil.getToken())
+                        .compose(bindToLifecycle())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<TraderEntity>() {
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(@NonNull TraderEntity traderEntity) {
+                                if (!traderEntity.HasError) {
+                                    ToastUtils.showShortSafe("密码设置成功");
+                                    LogUtils.e("密码设置成功:" + newPassword);
+                                    DataSaver.setTraderInfo(traderEntity.Value);
+                                    hideInputMethod();
+                                    finish();
+                                } else {
+                                    LogUtils.e("密码设置失败");
+                                }
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                ToastUtils.showShortSafe("密码设置失败");
+                                LogUtils.e("密码设置失败");
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
+            }
+        }
+
+    }
 
     private void onConfigureClicked() {
         ToastUtils.showShortSafe("请先获取服务器信息");
@@ -450,129 +480,13 @@ public class LoginActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    /**
-     * 密码登录
-     */
-    private void onPwdLogin() {
-
-        String phoneNumber = etName.getText().toString().trim();
-        String pwd = etPassword.getText().toString();
-
-        String accountId = PreferencesUtil.getString(ApiConstants.CPreference.ACCOUNT_ID);
-        String port = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PORT);
-        String ip = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_IP);
-        String domain = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN);
-        if (domain == null || port == null || ip == null || ("0").equals(accountId)) {
-            onConfigureClicked();
-        } else {
-            if (!PhoneFormatCheckUtils.isPhoneLegal(phoneNumber)) {
-                ToastUtils.showShortSafe("请输入正确的手机号");
-                return;
-            }
-            if (!CommonUtil.isNetworkAvailable(LoginActivity.this)) {
-                ToastUtils.showShortSafe("当前网络不可用,请检查网络设置");
-                return;
-            }
-            if (TextUtils.isEmpty(pwd)) {
-                ToastUtils.showShortSafe("请输入密码");
-                return;
-            }
-            if (TextUtils.isEmpty(phoneNumber)) {
-                ToastUtils.showShortSafe("请输入手机号");
-                return;
-            }
-            String domain1 = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN);
-            AppInfoUtil.resetBaseUrl(domain1, false);
-
-            LoadingDialog loadingDialog = new LoadingDialog(LoginActivity.this, getString(R.string.log_in));
-            RetrofitHelper.getPasswordLoginApi()
-                    .passwordLogin(ip, port, accountId, phoneNumber, pwd, AppInfoUtil.getDeviceId(this), AppInfoUtil.getIPAddress())
-                    .compose(bindToLifecycle())
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<PasswordLoginEntity>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-                            loadingDialog.show();
-                        }
-
-                        @Override
-                        public void onNext(@NonNull PasswordLoginEntity passwordLoginEntity) {
-                            if (!passwordLoginEntity.HasError && passwordLoginEntity.Value.Value != null) {
-                                LogUtils.e("passwordLoginEntity success!");
-                                DataSaver.setPasswordCustomerInfo(passwordLoginEntity.Value.Value);
-                                PreferencesUtil.putInt("TraderId", passwordLoginEntity.Value.Value.TraderId);
-                                PreferencesUtil.putInt("Id", passwordLoginEntity.Value.Value.Id);
-                                PreferencesUtil.putString("ContactName", passwordLoginEntity.Value.Value.ContactName);
-                                AppInfoUtil.restoreToken(passwordLoginEntity.Tag);
-                                String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
-                                if (!StringUtils.isEmpty(userName)) {
-                                    if (!userName.equals(phoneNumber)) {
-                                        FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
-                                    }
-                                }
-                                PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, phoneNumber);
-
-                                LogUtils.e("登录 onComplete");
-                                LogUtils.e("traderId " + passwordLoginEntity.Value.Value.TraderId);
-                                RetrofitHelper.getTraderApi()
-                                        .fetchTrader("Trader", "Id =" + passwordLoginEntity.Value.Value.TraderId, "", AppInfoUtil.getToken())
-                                        .compose(bindToLifecycle())
-                                        .subscribeOn(Schedulers.newThread())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(new Observer<TraderEntity>() {
-                                            @Override
-                                            public void onSubscribe(@NonNull Disposable d) {
-                                                LogUtils.e("获取Trader onSubscribe");
-                                            }
-
-                                            @Override
-                                            public void onNext(@NonNull TraderEntity traderEntity) {
-                                                if (!traderEntity.HasError && traderEntity.Value != null) {
-                                                    loadingDialog.dismiss();
-                                                    LogUtils.e("获取Trader onNext");
-                                                    DataSaver.setPriceSystemId(traderEntity.Value.DefaultPriceSystemId);
-                                                    DataSaver.setTraderInfo(traderEntity.Value);
-                                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                                    finish();
-                                                } else {
-                                                    ToastUtils.showShortSafe(getString(R.string.login_failure) + traderEntity.Information.toString());
-                                                    loadingDialog.dismiss();
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onError(@NonNull Throwable e) {
-                                                LogUtils.e("获取Trader onError" + e.getMessage());
-                                                ToastUtils.showShortSafe(getString(R.string.login_failure) + e.getMessage());
-                                                loadingDialog.dismiss();
-                                            }
-
-                                            @Override
-                                            public void onComplete() {
-                                                loadingDialog.dismiss();
-                                            }
-                                        });
-
-                            } else {
-                                ToastUtils.showShortSafe(getString(R.string.login_failure) + passwordLoginEntity.Information);
-                                loadingDialog.dismiss();
-                            }
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-                            LogUtils.e("登录 onError" + e.getMessage());
-                            loadingDialog.dismiss();
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
+    public void hideInputMethod() {
+        if (getCurrentFocus() != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(
+                            getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
         }
-
     }
 
 }
