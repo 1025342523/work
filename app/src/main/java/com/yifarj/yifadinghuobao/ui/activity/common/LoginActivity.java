@@ -169,7 +169,7 @@ public class LoginActivity extends BaseActivity {
                         if (domain == null || port == null || ip == null || ("0").equals(accountId)) {
                             onConfigureClicked();
                         } else {
-                            if (PhoneFormatCheckUtils.isPhoneLegal(phoneNumber)) {
+                            if (PhoneFormatCheckUtils.isPhone(phoneNumber)) {
                                 RetrofitHelper.getMettingCodeApi().getMettingCode(ip, port, accountId, phoneNumber, AppInfoUtil.getDeviceId(LoginActivity.this), AppInfoUtil.getIPAddress())
                                         .compose(bindToLifecycle())
                                         .subscribeOn(Schedulers.newThread())
@@ -465,7 +465,7 @@ public class LoginActivity extends BaseActivity {
         if (domain == null || port == null || ip == null || ("0").equals(accountId)) {
             onConfigureClicked();
         } else {
-            if (!PhoneFormatCheckUtils.isPhoneLegal(phoneNumber)) {
+            if (!PhoneFormatCheckUtils.isPhone(phoneNumber)) {
                 ToastUtils.showShortSafe("请输入正确的手机号");
                 return;
             }
@@ -610,6 +610,7 @@ public class LoginActivity extends BaseActivity {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
+                            ToastUtils.showShortSafe("请检查，网络是否畅通");
                             LogUtils.e("登录 onError" + e.getMessage());
                             loadingDialog.dismiss();
                         }

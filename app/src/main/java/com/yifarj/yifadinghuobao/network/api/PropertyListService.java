@@ -1,0 +1,31 @@
+package com.yifarj.yifadinghuobao.network.api;
+
+import com.yifarj.yifadinghuobao.model.entity.ProductPropertyListEntity;
+import com.yifarj.yifadinghuobao.network.ApiConstants;
+
+import io.reactivex.Observable;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
+
+/**
+ * PropertyListService
+ *
+ * @auther Czech.Yuan
+ * @date 2017/9/7 10:48
+ */
+
+public interface PropertyListService {
+
+    /**
+     * 商品属性列表
+     */
+    @FormUrlEncoded
+    @POST(ApiConstants.CUrl.FETCH_LIST)
+    Observable<ProductPropertyListEntity> getPropertyList(
+            @Field("DataTypeName") String dataTypeName,
+            @Field("PageInfo") String pageInfo,
+            @Field("Body") String body,
+            @Field("Param") String param,
+            @Field("Token") String token);
+}

@@ -116,8 +116,8 @@ dependencies {
     compile 'com.zhy:flowlayout-lib:1.0.3'
     //zxing二维码扫描
     compile 'com.google.zxing:core:3.2.1'
-    compile 'cn.bingoogolapple:bga-qrcodecore:1.1.0@aar'
-    compile 'cn.bingoogolapple:bga-zxing:1.1.0@aar'
+    compile 'cn.bingoogolapple:bga-qrcodecore:1.1.7@aar'
+    compile 'cn.bingoogolapple:bga-zxing:1.1.7@aar'
     //Debug
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
@@ -125,10 +125,9 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
-
     //banner
     compile 'com.youth.banner:banner:1.4.9'
-
+    compile project(':imagepicker')
 }
 
 configurations.all {

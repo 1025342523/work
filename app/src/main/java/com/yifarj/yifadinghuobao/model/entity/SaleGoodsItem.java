@@ -110,7 +110,9 @@ public class SaleGoodsItem {
         public String BrandName = "";
         public String OrderCode = "";
         public String PackSpec;
-        public List<ProductUnitEntity.ValueEntity> ProductUnitList=new ArrayList<>();
+        public List<ProductUnitEntity.ValueEntity> ProductUnitList = new ArrayList<>();
+        public List<ProductPropertyListEntity.ValueEntity> ProperyList1;
+        public List<ProductPropertyListEntity.ValueEntity> ProperyList2;
         public String SalesStockProductInfo;
         public String ProductUnitName = "";
         public double MemberPrice;
@@ -212,6 +214,8 @@ public class SaleGoodsItem {
             dest.writeString(this.OrderCode);
             dest.writeString(this.PackSpec);
             dest.writeTypedList(this.ProductUnitList);
+            dest.writeTypedList(this.ProperyList1);
+            dest.writeTypedList(this.ProperyList2);
             dest.writeString(this.SalesStockProductInfo);
             dest.writeString(this.ProductUnitName);
             dest.writeDouble(this.MemberPrice);
@@ -294,6 +298,8 @@ public class SaleGoodsItem {
             this.OrderCode = in.readString();
             this.PackSpec = in.readString();
             this.ProductUnitList = in.createTypedArrayList(ProductUnitEntity.ValueEntity.CREATOR);
+            this.ProperyList1 = in.createTypedArrayList(ProductPropertyListEntity.ValueEntity.CREATOR);
+            this.ProperyList2 = in.createTypedArrayList(ProductPropertyListEntity.ValueEntity.CREATOR);
             this.SalesStockProductInfo = in.readString();
             this.ProductUnitName = in.readString();
             this.MemberPrice = in.readDouble();

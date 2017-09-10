@@ -210,8 +210,8 @@ public class ShoppingCartActivity extends BaseActivity {
         intent.putExtra("CreateOrder", true);
         intent.putExtra("saleType", saleType);
         startActivity(intent);
-        finish();
         setResult(RESULT_OK);
+        finish();
     }
 
 

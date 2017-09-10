@@ -36,11 +36,57 @@
             android:textSize="@dimen/font_32"/>
     </LinearLayout>
 
+
+    <LinearLayout
+        android:id="@+id/llScan"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_110"
+        android:layout_below="@id/llGetAccountIds"
+        android:layout_marginTop="@dimen/size_30"
+        android:background="@drawable/selector_list_bg"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_110"
+            android:drawableLeft="@drawable/ic_scan"
+            android:drawablePadding="@dimen/size_8"
+            android:drawableStart="@drawable/ic_scan"
+            android:gravity="center"
+            android:text="扫描二维码"
+            android:textColor="@color/main_green"
+            android:textSize="@dimen/font_30"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llScan2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_110"
+        android:layout_below="@id/llScan"
+        android:layout_marginTop="@dimen/size_30"
+        android:background="@drawable/selector_list_bg"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_110"
+            android:drawableLeft="@drawable/ic_scan_decode"
+            android:drawablePadding="@dimen/size_8"
+            android:drawableStart="@drawable/ic_scan_decode"
+            android:gravity="center"
+            android:text="识别图片二维码"
+            android:textColor="@color/main_blue"
+            android:textSize="@dimen/font_30"/>
+    </LinearLayout>
+
+
     <LinearLayout
         android:id="@+id/llTest"
         android:layout_width="match_parent"
         android:layout_height="@dimen/size_110"
-        android:layout_below="@id/llGetAccountIds"
+        android:layout_below="@id/llScan2"
         android:layout_marginTop="@dimen/size_30"
         android:background="@drawable/selector_list_bg"
         android:gravity="center">

@@ -252,4 +252,22 @@ public class SaleGoodsItemModel extends BaseRXModel {
     @Column
     public String DiscountValue = "";
 
+    @Column
+    public String ParentProperyId1Name = "";
+
+    @Column
+    public String ParentProperyId2Name = "";
+
+    @Column
+    public int ProperyId1;
+
+    @Column
+    public int ProperyId2;
+
+    @Column
+    public int ParentProperyId1;
+
+    @Column
+    public int ParentProperyId2;
+
 }

@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.GoodsListAdapter;
 import com.yifarj.yifadinghuobao.adapter.helper.AbsRecyclerViewAdapter;
@@ -223,6 +224,8 @@ public class TabMainFragment extends BaseFragment {
                                 }
                             }
                             finishTask();
+                        }else {
+                            ToastUtils.showShortSafe(goodsListEntity.Information==null?"请求超时":goodsListEntity.Information);
                         }
                     }
 

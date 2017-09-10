@@ -5,16 +5,21 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
-* PhoneFormatCheckUtils
-* @auther  Czech.Yuan
-* @date 2017/5/19 18:00
-*/
+ * PhoneFormatCheckUtils
+ *
+ * @auther Czech.Yuan
+ * @date 2017/5/19 18:00
+ */
 public class PhoneFormatCheckUtils {
     /**
      * 大陆号码或香港号码均可
      */
-    public static boolean isPhoneLegal(String str)throws PatternSyntaxException {
+    public static boolean isPhoneLegal(String str) throws PatternSyntaxException {
         return isChinaPhoneLegal(str) || isHKPhoneLegal(str);
+    }
+
+    public static boolean isPhone(String str) throws PatternSyntaxException {
+        return str.length() == 11 || str.length() == 8;
     }
 
     /**
@@ -36,7 +41,7 @@ public class PhoneFormatCheckUtils {
     /**
      * 香港手机号码8位数，5|6|8|9开头+7位任意数
      */
-    public static boolean isHKPhoneLegal(String str)throws PatternSyntaxException {
+    public static boolean isHKPhoneLegal(String str) throws PatternSyntaxException {
         String regExp = "^(5|6|8|9)\\d{7}$";
         Pattern p = Pattern.compile(regExp);
         Matcher m = p.matcher(str);

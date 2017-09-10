@@ -44,7 +44,7 @@ public class ScanQrcodeActivity extends BaseActivity {
     TitleView titleView;
     @BindView(R.id.btnFlashLight)
     Button btnFlashLight;
-    private boolean flashOpened;
+    private boolean flashOpened, isScanBarcode;
 
 
     @Override
@@ -58,7 +58,10 @@ public class ScanQrcodeActivity extends BaseActivity {
     }
 
     private void initView() {
-
+        isScanBarcode = getIntent().getBooleanExtra("ScanBarcode", false);
+        if (isScanBarcode) {
+            titleView.setTitle("扫描条形码");
+        }
         RxView.clicks(btnFlashLight)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)

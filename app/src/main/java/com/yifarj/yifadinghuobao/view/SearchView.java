@@ -33,8 +33,9 @@ public class SearchView extends LinearLayout {
     private TextView tvCancel;
     private LinearLayout llContent;
     private boolean showing;
-    private ImageView ivLeft, ivSearch;
+    private ImageView ivLeft, ivSearch, ivRight;
     private OnClickListener mOnCancelListener;
+    private OnClickListener mScanQrCodeListener;
     private OnSearchClickListener mOnSearchClickListener;
 
     public SearchView(Context context) {
@@ -66,6 +67,7 @@ public class SearchView extends LinearLayout {
         etSearch = (EditText) content.findViewById(R.id.etSearch);
         lvSearch = (ListView) content.findViewById(R.id.searchContent);
         ivLeft = (ImageView) content.findViewById(R.id.ivLeft);
+        ivRight = (ImageView) content.findViewById(R.id.ivRight);
         ivSearch = (ImageView) content.findViewById(R.id.ivSearch);
         LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(context);
         if (array != null) {
@@ -93,6 +95,14 @@ public class SearchView extends LinearLayout {
                         mOnCancelListener.onClick(v);
                     }
                     cancelSearchView();
+                }
+            });
+            ivRight.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mScanQrCodeListener != null) {
+                        mScanQrCodeListener.onClick(v);
+                    }
                 }
             });
             ivSearch.setOnClickListener(new OnClickListener() {
@@ -146,6 +156,10 @@ public class SearchView extends LinearLayout {
 
     public void setOnCancelListener(final OnClickListener l) {
         mOnCancelListener = l;
+    }
+
+    public void setOnScanQrCodeListener(final OnClickListener l) {
+        mScanQrCodeListener = l;
     }
 
     public void show() {

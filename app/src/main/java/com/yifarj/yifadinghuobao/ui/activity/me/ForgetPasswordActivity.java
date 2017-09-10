@@ -150,7 +150,7 @@ public class ForgetPasswordActivity extends BaseActivity {
                         if (domain == null || port == null || ip == null || ("0").equals(accountId)) {
                             onConfigureClicked();
                         } else {
-                            if (PhoneFormatCheckUtils.isPhoneLegal(phoneNumber)) {
+                            if (PhoneFormatCheckUtils.isPhone(phoneNumber)) {
                                 RetrofitHelper.getMettingCodeApi().getMettingCode(ip, port, accountId, phoneNumber, AppInfoUtil.getDeviceId(ForgetPasswordActivity.this), AppInfoUtil.getIPAddress())
                                         .compose(bindToLifecycle())
                                         .subscribeOn(Schedulers.newThread())

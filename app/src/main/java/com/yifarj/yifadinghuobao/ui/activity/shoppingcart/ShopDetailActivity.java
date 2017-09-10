@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.ButtonBarLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -33,6 +34,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 import com.yifarj.yifadinghuobao.loader.GlideImageLoader;
 import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductMemoryPriceEntity;
+import com.yifarj.yifadinghuobao.model.entity.ProductPropertyListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.StockInfoForToolTipListEntity;
 import com.yifarj.yifadinghuobao.model.helper.DataSaver;
@@ -95,6 +97,10 @@ public class ShopDetailActivity extends BaseActivity {
     TextView shopDetail_Inventory;
     @BindView(R.id.shopDetail_unit)
     TagFlowLayout shopDetail_unit;
+    @BindView(R.id.shopDetail_property1)
+    TagFlowLayout shopDetail_property1;
+    @BindView(R.id.shopDetail_property2)
+    TagFlowLayout shopDetail_property2;
     @BindView(R.id.shopDetail_orderNum)
     NumberAddSubView shopDetail_orderNum;
     @BindView(R.id.shopDetail_totalPrice)
@@ -111,7 +117,10 @@ public class ShopDetailActivity extends BaseActivity {
     ImageView collection;
     @BindView(R.id.shopDetail_tvAddShoppingCart)
     TextView shopDetail_tvAddShoppingCart;
-
+    @BindView(R.id.llProperty2)
+    LinearLayout llProperty2;
+    @BindView(R.id.llProperty1)
+    LinearLayout llProperty1;
     @BindView(R.id.tv_productName)
     TextView tv_productName;
     @BindView(R.id.tv_code)
@@ -124,6 +133,10 @@ public class ShopDetailActivity extends BaseActivity {
     TextView tv_category;
     @BindView(R.id.tv_brand)
     TextView tv_brand;
+    @BindView(R.id.tvProperty1)
+    TextView tvProperty1;
+    @BindView(R.id.tvProperty2)
+    TextView tvProperty2;
 
 
     private GoodsListEntity.ValueEntity goodsBean;
@@ -148,6 +161,11 @@ public class ShopDetailActivity extends BaseActivity {
     private static final int REQUEST_REFRESH = 10;
 
     private List<Integer> selectedUnitList = new ArrayList<>(new HashSet<>());
+    private List<Integer> selectedProperty1List = new ArrayList<>(new HashSet<>());
+    private List<Integer> selectedProperty2List = new ArrayList<>(new HashSet<>());
+
+    private List<ProductPropertyListEntity.ValueEntity> productPropery1 = new ArrayList<>();
+    private List<ProductPropertyListEntity.ValueEntity> productPropery2 = new ArrayList<>();
 
     @Override
     public int getLayoutId() {
@@ -286,54 +304,8 @@ public class ShopDetailActivity extends BaseActivity {
                     @Override
                     public void onNext(@NonNull GoodsListEntity goodsListEntity) {
                         goodsBean = goodsListEntity.Value.get(0);
-                        //获取库存
-                        RetrofitHelper
-                                .getStockInfoListApi()
-                                .getStockInfoList("StockInfoForToolTipList", "", "ProductId =" + shoppingId, "", AppInfoUtil.getToken())
-                                .compose(bindToLifecycle())
-                                .subscribeOn(Schedulers.newThread())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Observer<StockInfoForToolTipListEntity>() {
-                                    @Override
-                                    public void onSubscribe(@NonNull Disposable d) {
+                        getStockInfo();
 
-                                    }
-
-                                    @Override
-                                    public void onNext(@NonNull StockInfoForToolTipListEntity stockInfoForToolTipListEntity) {
-                                        if (stockInfoForToolTipListEntity.Value != null && stockInfoForToolTipListEntity.Value.size() > 0) {
-                                            LogUtils.e("stockInfoForToolTipListEntitySize:", stockInfoForToolTipListEntity.Value.size());
-                                            boolean chosen = false;
-                                            for (StockInfoForToolTipListEntity.ValueEntity item :
-                                                    stockInfoForToolTipListEntity.Value) {
-                                                if (item.WarehouseId == goodsBean.DefaultWarehouseId) {
-                                                    LogUtils.e("SalesQuantityPackString", item.SalesQuantityPackString);
-                                                    chosen = true;
-                                                    shopDetail_Inventory.setText("库存：" + item.SalesQuantityPackString);//可开库存
-                                                }
-                                            }
-                                            if (!chosen) {
-                                                //没有找到对应的仓库
-                                                shopDetail_Inventory.setText("");
-                                                LogUtils.e("没有找到对应的仓库");
-                                            }
-                                        } else {
-                                            //没有找到对应的仓库
-                                            shopDetail_Inventory.setText("");
-                                            LogUtils.e("没有找到对应的仓库");
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onError(@NonNull Throwable e) {
-
-                                    }
-
-                                    @Override
-                                    public void onComplete() {
-
-                                    }
-                                });
 
                         LogUtils.e("goodBean", goodsBean.Name);
                         if (!goodsListEntity.HasError) {
@@ -466,6 +438,17 @@ public class ShopDetailActivity extends BaseActivity {
                             });
                             setSelectedUnit(tagAdapter);
 
+
+                            //商品多属性
+                            if (goodsBean.ProperyId1 != 0 && goodsBean.ProperyId2 != 0) {
+                                tvProperty1.setText(goodsBean.ProperyId1Name);
+                                tvProperty2.setText(goodsBean.ProperyId2Name);
+                                getPropertyList1(true);
+                            } else {
+                                llProperty1.setVisibility(View.GONE);
+                                llProperty2.setVisibility(View.GONE);
+                            }
+
                             //订购数量增加/减少的点击事件
                             shopDetail_orderNum.setOnButtonClickListener(new NumberAddSubView.OnButtonClickListener() {
                                 @Override
@@ -541,6 +524,58 @@ public class ShopDetailActivity extends BaseActivity {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         showEmptyView();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void getStockInfo() {
+        //获取库存
+        RetrofitHelper
+                .getStockInfoListApi()
+                .getStockInfoList("StockInfoForToolTipList", "", "ProductId =" + shoppingId, "", AppInfoUtil.getToken())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<StockInfoForToolTipListEntity>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull StockInfoForToolTipListEntity stockInfoForToolTipListEntity) {
+                        if (stockInfoForToolTipListEntity.Value != null && stockInfoForToolTipListEntity.Value.size() > 0) {
+                            LogUtils.e("stockInfoForToolTipListEntitySize:", stockInfoForToolTipListEntity.Value.size());
+                            boolean chosen = false;
+                            for (StockInfoForToolTipListEntity.ValueEntity item :
+                                    stockInfoForToolTipListEntity.Value) {
+                                if (item.WarehouseId == goodsBean.DefaultWarehouseId) {
+                                    LogUtils.e("SalesQuantityPackString", item.SalesQuantityPackString);
+                                    chosen = true;
+                                    shopDetail_Inventory.setText("库存：" + (TextUtils.isEmpty(item.SalesQuantityPackString) ? "无" : item.SalesQuantityPackString));//可开库存
+                                }
+                            }
+                            if (!chosen) {
+                                //没有找到对应的仓库
+                                shopDetail_Inventory.setText("库存：无");
+                                LogUtils.e("没有找到对应的仓库");
+                            }
+                        } else {
+                            //没有找到对应的仓库
+                            shopDetail_Inventory.setText("库存：无");
+                            LogUtils.e("没有找到对应的仓库");
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.e("获取库存 onError  重试", e.getMessage() + "");
+                        getStockInfo();
                     }
 
                     @Override
@@ -964,6 +999,10 @@ public class ShopDetailActivity extends BaseActivity {
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
             itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
         }
+        itemModel.ParentProperyId1Name = goodsBean.ProperyId1Name;
+        itemModel.ParentProperyId2Name = goodsBean.ProperyId2Name;
+        itemModel.ParentProperyId1 = goodsBean.ProperyId1;
+        itemModel.ParentProperyId2 = goodsBean.ProperyId2;
         itemModel.PriceSystemId = DataSaver.getPriceSystemId();
         itemModel.PackSpec = goodsBean.PackSpec;
         itemModel.Code = goodsBean.Code;
@@ -1196,5 +1235,92 @@ public class ShopDetailActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         loadData();
+    }
+
+    private void getPropertyList1(boolean isProperty1) {
+        if (goodsBean == null) {
+            return;
+        }
+        RetrofitHelper
+                .getPropertyListApi()
+                .getPropertyList("ProductProperyList", "", "ParentId =" + (isProperty1 ? goodsBean.ProperyId1 : goodsBean.ProperyId2), "", AppInfoUtil.getToken())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ProductPropertyListEntity>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull ProductPropertyListEntity entity) {
+                        if (!entity.HasError && entity.Value != null && entity.Value.size() > 0) {
+                            if (isProperty1) {
+                                productPropery1.addAll(entity.Value);
+                                final LayoutInflater mInflater = LayoutInflater.from(ShopDetailActivity.this);
+                                TagAdapter<ProductPropertyListEntity.ValueEntity> tagAdapter = new TagAdapter<ProductPropertyListEntity.ValueEntity>(productPropery1) {
+                                    @Override
+                                    public View getView(FlowLayout parent, int position, ProductPropertyListEntity.ValueEntity entity) {
+                                        TextView tv = (TextView) mInflater.inflate(R.layout.tv, parent, false);
+                                        tv.setText(entity.Name);
+                                        return tv;
+                                    }
+                                };
+                                shopDetail_property1.setAdapter(tagAdapter);
+                                shopDetail_property1.setOnSelectListener(new TagFlowLayout.OnSelectListener() {
+                                    @Override
+                                    public void onSelected(Set<Integer> selectPosSet) {
+                                        selectedProperty1List.clear();
+                                        if (selectPosSet.size() > 0) {
+                                            selectedProperty1List.addAll(selectPosSet);
+                                        }
+                                    }
+                                });
+                                tagAdapter.setSelectedList(0);
+                                selectedProperty1List.add(0);
+                                getPropertyList1(false);
+                            } else {
+                                productPropery2.addAll(entity.Value);
+                                final LayoutInflater mInflater = LayoutInflater.from(ShopDetailActivity.this);
+                                TagAdapter<ProductPropertyListEntity.ValueEntity> tagAdapter = new TagAdapter<ProductPropertyListEntity.ValueEntity>(productPropery2) {
+                                    @Override
+                                    public View getView(FlowLayout parent, int position, ProductPropertyListEntity.ValueEntity entity) {
+                                        TextView tv = (TextView) mInflater.inflate(R.layout.tv, parent, false);
+                                        tv.setText(entity.Name);
+                                        return tv;
+                                    }
+                                };
+                                shopDetail_property2.setAdapter(tagAdapter);
+                                shopDetail_property2.setOnSelectListener(new TagFlowLayout.OnSelectListener() {
+                                    @Override
+                                    public void onSelected(Set<Integer> selectPosSet) {
+                                        selectedProperty1List.clear();
+                                        if (selectPosSet.size() > 0) {
+                                            selectedProperty2List.addAll(selectPosSet);
+                                        }
+                                    }
+                                });
+                                tagAdapter.setSelectedList(0);
+                                selectedProperty2List.add(0);
+                            }
+                        } else {
+                            llProperty1.setVisibility(View.GONE);
+                            llProperty2.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.e("获取商品多属性1失败，重试");
+                        getPropertyList1(isProperty1);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 }

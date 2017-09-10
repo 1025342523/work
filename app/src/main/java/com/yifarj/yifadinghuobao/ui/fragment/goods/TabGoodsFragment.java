@@ -3,6 +3,7 @@ package com.yifarj.yifadinghuobao.ui.fragment.goods;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AbsListView;
@@ -24,6 +25,7 @@ import com.yifarj.yifadinghuobao.model.entity.GoodsListEntity;
 import com.yifarj.yifadinghuobao.network.PageInfo;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.network.utils.JsonUtils;
+import com.yifarj.yifadinghuobao.ui.activity.common.ScanQrcodeActivity;
 import com.yifarj.yifadinghuobao.ui.activity.productCategory.ProductCategoryActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShopDetailActivity;
 import com.yifarj.yifadinghuobao.ui.activity.shoppingcart.ShoppingCartActivity;
@@ -44,6 +46,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * TabGoodsFragment
  *
@@ -53,6 +57,7 @@ import io.reactivex.schedulers.Schedulers;
 public class TabGoodsFragment extends BaseFragment implements View.OnClickListener {
     private static final int REQUEST_REFRESH = 10;
     private static final int REQUEST_ITEM = 11;
+    private static final int REQUEST_BARCODE = 15;
 
     @BindView(R.id.lvContent)
     ListView lvContent;
@@ -146,6 +151,16 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                 doSearch(keyword);
             }
         });
+
+        searchView.setOnScanQrCodeListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ScanQrcodeActivity.class);
+                intent.putExtra("ScanBarcode", true);
+                startActivityForResult(intent, REQUEST_BARCODE);
+            }
+        });
+
         searchView.setOnCancelListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -408,7 +423,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                                     showEmptyView();
                                 }
                             } else {
-                                ToastUtils.showShortSafe("请求超时");
+                                ToastUtils.showShortSafe(goodsListEntity.Information == null ? "请求超时" : goodsListEntity.Information);
                             }
                         } else if (goodsListEntity != null && goodsListEntity.Value.size() > 0) {
                             goodsList.Value.addAll(goodsListEntity.Value);
@@ -475,18 +490,32 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            try {
+                if (requestCode == REQUEST_REFRESH) {
+                    onTab1Click();
+                } else if (requestCode == REQUEST_ITEM) {
+                    searchSQlite(shopId);
+                    if (itemType == 0) {
+                        searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
+                    } else {
+                        goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
+                    }
+                } else if (requestCode == REQUEST_BARCODE) {
+                    if (data != null) {
+                        String barcode = data.getStringExtra("barcode");
+                        if (searchView != null) {
+                            if (!TextUtils.isEmpty(barcode)) {
+                                searchView.getEditText().setText(barcode);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
 
-        if (requestCode == REQUEST_REFRESH) {
-            onTab1Click();
-        } else if (requestCode == REQUEST_ITEM) {
-            searchSQlite(shopId);
-            if (itemType == 0) {
-                searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
-            } else {
-                goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
             }
-        }
 
+        }
     }
 
 
