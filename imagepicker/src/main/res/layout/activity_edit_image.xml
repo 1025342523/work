@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="#000"
+             android:fitsSystemWindows="true"
+             android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <include
+            android:id="@+id/graffiti__title_bar"
+            layout="@layout/graffiti__title_bar"/>
+
+        <FrameLayout
+            android:id="@+id/graffiti_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/graffiti__title_bar"/>
+
+        <RelativeLayout
+            android:id="@+id/graffiti_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/graffiti__title_bar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="#cc22292c"
+                android:orientation="vertical"
+                android:padding="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp">
+
+                    <RelativeLayout
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/graffiti_btn_effect_rect_line">
+
+                        <ImageView
+                            android:id="@+id/btn_set_color"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"/>
+                    </RelativeLayout>
+
+                    <SeekBar
+                        android:id="@+id/paint_size"
+                        android:layout_width="260dp"
+                        android:layout_height="33dp"
+                        android:max="100"
+                        android:maxHeight="33dp"
+                        android:minHeight="33dp"
+                        android:paddingLeft="10dp"
+                        android:progressDrawable="@drawable/graffiti_seekbar_bg"
+                        android:thumb="@drawable/graffiti_thumb_seekbarr"
+                        android:thumbOffset="0dp"/>
+
+                    <TextView
+                        android:id="@+id/paint_size_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginStart="5dp"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp"/>
+
+                    <View
+                        android:id="@+id/view"
+                        android:layout_width="1px"
+                        android:layout_height="35dp"
+                        android:layout_gravity="center"
+                        android:background="#696969"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
+
+
+                        <ImageView
+                            android:id="@+id/btn_undo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/selector_checkout"/>
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="#696969"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp">
+
+                    <ImageView
+                        android:id="@+id/btn_pen_hand"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/selector_paint"
+                        android:visibility="visible"/>
+
+                    <ImageView
+                        android:id="@+id/btn_pen_copy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/selector_copy"
+                        android:visibility="visible"/>
+
+                    <ImageView
+                        android:id="@+id/btn_pen_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/selector_text"
+                        android:visibility="visible"/>
+
+
+                    <ImageView
+                        android:id="@+id/btn_pen_bitmap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+
+                        android:src="@drawable/selector_image"
+                        android:visibility="visible"/>
+
+                    <ImageView
+                        android:id="@+id/btn_pen_eraser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/selector_eraser"
+                        android:visibility="visible"/>
+
+                    <ImageView
+                        android:id="@+id/graffiti_btn_rotate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/selector_rotate"
+                        android:visibility="visible"/>
+
+                    <Button
+                        android:id="@+id/btn_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/graffiti_btn_effect_round"
+                        android:text="清屏"
+                        android:textColor="#fff"
+                        android:textSize="13sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/graffiti_selectable_edit_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/title_bar_height"
+                android:background="#88000000"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/graffiti_selectable_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/graffiti_btn_effect_rect_pressed_black"
+                    android:gravity="center"
+                    android:text="@string/graffiti_edit"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/graffiti_selectable_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/graffiti_btn_effect_rect_pressed_black"
+                    android:gravity="center"
+                    android:text="@string/graffiti_top"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/graffiti_selectable_remove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/graffiti_btn_effect_rect_pressed_black"
+                    android:gravity="center"
+                    android:text="@string/graffiti_remove"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+</FrameLayout>

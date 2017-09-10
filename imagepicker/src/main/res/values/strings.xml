@@ -1,0 +1,27 @@
+<resources>
+    <string name="all_images">全部图片</string>
+    <string name="folder_image_count">共%1$d张</string>
+    <string name="preview_image_count">%1$s/%2$s</string>
+    <string name="select_limit">最多选择%1$s张图片</string>
+    <string name="complete">完成</string>
+    <string name="select_complete">完成(%1$s/%2$s)</string>
+    <string name="preview_count">预览(%1$s)</string>
+    <string name="photo_crop">图片裁剪</string>
+    <string name="origin">原图</string>
+    <string name="origin_size">原图(%1$s)</string>
+    <string name="edit_images">编辑图片</string>
+    <string name="graffiti_app_name">CzechYuan</string>
+
+    <string name="graffiti_moving_pic">单指移动、双指缩放</string>
+    <string name="graffiti_clear_screen">清屏</string>
+    <string name="graffiti_cant_undo_after_clearing">清屏后不可撤销！</string>
+    <string name="graffiti_saving_picture">保存图片</string>
+    <string name="graffiti_enter">确定</string>
+    <string name="graffiti_cancel">取消</string>
+    <string name="graffiti_success">成功</string>
+    <string name="graffiti_failed">失败</string>
+
+    <string name="graffiti_edit">编辑</string>
+    <string name="graffiti_remove">移除</string>
+    <string name="graffiti_top">置顶</string>
+</resources>
