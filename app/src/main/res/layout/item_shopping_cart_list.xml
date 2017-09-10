@@ -59,6 +59,16 @@
                 android:textSize="@dimen/font_28"/>
 
             <TextView
+                android:id="@+id/tv_Property"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/size_20"
+                android:layout_marginStart="@dimen/size_20"
+                android:gravity="center_vertical"
+                android:textColor="@color/text_desc"
+                android:textSize="@dimen/font_26"/>
+
+            <TextView
                 android:id="@+id/tv_PackSpec"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

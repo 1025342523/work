@@ -994,15 +994,34 @@ public class ShopDetailActivity extends BaseActivity {
     }
 
     private void add(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
+        if (productPropery1.size() > 0 && productPropery2.size() > 0 && selectedProperty1List.size() > 0 && selectedProperty2List.size() > 0) {
+            for (int property1Position : selectedProperty1List) {
+                for (int property2Position : selectedProperty2List) {
+                    createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, productPropery1.get(property1Position).Id, productPropery2.get(property2Position).Id, productPropery1.get(property1Position).Name, productPropery2.get(property2Position).Name, true);
+                }
+            }
+        } else {
+            createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false);
+        }
+
+    }
+
+    private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = totalPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
             itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
         }
-        itemModel.ParentProperyId1Name = goodsBean.ProperyId1Name;
-        itemModel.ParentProperyId2Name = goodsBean.ProperyId2Name;
-        itemModel.ParentProperyId1 = goodsBean.ProperyId1;
-        itemModel.ParentProperyId2 = goodsBean.ProperyId2;
+        if (isProperty) {
+            itemModel.ParentProperyId1Name = goodsBean.ProperyId1Name;
+            itemModel.ParentProperyId2Name = goodsBean.ProperyId2Name;
+            itemModel.ParentProperyId1 = goodsBean.ProperyId1;
+            itemModel.ParentProperyId2 = goodsBean.ProperyId2;
+            itemModel.ProperyId1 = property1Id;
+            itemModel.ProperyId2 = property2Id;
+            itemModel.ProperyId1Name = property1IdName;
+            itemModel.ProperyId2Name = property2IdName;
+        }
         itemModel.PriceSystemId = DataSaver.getPriceSystemId();
         itemModel.PackSpec = goodsBean.PackSpec;
         itemModel.Code = goodsBean.Code;
@@ -1051,32 +1070,65 @@ public class ShopDetailActivity extends BaseActivity {
                 LogUtils.e("Item保存数据成功");
             }
         });
-        Flowable.fromIterable(goodsBean.ProductUnitList)
-                .forEach(valueEntity -> {
-                    GoodsUnitModel goodsUnitModel = new GoodsUnitModel();
-                    goodsUnitModel.Id = valueEntity.Id;
-                    goodsUnitModel.ProductId = valueEntity.ProductId;
-                    goodsUnitModel.Name = valueEntity.Name;
-                    goodsUnitModel.Factor = valueEntity.Factor;
-                    goodsUnitModel.BasicFactor = valueEntity.BasicFactor;
-                    goodsUnitModel.IsBasic = valueEntity.IsBasic;
-                    goodsUnitModel.IsDefault = valueEntity.IsDefault;
-                    goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
-                    goodsUnitModel.Ordinal = valueEntity.Ordinal;
-                    goodsUnitModel.insert().subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(@NonNull Long aLong) throws Exception {
-                            LogUtils.e("Unit插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+        RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
+                .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
+                .queryList()
+                .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                    @Override
+                    public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                        if (goodsUnitModels == null || goodsUnitModels.size() == 0) {
+                            Flowable.fromIterable(goodsBean.ProductUnitList)
+                                    .forEach(valueEntity -> {
+                                        GoodsUnitModel goodsUnitModel = new GoodsUnitModel();
+                                        goodsUnitModel.Id = valueEntity.Id;
+                                        goodsUnitModel.ProductId = valueEntity.ProductId;
+                                        goodsUnitModel.Name = valueEntity.Name;
+                                        goodsUnitModel.Factor = valueEntity.Factor;
+                                        goodsUnitModel.BasicFactor = valueEntity.BasicFactor;
+                                        goodsUnitModel.IsBasic = valueEntity.IsBasic;
+                                        goodsUnitModel.IsDefault = valueEntity.IsDefault;
+                                        goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
+                                        goodsUnitModel.Ordinal = valueEntity.Ordinal;
+                                        goodsUnitModel.insert().subscribe(new Consumer<Long>() {
+                                            @Override
+                                            public void accept(@NonNull Long aLong) throws Exception {
+                                                LogUtils.e("Unit插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                            }
+                                        });
+                                    });
                         }
-                    });
+                    }
                 });
+
     }
 
     private void addReturnList(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
+        if (productPropery1.size() > 0 && productPropery2.size() > 0 && selectedProperty1List.size() > 0 && selectedProperty2List.size() > 0) {
+            for (int property1Position : selectedProperty1List) {
+                for (int property2Position : selectedProperty2List) {
+                    createReturnGoodsItem(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, productPropery1.get(property1Position).Id, productPropery2.get(property2Position).Id, productPropery1.get(property1Position).Name, productPropery2.get(property2Position).Name, true);
+                }
+            }
+        } else {
+            createReturnGoodsItem(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false);
+        }
+    }
+
+    private void createReturnGoodsItem(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
         ReturnListItemModel itemModel = new ReturnListItemModel();
         itemModel.CurrentPrice = totalPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
             itemModel.Path = goodsBean.ProductPictureList.get(0).Path;
+        }
+        if (isProperty) {
+            itemModel.ParentProperyId1Name = goodsBean.ProperyId1Name;
+            itemModel.ParentProperyId2Name = goodsBean.ProperyId2Name;
+            itemModel.ParentProperyId1 = goodsBean.ProperyId1;
+            itemModel.ParentProperyId2 = goodsBean.ProperyId2;
+            itemModel.ProperyId1 = property1Id;
+            itemModel.ProperyId2 = property2Id;
+            itemModel.ProperyId1Name = property1IdName;
+            itemModel.ProperyId2Name = property2IdName;
         }
         itemModel.PriceSystemId = DataSaver.getPriceSystemId();
         itemModel.PackSpec = goodsBean.PackSpec;
@@ -1126,24 +1178,35 @@ public class ShopDetailActivity extends BaseActivity {
                 LogUtils.e("Item保存数据成功");
             }
         });
-        Flowable.fromIterable(goodsBean.ProductUnitList)
-                .forEach(valueEntity -> {
-                    ReturnGoodsUnitModel goodsUnitModel = new ReturnGoodsUnitModel();
-                    goodsUnitModel.Id = valueEntity.Id;
-                    goodsUnitModel.ProductId = valueEntity.ProductId;
-                    goodsUnitModel.Name = valueEntity.Name;
-                    goodsUnitModel.Factor = valueEntity.Factor;
-                    goodsUnitModel.BasicFactor = valueEntity.BasicFactor;
-                    goodsUnitModel.IsBasic = valueEntity.IsBasic;
-                    goodsUnitModel.IsDefault = valueEntity.IsDefault;
-                    goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
-                    goodsUnitModel.Ordinal = valueEntity.Ordinal;
-                    goodsUnitModel.insert().subscribe(new Consumer<Long>() {
-                        @Override
-                        public void accept(@NonNull Long aLong) throws Exception {
-                            LogUtils.e("Unit插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+
+        RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
+                .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
+                .queryList()
+                .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                    @Override
+                    public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                        if (goodsUnitModels == null || goodsUnitModels.size() == 0) {
+                            Flowable.fromIterable(goodsBean.ProductUnitList)
+                                    .forEach(valueEntity -> {
+                                        ReturnGoodsUnitModel goodsUnitModel = new ReturnGoodsUnitModel();
+                                        goodsUnitModel.Id = valueEntity.Id;
+                                        goodsUnitModel.ProductId = valueEntity.ProductId;
+                                        goodsUnitModel.Name = valueEntity.Name;
+                                        goodsUnitModel.Factor = valueEntity.Factor;
+                                        goodsUnitModel.BasicFactor = valueEntity.BasicFactor;
+                                        goodsUnitModel.IsBasic = valueEntity.IsBasic;
+                                        goodsUnitModel.IsDefault = valueEntity.IsDefault;
+                                        goodsUnitModel.BreakupNotify = valueEntity.BreakupNotify;
+                                        goodsUnitModel.Ordinal = valueEntity.Ordinal;
+                                        goodsUnitModel.insert().subscribe(new Consumer<Long>() {
+                                            @Override
+                                            public void accept(@NonNull Long aLong) throws Exception {
+                                                LogUtils.e("Unit插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                            }
+                                        });
+                                    });
                         }
-                    });
+                    }
                 });
     }
 
@@ -1295,7 +1358,7 @@ public class ShopDetailActivity extends BaseActivity {
                                 shopDetail_property2.setOnSelectListener(new TagFlowLayout.OnSelectListener() {
                                     @Override
                                     public void onSelected(Set<Integer> selectPosSet) {
-                                        selectedProperty1List.clear();
+                                        selectedProperty2List.clear();
                                         if (selectPosSet.size() > 0) {
                                             selectedProperty2List.addAll(selectPosSet);
                                         }

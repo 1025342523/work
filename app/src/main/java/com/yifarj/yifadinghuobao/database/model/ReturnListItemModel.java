@@ -265,6 +265,12 @@ public class ReturnListItemModel extends BaseRXModel {
     public int ProperyId2;
 
     @Column
+    public String ProperyId1Name = "";
+
+    @Column
+    public String ProperyId2Name = "";
+
+    @Column
     public int ParentProperyId1;
 
     @Column

@@ -1,6 +1,7 @@
 package com.yifarj.yifadinghuobao.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -204,6 +205,11 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                     });
                 }
             });
+            if (!TextUtils.isEmpty(goodsBean.ParentProperyId1Name) && !TextUtils.isEmpty(goodsBean.ProperyId1Name) && !TextUtils.isEmpty(goodsBean.ParentProperyId2Name) && !TextUtils.isEmpty(goodsBean.ProperyId2Name)) {
+                itemViewHolder.tvProperty.setText(goodsBean.ParentProperyId1Name + "：" + goodsBean.ProperyId1Name + "，" + goodsBean.ParentProperyId2Name + "：" + goodsBean.ProperyId2Name);
+            } else {
+                itemViewHolder.tvProperty.setVisibility(View.GONE);
+            }
             itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
             itemViewHolder.tvBasicPrice.setText(goodsBean.BasicUnitPrice + "元/" + goodsBean.BasicUnitName);
             itemViewHolder.tvCode.setText("编号：" + goodsBean.Code.substring(goodsBean.Code.length() - 4, goodsBean.Code.length()));
@@ -542,6 +548,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
         TextView tvPackSpec;
         TextView tvBasicPrice;
         TextView tvCode;
+        TextView tvProperty;
         TagFlowLayout llFlowLayout;
         NumberAddSubView numberAddSubView;
 
@@ -558,6 +565,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
             llFlowLayout = $(R.id.ll_flowLayout);
             numberAddSubView = $(R.id.num_control);
             ivDelete = $(R.id.iv_delete);
+            tvProperty = $(R.id.tv_Property);
         }
     }
 
