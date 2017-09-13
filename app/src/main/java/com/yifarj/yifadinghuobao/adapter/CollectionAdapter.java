@@ -88,7 +88,7 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
                         @Override
                         public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
                             if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
-                                itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+//                                itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
                             } else {
                                 itemViewHolder.btnEle.setCount(0);
                             }

@@ -53,6 +53,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
     private BaseActivity activity;
     private int icon;
     private int saleType = 0;
+    private AddShoppingCartClickListener mAddShoppingCartClickListener;
 
     public GoodsListAdapter(RecyclerView recyclerView, List<GoodsListEntity.ValueEntity> data, boolean type, TabGoodsFragment context, BaseActivity activity, int icon, int saleType) {
         super(recyclerView);
@@ -62,6 +63,14 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         this.activity = activity;
         this.icon = icon;
         this.saleType = saleType;
+    }
+
+    public interface AddShoppingCartClickListener {
+        void onAddShoppingCartClickListener(View view, GoodsListEntity.ValueEntity goodsEntity, int statusIcon, int saleType);
+    }
+
+    public void setAddShoppingCartClickListener(AddShoppingCartClickListener l) {
+        this.mAddShoppingCartClickListener = l;
     }
 
     @Override
@@ -107,7 +116,14 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                     itemViewHolder.tvIcon.setText("推荐");
                     break;
             }
-
+            itemViewHolder.addShopCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mAddShoppingCartClickListener != null) {
+                        mAddShoppingCartClickListener.onAddShoppingCartClickListener(view, goodsBean, icon, saleType);
+                    }
+                }
+            });
             itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
             if (goodsBean.Code.length() <= 6) {
                 itemViewHolder.tvCode.setText("编号：" + goodsBean.Code);
@@ -137,7 +153,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                 @Override
                                 public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
                                     if (returnListItemModels != null && returnListItemModels.size() > 0) {
-                                        itemViewHolder.btnEle.setCount(returnListItemModels.get(0).Quantity);
+//                                        itemViewHolder.btnEle.setCount(returnListItemModels.get(0).Quantity);
                                     } else {
                                         itemViewHolder.btnEle.setCount(0);
                                     }
@@ -286,7 +302,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                 @Override
                                 public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
                                     if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
-                                        itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+//                                        itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
                                     } else {
                                         itemViewHolder.btnEle.setCount(0);
                                     }
@@ -687,6 +703,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
         TextView tvCode;
         AnimShopButton btnEle;
         TextView tvIcon;
+        ImageView addShopCart;
 
         public ItemViewHolder(View itemView) {
 
@@ -699,6 +716,7 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
             btnEle = $(R.id.btnEle);
             tvCode = $(R.id.tv_Code);
             tvIcon = $(R.id.tv_icon);
+            addShopCart =$(R.id.addShopCart);
         }
     }
 

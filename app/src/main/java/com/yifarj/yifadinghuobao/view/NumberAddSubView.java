@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.widget.TintTypedArray;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.utils.NumberUtil;
 
 import static com.yifarj.yifadinghuobao.R.id.et_num;
 
@@ -40,7 +42,7 @@ public class NumberAddSubView extends LinearLayout implements View.OnClickListen
     private LayoutInflater mInflater;
 
 
-    private int value;
+    private double value;
     private int minValue;
     private int maxValue = DEFUALT_MAX;
 
@@ -140,7 +142,7 @@ public class NumberAddSubView extends LinearLayout implements View.OnClickListen
         if (this.value <= maxValue)
             this.value = +this.value + 1;
 
-        mEtxtNum.setText(value + "");
+        mEtxtNum.setText(NumberUtil.formatDouble2String(value));
     }
 
 
@@ -152,22 +154,23 @@ public class NumberAddSubView extends LinearLayout implements View.OnClickListen
         if (this.value > minValue)
             this.value = this.value - 1;
 
-        mEtxtNum.setText(value + "");
+        mEtxtNum.setText(NumberUtil.formatDouble2String(value));
     }
 
 
-    public int getValue() {
+    public double getValue() {
 
-        String value = mEtxtNum.getText().toString();
+        String value = mEtxtNum.getText().toString().trim();
 
-        if (value != null && !"".equals(value))
-            this.value = Integer.parseInt(value);
+        if (!TextUtils.isEmpty(value)) {
+            this.value = Double.parseDouble(value);
+        }
 
         return this.value;
     }
 
-    public void setValue(int value) {
-        mEtxtNum.setText(value + "");
+    public void setValue(double value) {
+        mEtxtNum.setText(NumberUtil.formatDouble2String(value));
         this.value = value;
     }
 
@@ -224,9 +227,9 @@ public class NumberAddSubView extends LinearLayout implements View.OnClickListen
 
     public interface OnButtonClickListener {
 
-        public void onButtonAddClick(View view, int value);
+        public void onButtonAddClick(View view, double value);
 
-        public void onButtonSubClick(View view, int value);
+        public void onButtonSubClick(View view, double value);
 
     }
 

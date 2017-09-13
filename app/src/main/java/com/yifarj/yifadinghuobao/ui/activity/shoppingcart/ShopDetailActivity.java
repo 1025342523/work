@@ -144,7 +144,7 @@ public class ShopDetailActivity extends BaseActivity {
 
     private int shoppingId;
     private double totalPrice = 0;
-    private int quantity = 0;
+    private double quantity = 0;
     private String unitName;
     private int unitId;
     private double unitPrice;
@@ -452,7 +452,7 @@ public class ShopDetailActivity extends BaseActivity {
                             //订购数量增加/减少的点击事件
                             shopDetail_orderNum.setOnButtonClickListener(new NumberAddSubView.OnButtonClickListener() {
                                 @Override
-                                public void onButtonAddClick(View view, int value) {
+                                public void onButtonAddClick(View view, double value) {
                                     if (value > 0) {
                                         quantity = value;
                                         totalPrice = unitPrice * quantity;
@@ -462,7 +462,7 @@ public class ShopDetailActivity extends BaseActivity {
                                 }
 
                                 @Override
-                                public void onButtonSubClick(View view, int value) {
+                                public void onButtonSubClick(View view, double value) {
                                     if (value > 0) {
                                         quantity = value;
                                         totalPrice = unitPrice * quantity;
@@ -485,9 +485,9 @@ public class ShopDetailActivity extends BaseActivity {
                                     mDialog.setConfirmClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            int count = 1;
+                                            double count = 1;
                                             try {
-                                                int tempEditText = Integer.parseInt(mDialog.getEditText().getText().toString());
+                                                double tempEditText = Double.parseDouble(mDialog.getEditText().getText().toString().trim());
                                                 if (tempEditText <= 0) {
                                                     Toast.makeText(ShopDetailActivity.this, "订购数量必须大于0", Toast.LENGTH_SHORT).show();
                                                 } else {
@@ -595,7 +595,7 @@ public class ShopDetailActivity extends BaseActivity {
     }
 
 
-    public static void closeKeybord(EditText mEditText, Context mContext) {
+    public void closeKeybord(EditText mEditText, Context mContext) {
         InputMethodManager imm = (InputMethodManager) mContext.
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
@@ -993,7 +993,7 @@ public class ShopDetailActivity extends BaseActivity {
         }
     }
 
-    private void add(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
+    private void add(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
         if (productPropery1.size() > 0 && productPropery2.size() > 0 && selectedProperty1List.size() > 0 && selectedProperty2List.size() > 0) {
             for (int property1Position : selectedProperty1List) {
                 for (int property2Position : selectedProperty2List) {
@@ -1006,7 +1006,7 @@ public class ShopDetailActivity extends BaseActivity {
 
     }
 
-    private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
+    private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = totalPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
@@ -1102,7 +1102,7 @@ public class ShopDetailActivity extends BaseActivity {
 
     }
 
-    private void addReturnList(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
+    private void addReturnList(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice) {
         if (productPropery1.size() > 0 && productPropery2.size() > 0 && selectedProperty1List.size() > 0 && selectedProperty2List.size() > 0) {
             for (int property1Position : selectedProperty1List) {
                 for (int property2Position : selectedProperty2List) {
@@ -1114,7 +1114,7 @@ public class ShopDetailActivity extends BaseActivity {
         }
     }
 
-    private void createReturnGoodsItem(GoodsListEntity.ValueEntity goodsBean, int count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
+    private void createReturnGoodsItem(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
         ReturnListItemModel itemModel = new ReturnListItemModel();
         itemModel.CurrentPrice = totalPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {

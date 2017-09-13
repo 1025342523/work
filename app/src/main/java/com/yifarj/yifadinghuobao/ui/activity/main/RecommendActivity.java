@@ -75,7 +75,8 @@ public class RecommendActivity extends BaseActivity {
     private GoodsListViewAdapter searchGoodsListAdapter;
 
     private int orderCount, saleType = 0;
-    private int shopQuantity = 0, itemPosition, itemType, shopId;
+    private int itemPosition, itemType, shopId;
+    private double shopQuantity = 0;
     private boolean isClearText = false;
 
     @Override
@@ -141,7 +142,7 @@ public class RecommendActivity extends BaseActivity {
                 searchPageInfo.PageIndex = -1;
                 searchRequesting = false;
                 searchMorePage = true;
-                if (!isClearText&&StringUtils.isEmpty(result)) {
+                if (!isClearText && StringUtils.isEmpty(result)) {
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result) && result.length() == 13) {

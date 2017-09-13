@@ -75,7 +75,8 @@ public class NewProductActivity extends BaseActivity {
     private GoodsListViewAdapter searchGoodsListAdapter;
 
     private int orderCount, saleType = 0;
-    private int shopQuantity = 0, itemPosition, itemType, shopId;
+    private int  itemPosition, itemType, shopId;
+    private double shopQuantity = 0;
     private boolean isClearText = false;
 
     @Override

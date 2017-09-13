@@ -54,4 +54,10 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.6</item>
     </style>
+
+    <!-- PopupWindow左右滑动的窗口动画 -->
+    <style name="MenuAnimationLeftRight">
+        <item name="android:windowEnterAnimation">@anim/menu_fadein_right</item>
+        <item name="android:windowExitAnimation">@anim/menu_fadein_left</item>
+    </style>
 </resources>

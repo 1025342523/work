@@ -65,8 +65,8 @@ public class ProductListActivity extends BaseActivity {
 
     private int orderCount;
     private int categoryId, saleType = 0;
-    private int shopQuantity = 0, itemPosition, itemType, shopId;
-
+    private int itemPosition, itemType, shopId;
+    private double shopQuantity = 0;
     private PageInfo pageInfo = new PageInfo();
     private boolean requesting;
     private boolean morePage = true;
@@ -146,7 +146,7 @@ public class ProductListActivity extends BaseActivity {
                 searchPageInfo.PageIndex = -1;
                 searchRequesting = false;
                 searchMorePage = true;
-                if (!isClearText&&StringUtils.isEmpty(result)) {
+                if (!isClearText && StringUtils.isEmpty(result)) {
                     searchView.getListView().setAdapter(null);
                 }
                 if (!StringUtils.isEmpty(result)) {

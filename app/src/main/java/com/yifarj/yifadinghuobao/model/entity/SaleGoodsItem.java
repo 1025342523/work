@@ -45,7 +45,7 @@ public class SaleGoodsItem {
         public int LocationId;
         public int ProductId;
         public String BatchId;
-        public int Quantity;
+        public double Quantity;
         public double BasicQuantity;
         public String PackString = "";
         public int UnitId;
@@ -148,7 +148,7 @@ public class SaleGoodsItem {
             dest.writeInt(this.LocationId);
             dest.writeInt(this.ProductId);
             dest.writeString(this.BatchId);
-            dest.writeInt(this.Quantity);
+            dest.writeDouble(this.Quantity);
             dest.writeDouble(this.BasicQuantity);
             dest.writeString(this.PackString);
             dest.writeInt(this.UnitId);
@@ -232,7 +232,7 @@ public class SaleGoodsItem {
             this.LocationId = in.readInt();
             this.ProductId = in.readInt();
             this.BatchId = in.readString();
-            this.Quantity = in.readInt();
+            this.Quantity = in.readDouble();
             this.BasicQuantity = in.readDouble();
             this.PackString = in.readString();
             this.UnitId = in.readInt();

@@ -8,11 +8,11 @@ import com.raizlabs.android.dbflow.rx2.structure.BaseRXModel;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
 
 /**
-*  退货清单
+ * 退货清单
  *
-* @auther zydx
-* @date 2017/8/2 14:58
-*/
+ * @auther zydx
+ * @date 2017/8/2 14:58
+ */
 @Table(database = AppDatabase.class)
 public class ReturnListItemModel extends BaseRXModel {
 
@@ -47,7 +47,7 @@ public class ReturnListItemModel extends BaseRXModel {
     public String BatchId;
 
     @Column
-    public int Quantity;
+    public double Quantity;
 
     @Column
     public double BasicQuantity;

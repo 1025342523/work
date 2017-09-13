@@ -123,7 +123,7 @@ public class GoodsListEntity {
         public String PurchaserName;
         public String ManagerName;
         public String BarcodeStrings;
-        public int GQIntermediaryRate;
+        public double GQIntermediaryRate;
         public int TraderId;
         public String TraderName;
         public double SalesTax;

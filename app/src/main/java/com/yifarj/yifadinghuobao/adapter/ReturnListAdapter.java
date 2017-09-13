@@ -164,19 +164,19 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                 @Override
                 public void onClick(View view) {
                     CzechYuanEditDialog mDialog = new CzechYuanEditDialog(getContext(), R.style.CzechYuanDialog);
-                    mDialog.getEditText().setText(String.valueOf(goodsBean.Quantity));
-                    mDialog.getEditText().setSelection(0, String.valueOf(goodsBean.Quantity).length());
+                    mDialog.getEditText().setText(NumberUtil.formatDouble2String(goodsBean.Quantity));
+                    mDialog.getEditText().setSelection(0,NumberUtil.formatDouble2String(goodsBean.Quantity).length());
                     mDialog.setConfirmClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            int count;
+                            double count;
                             try {
-                                count = Integer.parseInt(mDialog.getEditText().getText().toString());
+                                count = Double.parseDouble(mDialog.getEditText().getText().toString().trim());
                             } catch (NumberFormatException e) {
                                 count = goodsBean.Quantity;
                             }
                             if (count != goodsBean.Quantity) {
-                                int tempCount = count;
+                                double tempCount = count;
                                 goodsBean.Quantity = tempCount;
                                 goodsBean.CurrentPrice = goodsBean.UnitPrice * tempCount;
                                 notifyDataSetChanged();
@@ -214,7 +214,7 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
             itemViewHolder.numberAddSubView.setValue(goodsBean.Quantity);
             itemViewHolder.numberAddSubView.setOnButtonClickListener(new NumberAddSubView.OnButtonClickListener() {
                 @Override
-                public void onButtonAddClick(View view, int value) {
+                public void onButtonAddClick(View view, double value) {
                     if (value != goodsBean.Quantity) {
                         goodsBean.Quantity = value;
                         goodsBean.CurrentPrice = goodsBean.UnitPrice * value;
@@ -243,7 +243,7 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                 }
 
                 @Override
-                public void onButtonSubClick(View view, int value) {
+                public void onButtonSubClick(View view, double value) {
                     if (value != goodsBean.Quantity) {
                         goodsBean.Quantity = value;
                         goodsBean.CurrentPrice = goodsBean.UnitPrice * value;

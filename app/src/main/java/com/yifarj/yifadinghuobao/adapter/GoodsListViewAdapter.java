@@ -57,6 +57,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
     private Context currentContext;
     private int saleType = 0;
     private SparseArray<View> vmap = new SparseArray<View>();
+    private AddShoppingCartClickListener mAddShoppingCartClickListener;
 
     public GoodsListViewAdapter(List<GoodsListEntity.ValueEntity> data, TabGoodsFragment context, int icon, BaseActivity activity, boolean type, int saleType) {
         this.data = data;
@@ -66,6 +67,14 @@ public class GoodsListViewAdapter extends BaseAdapter {
         this.activity = activity;
         currentContext = context == null ? activity.getBaseContext() : context.getContext();
         this.saleType = saleType;
+    }
+
+    public interface AddShoppingCartClickListener {
+        void onAddShoppingCartClickListener(View view, GoodsListEntity.ValueEntity goodsEntity, int statusIcon, int saleType);
+    }
+
+    public void setAddShoppingCartClickListener(AddShoppingCartClickListener l) {
+        this.mAddShoppingCartClickListener = l;
     }
 
     @Override
@@ -98,12 +107,21 @@ public class GoodsListViewAdapter extends BaseAdapter {
             holder.tvPrice = (TextView) convertView.findViewById(R.id.tv_price);
             holder.btnEle = (AnimShopButton) convertView.findViewById(R.id.btnEle);
             holder.tvIcon = (TextView) convertView.findViewById(R.id.tv_icon);
+            holder.addShopCart = convertView.findViewById(R.id.addShopCart);
             convertView.setTag(holder);
             vmap.put(position, convertView);
         } else {
             convertView = vmap.get(position);
             holder = (ViewHolder) convertView.getTag();
         }
+        holder.addShopCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mAddShoppingCartClickListener != null) {
+                    mAddShoppingCartClickListener.onAddShoppingCartClickListener(view, goodsBean, icon, saleType);
+                }
+            }
+        });
         onbind = true;
         String unitName = null;
         int unitId = 0;
@@ -163,7 +181,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
                             @Override
                             public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
                                 if (returnListItemModels != null && returnListItemModels.size() > 0) {
-                                    holder.btnEle.setCount(returnListItemModels.get(0).Quantity);
+//                                    holder.btnEle.setCount(returnListItemModels.get(0).Quantity);
                                 } else {
                                     holder.btnEle.setCount(0);
                                 }
@@ -178,7 +196,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
                             @Override
                             public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
                                 if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
-                                    holder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+//                                    holder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
                                 } else {
                                     holder.btnEle.setCount(0);
                                 }
@@ -705,6 +723,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
 
     static class ViewHolder {
         ImageView itemImg;
+        ImageView addShopCart;
         TextView tvName;
         TextView tvPackSpec;
         TextView tvPrice;
@@ -713,7 +732,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
         TextView tvIcon;
     }
 
-    public void updataView(int position, int quantity, ListView mListView) {
+    public void updataView(int position, double quantity, ListView mListView) {
         //得到第一个可显示控件的位置
         int visibleFirstPosition = mListView.getFirstVisiblePosition();
         int visibleLastPosition = mListView.getLastVisiblePosition();
@@ -722,7 +741,7 @@ public class GoodsListViewAdapter extends BaseAdapter {
             //得到要更新的item的view
             View view = mListView.getChildAt(position - visibleFirstPosition);
             ViewHolder holder = (ViewHolder) view.getTag();
-            holder.btnEle.setCount(quantity);
+//            holder.btnEle.setCount(quantity);
 //                    getView(position,view,mListView);
         }
     }

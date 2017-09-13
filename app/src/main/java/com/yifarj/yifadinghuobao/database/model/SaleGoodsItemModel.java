@@ -47,7 +47,7 @@ public class SaleGoodsItemModel extends BaseRXModel {
     public String BatchId;
 
     @Column
-    public int Quantity;
+    public double Quantity;
 
     @Column
     public double BasicQuantity;

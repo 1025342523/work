@@ -168,14 +168,14 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                     mDialog.setConfirmClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            int count;
+                            double count;
                             try {
                                 count = Integer.parseInt(mDialog.getEditText().getText().toString());
                             } catch (NumberFormatException e) {
                                 count = goodsBean.Quantity;
                             }
                             if (count != goodsBean.Quantity) {
-                                int tempCount = count;
+                                double tempCount = count;
                                 goodsBean.Quantity = tempCount;
                                 goodsBean.CurrentPrice = goodsBean.UnitPrice * tempCount;
                                 notifyDataSetChanged();
@@ -218,7 +218,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
             itemViewHolder.numberAddSubView.setValue(goodsBean.Quantity);
             itemViewHolder.numberAddSubView.setOnButtonClickListener(new NumberAddSubView.OnButtonClickListener() {
                 @Override
-                public void onButtonAddClick(View view, int value) {
+                public void onButtonAddClick(View view, double value) {
                     if (value != goodsBean.Quantity) {
                         goodsBean.Quantity = value;
                         goodsBean.CurrentPrice = goodsBean.UnitPrice * value;
@@ -247,7 +247,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                 }
 
                 @Override
-                public void onButtonSubClick(View view, int value) {
+                public void onButtonSubClick(View view, double value) {
                     if (value != goodsBean.Quantity) {
                         goodsBean.Quantity = value;
                         goodsBean.CurrentPrice = goodsBean.UnitPrice * value;
