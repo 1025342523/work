@@ -866,7 +866,7 @@ public class ShopDetailActivity extends BaseActivity {
                         public void accept(@NonNull Object o) throws Exception {
                             if (quantity > 0) {
                                 RXSQLite.rx(SQLite.select().from(ReturnListItemModel.class)
-                                        .where(ReturnListItemModel_Table.ProductId.eq(goodsBean.Id)))
+                                        .where(ReturnListItemModel_Table.ProductId.eq(shoppingId)))
                                         .queryList().subscribe(new Consumer<List<ReturnListItemModel>>() {
                                     @Override
                                     public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
@@ -933,7 +933,7 @@ public class ShopDetailActivity extends BaseActivity {
                         public void accept(@NonNull Object o) throws Exception {
                             if (quantity > 0) {
                                 RXSQLite.rx(SQLite.select().from(SaleGoodsItemModel.class)
-                                        .where(SaleGoodsItemModel_Table.ProductId.eq(goodsBean.Id)))
+                                        .where(SaleGoodsItemModel_Table.ProductId.eq(shoppingId)))
                                         .queryList().subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                                     @Override
                                     public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
@@ -1179,12 +1179,12 @@ public class ShopDetailActivity extends BaseActivity {
             }
         });
 
-        RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
-                .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
+        RXSQLite.rx(SQLite.select().from(ReturnGoodsUnitModel.class)
+                .where(ReturnGoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
                 .queryList()
-                .subscribe(new Consumer<List<GoodsUnitModel>>() {
+                .subscribe(new Consumer<List<ReturnGoodsUnitModel>>() {
                     @Override
-                    public void accept(@NonNull List<GoodsUnitModel> goodsUnitModels) throws Exception {
+                    public void accept(@NonNull List<ReturnGoodsUnitModel> goodsUnitModels) throws Exception {
                         if (goodsUnitModels == null || goodsUnitModels.size() == 0) {
                             Flowable.fromIterable(goodsBean.ProductUnitList)
                                     .forEach(valueEntity -> {

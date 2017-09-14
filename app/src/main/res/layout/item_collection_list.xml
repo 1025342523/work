@@ -104,6 +104,16 @@
                 android:textColor="@color/main_red"
                 android:textSize="@dimen/font_30"/>
 
+            <ImageView
+                android:id="@+id/addShopCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/size_20"
+                android:src="@drawable/ic_add_shoppingcart_default"
+                />
+
             <com.mcxtzhang.lib.AnimShopButton
                 android:id="@+id/btnEle"
                 android:layout_width="wrap_content"
@@ -111,6 +121,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="@dimen/size_10"
+                android:visibility="gone"
                 app:addEnableBgColor="@color/main_blue"
                 app:addEnableFgColor="#ffffff"
                 app:hintBgColor="@color/main_blue"

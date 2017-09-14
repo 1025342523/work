@@ -182,8 +182,9 @@ public class GoodsListViewAdapter extends BaseAdapter {
                             public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
                                 if (returnListItemModels != null && returnListItemModels.size() > 0) {
 //                                    holder.btnEle.setCount(returnListItemModels.get(0).Quantity);
+                                    holder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_selected);
                                 } else {
-                                    holder.btnEle.setCount(0);
+                                    holder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_default);
                                 }
                                 onbind = false;
                             }
@@ -197,8 +198,9 @@ public class GoodsListViewAdapter extends BaseAdapter {
                             public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
                                 if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
 //                                    holder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+                                    holder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_selected);
                                 } else {
-                                    holder.btnEle.setCount(0);
+                                    holder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_default);
                                 }
                                 onbind = false;
                             }
@@ -741,7 +743,11 @@ public class GoodsListViewAdapter extends BaseAdapter {
             //得到要更新的item的view
             View view = mListView.getChildAt(position - visibleFirstPosition);
             ViewHolder holder = (ViewHolder) view.getTag();
-//            holder.btnEle.setCount(quantity);
+            if (quantity > 0) {
+                holder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_selected);
+            } else {
+                holder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_default);
+            }
 //                    getView(position,view,mListView);
         }
     }

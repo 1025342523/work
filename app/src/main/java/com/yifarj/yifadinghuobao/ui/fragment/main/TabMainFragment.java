@@ -562,7 +562,10 @@ public class TabMainFragment extends BaseFragment {
         } else {
             createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false);
         }
-
+        mGoodsListAdapter.notifyDataSetChanged();
+        if (mPopupWindow != null) {
+            mPopupWindow.dismiss();
+        }
     }
 
 

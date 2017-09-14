@@ -170,6 +170,9 @@ public class MettingOrderActivity extends BaseActivity {
                                             .forEach(new Consumer<ReturnListItemModel>() {
                                                 @Override
                                                 public void accept(@NonNull ReturnListItemModel returnListItemModel) throws Exception {
+                                                    if (returnListItemModel.ParentProperyId1 != 0 && returnListItemModel.ParentProperyId2 != 0) {
+
+                                                    }
                                                     SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
                                                     mItem.PriceSystemId = returnListItemModel.PriceSystemId;
                                                     mItem.CurrentPrice = returnListItemModel.CurrentPrice;

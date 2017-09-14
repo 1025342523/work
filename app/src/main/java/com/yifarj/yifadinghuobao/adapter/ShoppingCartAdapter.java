@@ -93,11 +93,13 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                             }
                         }
                     });
-            if (goodsBean.Path != null) {
+            itemViewHolder.itemImg.setImageResource(R.drawable.default_image);
+            if (!TextUtils.isEmpty(goodsBean.Path)) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.Path))
                         .fitCenter()
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .placeholder(R.drawable.default_image)
                         .dontAnimate()
                         .into(itemViewHolder.itemImg);
@@ -275,7 +277,7 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                     }
                 }
             });
-            if (itemUnit != null) {
+            if (itemUnit.size() > 0) {
                 final LayoutInflater mInflater = LayoutInflater.from(getContext());
                 TagAdapter<GoodsUnitModel> tagAdapter = new TagAdapter<GoodsUnitModel>(itemUnit.get(position)) {
                     @Override

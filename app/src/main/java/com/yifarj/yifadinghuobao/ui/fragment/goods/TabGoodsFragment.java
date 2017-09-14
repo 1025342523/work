@@ -140,7 +140,8 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     private GoodsListEntity searchGoodsList;
     private GoodsListViewAdapter searchGoodsListAdapter;
 
-    private int itemPosition, itemType, shopId;
+    private int itemPosition, shopId;
+    private boolean isSearchList;
     private double shopQuantity = 0;
     private boolean isClearText = false;
     private boolean isExist = false;
@@ -664,6 +665,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         if (searchRequesting) {
             return;
         }
+        isSearchList = true;
         searchRequesting = true;
         ++searchPageInfo.PageIndex;
         int traderId = PreferencesUtil.getInt("TraderId", 0);
@@ -690,7 +692,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                                         @Override
                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                             itemPosition = position;
-                                            itemType = 0;
                                             shopId = entity.Value.get(position).Id;
                                             Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
                                             intent.putExtra("shoppingId", entity.Value.get(position).Id);
@@ -703,7 +704,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                                     });
                                     if (entity.Value.size() == 1) {
                                         itemPosition = 0;
-                                        itemType = 0;
                                         shopId = entity.Value.get(0).Id;
                                         Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
                                         intent.putExtra("shoppingId", entity.Value.get(0).Id);
@@ -822,7 +822,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                                     lvContent.setOnItemClickListener((parent, view, position, id) -> {
                                         if (goodsList != null && goodsList.Value != null && goodsList.Value.size() > 0 && goodsList.Value.get(position) != null) {
                                             itemPosition = position;
-                                            itemType = 1;
                                             shopId = goodsList.Value.get(position).Id;
 
                                             Intent intent = new Intent(getActivity(), ShopDetailActivity.class);
@@ -919,7 +918,16 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         } else {
             createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false);
         }
+        searchSQlite(goodsBean.Id);
+        if (isSearchList) {
+            searchGoodsListAdapter.notifyDataSetChanged();
+        } else {
+            goodsListAdapter.notifyDataSetChanged();
+        }
 
+        if (mPopupWindow != null) {
+            mPopupWindow.dismiss();
+        }
     }
 
     private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
@@ -1045,10 +1053,18 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
                     onTab1Click();
                 } else if (requestCode == REQUEST_ITEM) {
                     searchSQlite(shopId);
-                    if (itemType == 0) {
-                        searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
+                    if (isSearchList) {
+                        if (itemPosition == 0) {
+                            searchGoodsListAdapter.notifyDataSetChanged();
+                        } else {
+                            searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
+                        }
                     } else {
-                        goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
+                        if (itemPosition == 0) {
+                            goodsListAdapter.notifyDataSetChanged();
+                        } else {
+                            goodsListAdapter.updataView(itemPosition, shopQuantity, lvContent);
+                        }
                     }
                 } else if (requestCode == REQUEST_BARCODE) {
                     if (data != null) {

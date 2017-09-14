@@ -1,6 +1,7 @@
 package com.yifarj.yifadinghuobao.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,6 @@ import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +94,8 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                             }
                         }
                     });
-            if (goodsBean.Path != null) {
+            itemViewHolder.itemImg.setImageResource(R.drawable.default_image);
+            if (!TextUtils.isEmpty(goodsBean.Path)) {
                 Glide.with(getContext())
                         .load(AppInfoUtil.genPicUrl(goodsBean.Path))
                         .centerCrop()
@@ -165,7 +166,7 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                 public void onClick(View view) {
                     CzechYuanEditDialog mDialog = new CzechYuanEditDialog(getContext(), R.style.CzechYuanDialog);
                     mDialog.getEditText().setText(NumberUtil.formatDouble2String(goodsBean.Quantity));
-                    mDialog.getEditText().setSelection(0,NumberUtil.formatDouble2String(goodsBean.Quantity).length());
+                    mDialog.getEditText().setSelection(0, NumberUtil.formatDouble2String(goodsBean.Quantity).length());
                     mDialog.setConfirmClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -206,6 +207,11 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                     });
                 }
             });
+            if (!TextUtils.isEmpty(goodsBean.ParentProperyId1Name) && !TextUtils.isEmpty(goodsBean.ProperyId1Name) && !TextUtils.isEmpty(goodsBean.ParentProperyId2Name) && !TextUtils.isEmpty(goodsBean.ProperyId2Name)) {
+                itemViewHolder.tvProperty.setText(goodsBean.ParentProperyId1Name + "：" + goodsBean.ProperyId1Name + "，" + goodsBean.ParentProperyId2Name + "：" + goodsBean.ProperyId2Name);
+            } else {
+                itemViewHolder.tvProperty.setVisibility(View.GONE);
+            }
             itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
             itemViewHolder.tvBasicPrice.setText(goodsBean.BasicUnitPrice + "元/" + goodsBean.BasicUnitName);
             itemViewHolder.tvCode.setText("编号：" + goodsBean.Code.substring(goodsBean.Code.length() - 4, goodsBean.Code.length()));
@@ -271,21 +277,13 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                     }
                 }
             });
-            if (itemUnit != null) {
-                List<String> unitName = new ArrayList<>();
-                Flowable.fromIterable(itemUnit.get(position))
-                        .forEach(new Consumer<ReturnGoodsUnitModel>() {
-                            @Override
-                            public void accept(@NonNull ReturnGoodsUnitModel returnGoodsUnitModel) throws Exception {
-                                unitName.add(returnGoodsUnitModel.Name);
-                            }
-                        });
+            if (itemUnit.size() > 0) {
                 final LayoutInflater mInflater = LayoutInflater.from(getContext());
-                TagAdapter<String> tagAdapter = new TagAdapter<String>(unitName) {
+                TagAdapter<ReturnGoodsUnitModel> tagAdapter = new TagAdapter<ReturnGoodsUnitModel>(itemUnit.get(position)) {
                     @Override
-                    public View getView(FlowLayout parent, int position, String s) {
+                    public View getView(FlowLayout parent, int position, ReturnGoodsUnitModel model) {
                         TextView tv = (TextView) mInflater.inflate(R.layout.tv, parent, false);
-                        tv.setText(s);
+                        tv.setText(model.Name);
                         return tv;
                     }
                 };
@@ -300,7 +298,7 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                         for (Integer item : selectPosSet) {
                             select = item;
                         }
-                        goodsBean.ProductUnitName = unitName.get(select);
+                        goodsBean.ProductUnitName = itemUnit.get(position).get(select).Name;
                         goodsBean.UnitId = itemUnit.get(position).get(select).Id;
                         LogUtils.e(itemUnit.get(position).get(select).BasicFactor);
                         if (mPriceSystemId == -1) {
@@ -368,12 +366,12 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
                         }
                     }
                 });
-                Flowable.fromIterable(unitName)
-                        .forEach(new Consumer<String>() {
+                Flowable.fromIterable(itemUnit.get(position))
+                        .forEach(new Consumer<ReturnGoodsUnitModel>() {
                             @Override
-                            public void accept(@NonNull String s) throws Exception {
-                                if (goodsBean.ProductUnitName.equals(s)) {
-                                    tagAdapter.setSelectedList(unitName.indexOf(s));
+                            public void accept(@NonNull ReturnGoodsUnitModel model) throws Exception {
+                                if (goodsBean.ProductUnitName.equals(model.Name)) {
+                                    tagAdapter.setSelectedList(itemUnit.get(position).indexOf(model));
                                 }
                             }
                         });
@@ -553,6 +551,7 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
         TextView tvBasicPrice;
         TextView tvCode;
         TagFlowLayout llFlowLayout;
+        TextView tvProperty;
         NumberAddSubView numberAddSubView;
 
         public ItemViewHolder(View itemView) {
@@ -568,6 +567,7 @@ public class ReturnListAdapter extends AbsRecyclerViewAdapter {
             llFlowLayout = $(R.id.ll_flowLayout);
             numberAddSubView = $(R.id.num_control);
             ivDelete = $(R.id.iv_delete);
+            tvProperty = $(R.id.tv_Property);
         }
     }
 

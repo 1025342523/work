@@ -154,8 +154,9 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                 public void accept(@NonNull List<ReturnListItemModel> returnListItemModels) throws Exception {
                                     if (returnListItemModels != null && returnListItemModels.size() > 0) {
 //                                        itemViewHolder.btnEle.setCount(returnListItemModels.get(0).Quantity);
+                                        itemViewHolder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_default);
                                     } else {
-                                        itemViewHolder.btnEle.setCount(0);
+                                        itemViewHolder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_selected);
                                     }
                                     onbind = false;
                                 }
@@ -303,8 +304,9 @@ public class GoodsListAdapter extends AbsRecyclerViewAdapter {
                                 public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
                                     if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
 //                                        itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+                                        itemViewHolder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_selected);
                                     } else {
-                                        itemViewHolder.btnEle.setCount(0);
+                                        itemViewHolder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_default);
                                     }
                                     onbind = false;
                                 }

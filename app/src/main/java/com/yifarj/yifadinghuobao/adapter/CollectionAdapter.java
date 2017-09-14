@@ -48,14 +48,14 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * CollectionAdapter
- *
+ * <p>
  * Created by zydx-pc on 2017/7/20.
  */
 public class CollectionAdapter extends AbsRecyclerViewAdapter {
     private List<CollectionItemModel> itemData;
     public static Map<Integer, Set<Integer>> selectedMap = new HashMap<Integer, Set<Integer>>();
     private CollectionActivity context;
-
+    private AddShoppingCartClickListener mAddShoppingCartClickListener;
     private int orderCount = 0;
 
     public CollectionAdapter(RecyclerView recyclerView, List<CollectionItemModel> mItemData, CollectionActivity context) {
@@ -64,6 +64,13 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
         this.context = context;
     }
 
+    public interface AddShoppingCartClickListener {
+        void onAddShoppingCartClickListener(View view, CollectionItemModel goodsEntity);
+    }
+
+    public void setAddShoppingCartClickListener(AddShoppingCartClickListener l) {
+        this.mAddShoppingCartClickListener = l;
+    }
 
     @Override
     public ClickableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -89,8 +96,9 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
                         public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModel) throws Exception {
                             if (saleGoodsItemModel != null && saleGoodsItemModel.size() > 0) {
 //                                itemViewHolder.btnEle.setCount(saleGoodsItemModel.get(0).Quantity);
+                                itemViewHolder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_selected);
                             } else {
-                                itemViewHolder.btnEle.setCount(0);
+                                itemViewHolder.addShopCart.setImageResource(R.drawable.ic_add_shoppingcart_default);
                             }
                         }
                     });
@@ -101,14 +109,14 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
                     .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                         @Override
                         public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
-                            LogUtils.e("saleGoodsItemModels："+saleGoodsItemModels.size());
+                            LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
                             orderCount = saleGoodsItemModels.size();
-                            if(orderCount>0){
-                                context.setRightIcon(View.VISIBLE,orderCount);
-                            }else if(orderCount==0){
-                                context.setRightIcon(View.GONE,0);
+                            if (orderCount > 0) {
+                                context.setRightIcon(View.VISIBLE, orderCount);
+                            } else if (orderCount == 0) {
+                                context.setRightIcon(View.GONE, 0);
                             }
-                            LogUtils.e("orderCount："+orderCount);
+                            LogUtils.e("orderCount：" + orderCount);
                         }
                     });
 
@@ -160,7 +168,14 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
             itemViewHolder.tvCode.setText("编号：" + goodsBean.Code.substring(goodsBean.Code.length() - 4, goodsBean.Code.length()));
             itemViewHolder.tvPackSpec.setText(goodsBean.PackSpec);
             itemViewHolder.tvBasicPrice.setText(goodsBean.BasicUnitPrice + "元/" + goodsBean.BasicUnitName);
-
+            itemViewHolder.addShopCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mAddShoppingCartClickListener != null) {
+                        mAddShoppingCartClickListener.onAddShoppingCartClickListener(view, goodsBean);
+                    }
+                }
+            });
             itemViewHolder.btnEle.setOnAddDelListener(new IOnAddDelListener() {
                 @Override
                 public void onAddSuccess(int i) {
@@ -178,23 +193,23 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
                                     @Override
                                     public void accept(@NonNull Boolean aBean) throws Exception {
                                         LogUtils.e(mItem.ProductName + "：数量增加为" + i);
-                                        if(i==1){
-                                            orderCount=orderCount+1;
-                                            if (orderCount>0){
-                                                context.setRightIcon(View.VISIBLE,orderCount);
-                                                LogUtils.e("orderCount："+orderCount);
+                                        if (i == 1) {
+                                            orderCount = orderCount + 1;
+                                            if (orderCount > 0) {
+                                                context.setRightIcon(View.VISIBLE, orderCount);
+                                                LogUtils.e("orderCount：" + orderCount);
                                             }
                                         }
                                     }
                                 });
                             } else {
                                 add(goodsBean, i);
-                                LogUtils.e("onAddSuccess---add---"+goodsBean.ProductName);
-                                if(i==1){
-                                    orderCount=orderCount+1;
-                                    if (orderCount>0){
-                                        context.setRightIcon(View.VISIBLE,orderCount);
-                                        LogUtils.e("orderCount："+orderCount);
+                                LogUtils.e("onAddSuccess---add---" + goodsBean.ProductName);
+                                if (i == 1) {
+                                    orderCount = orderCount + 1;
+                                    if (orderCount > 0) {
+                                        context.setRightIcon(View.VISIBLE, orderCount);
+                                        LogUtils.e("orderCount：" + orderCount);
                                     }
                                 }
                             }
@@ -224,22 +239,22 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
                                     @Override
                                     public void accept(@NonNull Boolean aBean) throws Exception {
                                         LogUtils.e(mItem.ProductName + "：数量减少为" + i);
-                                        if(i==0){
+                                        if (i == 0) {
                                             delete(goodsBean.ProductId);
-                                            orderCount=orderCount-1;
-                                            if (orderCount>0){
-                                                context.setRightIcon(View.VISIBLE,orderCount);
-                                                LogUtils.e("orderCount："+orderCount);
-                                            }else if(orderCount==0){
-                                                context.setRightIcon(View.GONE,0);
-                                                LogUtils.e("orderCount："+orderCount);
+                                            orderCount = orderCount - 1;
+                                            if (orderCount > 0) {
+                                                context.setRightIcon(View.VISIBLE, orderCount);
+                                                LogUtils.e("orderCount：" + orderCount);
+                                            } else if (orderCount == 0) {
+                                                context.setRightIcon(View.GONE, 0);
+                                                LogUtils.e("orderCount：" + orderCount);
                                             }
                                         }
                                     }
                                 });
                             } else {
                                 add(goodsBean, i);
-                                LogUtils.e("onDelSuccess---add---"+goodsBean.ProductName);
+                                LogUtils.e("onDelSuccess---add---" + goodsBean.ProductName);
                             }
 
                         }
@@ -414,6 +429,7 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
         TextView tvBasicPrice;
         TextView tvCode;
         AnimShopButton btnEle;
+        ImageView addShopCart;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
@@ -424,6 +440,7 @@ public class CollectionAdapter extends AbsRecyclerViewAdapter {
             tvPackSpec = $(R.id.tv_PackSpec);
             tvCode = $(R.id.tv_Code);
             btnEle = $(R.id.btnEle);
+            addShopCart = $(R.id.addShopCart);
         }
     }
 
