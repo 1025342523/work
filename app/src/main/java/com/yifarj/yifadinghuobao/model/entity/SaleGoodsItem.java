@@ -110,9 +110,13 @@ public class SaleGoodsItem {
         public String BrandName = "";
         public String OrderCode = "";
         public String PackSpec;
+        public int ProperyId1;
+        public int ProperyId2;
+        public int ProductProperyId1;
+        public int ProductProperyId2;
         public List<ProductUnitEntity.ValueEntity> ProductUnitList = new ArrayList<>();
-        public List<ProductPropertyListEntity.ValueEntity> ProperyList1;
-        public List<ProductPropertyListEntity.ValueEntity> ProperyList2;
+        public List<ProductPropertyListEntity.ValueEntity> ProperyList1 = new ArrayList<>();
+        public List<ProductPropertyListEntity.ValueEntity> ProperyList2 = new ArrayList<>();
         public String SalesStockProductInfo;
         public String ProductUnitName = "";
         public double MemberPrice;
@@ -221,6 +225,10 @@ public class SaleGoodsItem {
             dest.writeDouble(this.MemberPrice);
             dest.writeDouble(this.BaseMemberPrice);
             dest.writeString(this.DiscountValue);
+            dest.writeInt(this.ProperyId1);
+            dest.writeInt(this.ProperyId2);
+            dest.writeInt(this.ProductProperyId1);
+            dest.writeInt(this.ProductProperyId2);
         }
 
         protected ValueEntity(Parcel in) {
@@ -305,6 +313,10 @@ public class SaleGoodsItem {
             this.MemberPrice = in.readDouble();
             this.BaseMemberPrice = in.readDouble();
             this.DiscountValue = in.readString();
+            this.ProperyId1 = in.readInt();
+            this.ProperyId2 = in.readInt();
+            this.ProductProperyId1 = in.readInt();
+            this.ProductProperyId2 = in.readInt();
         }
 
         public static final Creator<ValueEntity> CREATOR = new Creator<ValueEntity>() {

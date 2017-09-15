@@ -23,6 +23,8 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.database.model.CollectionItemModel;
 import com.yifarj.yifadinghuobao.database.model.CollectionItemModel_Table;
+import com.yifarj.yifadinghuobao.database.model.GoodsPropertyModel;
+import com.yifarj.yifadinghuobao.database.model.GoodsPropertyModel_Table;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel;
@@ -1070,6 +1072,69 @@ public class ShopDetailActivity extends BaseActivity {
                 LogUtils.e("Item保存数据成功");
             }
         });
+
+        if (isProperty) {
+            RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class)
+                    .where(GoodsPropertyModel_Table.ProductId.eq(goodsBean.Id), GoodsPropertyModel_Table.ParentId.eq(goodsBean.ProperyId1)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                            if (goodsPropertyModels == null || goodsPropertyModels.size() == 0) {
+                                Flowable.fromIterable(productPropery1)
+                                        .forEach(valueEntity -> {
+                                            GoodsPropertyModel goodsPropertyModel = new GoodsPropertyModel();
+                                            goodsPropertyModel.Id = valueEntity.Id;
+                                            goodsPropertyModel.ProductId = goodsBean.Id;
+                                            goodsPropertyModel.Name = valueEntity.Name;
+                                            goodsPropertyModel.Ordinal = valueEntity.Ordinal;
+                                            goodsPropertyModel.ParentId = valueEntity.ParentId;
+                                            goodsPropertyModel.Level = valueEntity.Level;
+                                            goodsPropertyModel.PropertyType = 1;
+                                            goodsPropertyModel.Path = valueEntity.Path;
+                                            goodsPropertyModel.ProductCount = valueEntity.ProductCount;
+                                            goodsPropertyModel.insert().subscribe(new Consumer<Long>() {
+                                                @Override
+                                                public void accept(@NonNull Long aLong) throws Exception {
+                                                    LogUtils.e("商品属性1插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                                }
+                                            });
+                                        });
+                            }
+                        }
+                    });
+
+            RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class)
+                    .where(GoodsPropertyModel_Table.ProductId.eq(goodsBean.Id), GoodsPropertyModel_Table.ParentId.eq(goodsBean.ProperyId2)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                            if (goodsPropertyModels == null || goodsPropertyModels.size() == 0) {
+                                Flowable.fromIterable(productPropery2)
+                                        .forEach(valueEntity -> {
+                                            GoodsPropertyModel goodsPropertyModel = new GoodsPropertyModel();
+                                            goodsPropertyModel.Id = valueEntity.Id;
+                                            goodsPropertyModel.ProductId = goodsBean.Id;
+                                            goodsPropertyModel.Name = valueEntity.Name;
+                                            goodsPropertyModel.Ordinal = valueEntity.Ordinal;
+                                            goodsPropertyModel.ParentId = valueEntity.ParentId;
+                                            goodsPropertyModel.Level = valueEntity.Level;
+                                            goodsPropertyModel.PropertyType = 2;
+                                            goodsPropertyModel.Path = valueEntity.Path;
+                                            goodsPropertyModel.ProductCount = valueEntity.ProductCount;
+                                            goodsPropertyModel.insert().subscribe(new Consumer<Long>() {
+                                                @Override
+                                                public void accept(@NonNull Long aLong) throws Exception {
+                                                    LogUtils.e("商品属性2插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                                }
+                                            });
+                                        });
+                            }
+                        }
+                    });
+        }
+
         RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
                 .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
                 .queryList()
@@ -1179,6 +1244,69 @@ public class ShopDetailActivity extends BaseActivity {
             }
         });
 
+        if (isProperty) {
+            RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class)
+                    .where(GoodsPropertyModel_Table.ProductId.eq(goodsBean.Id), GoodsPropertyModel_Table.ParentId.eq(goodsBean.ProperyId1)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                            if (goodsPropertyModels == null || goodsPropertyModels.size() == 0) {
+                                Flowable.fromIterable(productPropery1)
+                                        .forEach(valueEntity -> {
+                                            GoodsPropertyModel goodsPropertyModel = new GoodsPropertyModel();
+                                            goodsPropertyModel.Id = valueEntity.Id;
+                                            goodsPropertyModel.ProductId = goodsBean.Id;
+                                            goodsPropertyModel.Name = valueEntity.Name;
+                                            goodsPropertyModel.Ordinal = valueEntity.Ordinal;
+                                            goodsPropertyModel.ParentId = valueEntity.ParentId;
+                                            goodsPropertyModel.Level = valueEntity.Level;
+                                            goodsPropertyModel.PropertyType = 1;
+                                            goodsPropertyModel.Path = valueEntity.Path;
+                                            goodsPropertyModel.ProductCount = valueEntity.ProductCount;
+                                            goodsPropertyModel.insert().subscribe(new Consumer<Long>() {
+                                                @Override
+                                                public void accept(@NonNull Long aLong) throws Exception {
+                                                    LogUtils.e("商品属性1插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                                }
+                                            });
+                                        });
+                            }
+                        }
+                    });
+
+            RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class)
+                    .where(GoodsPropertyModel_Table.ProductId.eq(goodsBean.Id), GoodsPropertyModel_Table.ParentId.eq(goodsBean.ProperyId2)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                            if (goodsPropertyModels == null || goodsPropertyModels.size() == 0) {
+                                Flowable.fromIterable(productPropery2)
+                                        .forEach(valueEntity -> {
+                                            GoodsPropertyModel goodsPropertyModel = new GoodsPropertyModel();
+                                            goodsPropertyModel.Id = valueEntity.Id;
+                                            goodsPropertyModel.ProductId = goodsBean.Id;
+                                            goodsPropertyModel.Name = valueEntity.Name;
+                                            goodsPropertyModel.Ordinal = valueEntity.Ordinal;
+                                            goodsPropertyModel.ParentId = valueEntity.ParentId;
+                                            goodsPropertyModel.Level = valueEntity.Level;
+                                            goodsPropertyModel.PropertyType = 2;
+                                            goodsPropertyModel.Path = valueEntity.Path;
+                                            goodsPropertyModel.ProductCount = valueEntity.ProductCount;
+                                            goodsPropertyModel.insert().subscribe(new Consumer<Long>() {
+                                                @Override
+                                                public void accept(@NonNull Long aLong) throws Exception {
+                                                    LogUtils.e("商品属性2插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                                }
+                                            });
+                                        });
+                            }
+                        }
+                    });
+        }
+
+
         RXSQLite.rx(SQLite.select().from(ReturnGoodsUnitModel.class)
                 .where(ReturnGoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
                 .queryList()
@@ -1208,6 +1336,7 @@ public class ShopDetailActivity extends BaseActivity {
                         }
                     }
                 });
+
     }
 
     private void addCollection(GoodsListEntity.ValueEntity goodsBean) {

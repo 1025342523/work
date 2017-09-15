@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-def dbflow_version = "4.0.0-beta7"
+def dbflow_version = "4.1.1"
 
 android {
     compileSdkVersion 26

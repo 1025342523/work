@@ -40,6 +40,8 @@ import com.yifarj.yifadinghuobao.adapter.helper.EndlessRecyclerOnScrollListener;
 import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.database.model.CollectionItemModel;
 import com.yifarj.yifadinghuobao.database.model.CollectionItemModel_Table;
+import com.yifarj.yifadinghuobao.database.model.GoodsPropertyModel;
+import com.yifarj.yifadinghuobao.database.model.GoodsPropertyModel_Table;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
@@ -556,11 +558,11 @@ public class TabMainFragment extends BaseFragment {
         if (productPropery1.size() > 0 && productPropery2.size() > 0 && selectedProperty1List.size() > 0 && selectedProperty2List.size() > 0) {
             for (int property1Position : selectedProperty1List) {
                 for (int property2Position : selectedProperty2List) {
-                    createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, productPropery1.get(property1Position).Id, productPropery2.get(property2Position).Id, productPropery1.get(property1Position).Name, productPropery2.get(property2Position).Name, true);
+                    createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, productPropery1.get(property1Position).Id, productPropery2.get(property2Position).Id, productPropery1.get(property1Position).Name, productPropery2.get(property2Position).Name, true, productPropery1, productPropery2);
                 }
             }
         } else {
-            createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false);
+            createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false, null, null);
         }
         mGoodsListAdapter.notifyDataSetChanged();
         if (mPopupWindow != null) {
@@ -569,7 +571,7 @@ public class TabMainFragment extends BaseFragment {
     }
 
 
-    private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty) {
+    private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty, List<ProductPropertyListEntity.ValueEntity> productPropery1, List<ProductPropertyListEntity.ValueEntity> productPropery2) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
         itemModel.CurrentPrice = totalPrice;
         if (goodsBean.ProductPictureList != null && goodsBean.ProductPictureList.size() > 0) {
@@ -633,6 +635,69 @@ public class TabMainFragment extends BaseFragment {
                 LogUtils.e("Item保存数据成功");
             }
         });
+
+        if (isProperty) {
+            RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class)
+                    .where(GoodsPropertyModel_Table.ProductId.eq(goodsBean.Id), GoodsPropertyModel_Table.ParentId.eq(goodsBean.ProperyId1)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                            if (goodsPropertyModels == null || goodsPropertyModels.size() == 0) {
+                                Flowable.fromIterable(productPropery1)
+                                        .forEach(valueEntity -> {
+                                            GoodsPropertyModel goodsPropertyModel = new GoodsPropertyModel();
+                                            goodsPropertyModel.Id = valueEntity.Id;
+                                            goodsPropertyModel.ProductId = goodsBean.Id;
+                                            goodsPropertyModel.Name = valueEntity.Name;
+                                            goodsPropertyModel.Ordinal = valueEntity.Ordinal;
+                                            goodsPropertyModel.ParentId = valueEntity.ParentId;
+                                            goodsPropertyModel.Level = valueEntity.Level;
+                                            goodsPropertyModel.PropertyType = 1;
+                                            goodsPropertyModel.Path = valueEntity.Path;
+                                            goodsPropertyModel.ProductCount = valueEntity.ProductCount;
+                                            goodsPropertyModel.insert().subscribe(new Consumer<Long>() {
+                                                @Override
+                                                public void accept(@NonNull Long aLong) throws Exception {
+                                                    LogUtils.e("商品属性1插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                                }
+                                            });
+                                        });
+                            }
+                        }
+                    });
+
+            RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class)
+                    .where(GoodsPropertyModel_Table.ProductId.eq(goodsBean.Id), GoodsPropertyModel_Table.ParentId.eq(goodsBean.ProperyId2)))
+                    .queryList()
+                    .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                        @Override
+                        public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                            if (goodsPropertyModels == null || goodsPropertyModels.size() == 0) {
+                                Flowable.fromIterable(productPropery2)
+                                        .forEach(valueEntity -> {
+                                            GoodsPropertyModel goodsPropertyModel = new GoodsPropertyModel();
+                                            goodsPropertyModel.Id = valueEntity.Id;
+                                            goodsPropertyModel.ProductId = goodsBean.Id;
+                                            goodsPropertyModel.Name = valueEntity.Name;
+                                            goodsPropertyModel.Ordinal = valueEntity.Ordinal;
+                                            goodsPropertyModel.ParentId = valueEntity.ParentId;
+                                            goodsPropertyModel.Level = valueEntity.Level;
+                                            goodsPropertyModel.PropertyType = 2;
+                                            goodsPropertyModel.Path = valueEntity.Path;
+                                            goodsPropertyModel.ProductCount = valueEntity.ProductCount;
+                                            goodsPropertyModel.insert().subscribe(new Consumer<Long>() {
+                                                @Override
+                                                public void accept(@NonNull Long aLong) throws Exception {
+                                                    LogUtils.e("商品属性2插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                                }
+                                            });
+                                        });
+                            }
+                        }
+                    });
+        }
+
         RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class)
                 .where(GoodsUnitModel_Table.ProductId.eq(goodsBean.Id)))
                 .queryList()

@@ -19,7 +19,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 public class AppDatabase {
     public static final String NAME = "YiDingHuoDatabase";
 
-    public static final int VERSION = 5; //2017/9/13 15:24 add Property
+    public static final int VERSION = 6; //2017/9/13 15:24 add Property
 
     @Migration(version = 5, database = AppDatabase.class)
     public static class Migration_5_SaleGoodsItemModel extends AlterTableMigration<SaleGoodsItemModel> {
