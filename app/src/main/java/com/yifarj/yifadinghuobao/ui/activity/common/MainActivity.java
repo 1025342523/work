@@ -21,6 +21,7 @@ import com.yifarj.yifadinghuobao.ui.fragment.order.TabOrderFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
 import com.yifarj.yifadinghuobao.view.LoadingDialog;
+import com.yifarj.yifadinghuobao.view.SetPasswordDialog;
 
 import butterknife.BindView;
 import io.reactivex.Observer;
@@ -30,8 +31,11 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.yifarj.yifadinghuobao.R.id.tabHost;
+import static com.yifarj.yifadinghuobao.network.ApiConstants.CPreference.SET_PASSWORD;
 
 public class MainActivity extends BaseActivity {
+
+
 
     @BindView(tabHost)
     FragmentTabHost mFragmentTabHost;
@@ -54,6 +58,12 @@ public class MainActivity extends BaseActivity {
         assert mTabWidget != null;
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         mFragmentTabHost.setCurrentTab(0);
+        if(!PreferencesUtil.getBoolean(SET_PASSWORD,false)){
+            SetPasswordDialog dialog = new SetPasswordDialog();
+            dialog.newInstance("1").setMargin(60).setOutCancel(false).show(getSupportFragmentManager());
+        }
+
+
     }
 
     private static final int[] TAB_BUTTON_ICON_RES = {
