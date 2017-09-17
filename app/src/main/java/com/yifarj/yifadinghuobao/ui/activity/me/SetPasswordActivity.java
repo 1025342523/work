@@ -178,6 +178,7 @@ public class SetPasswordActivity extends BaseActivity {
                             public void onNext(@NonNull TraderEntity traderEntity) {
                                 if (!traderEntity.HasError) {
                                     PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
+                                    PreferencesUtil.putBoolean(ApiConstants.CPreference.SET_PASSWORD,true);
                                     ToastUtils.showShortSafe("密码设置成功");
                                     LogUtils.e("密码设置成功:" + pwd);
                                     DataSaver.setTraderInfo(traderEntity.Value);
