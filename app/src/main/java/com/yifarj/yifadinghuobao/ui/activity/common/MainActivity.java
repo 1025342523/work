@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.model.entity.LoginEntity;
+import com.yifarj.yifadinghuobao.network.ApiConstants;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.goods.TabGoodsFragment;
@@ -31,11 +32,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.yifarj.yifadinghuobao.R.id.tabHost;
-import static com.yifarj.yifadinghuobao.network.ApiConstants.CPreference.SET_PASSWORD;
 
 public class MainActivity extends BaseActivity {
-
-
 
     @BindView(tabHost)
     FragmentTabHost mFragmentTabHost;
@@ -58,12 +56,10 @@ public class MainActivity extends BaseActivity {
         assert mTabWidget != null;
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         mFragmentTabHost.setCurrentTab(0);
-        if(!PreferencesUtil.getBoolean(SET_PASSWORD,false)){
+        if(!PreferencesUtil.getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),false)){
             SetPasswordDialog dialog = new SetPasswordDialog();
             dialog.newInstance("1").setMargin(60).setOutCancel(false).show(getSupportFragmentManager());
         }
-
-
     }
 
     private static final int[] TAB_BUTTON_ICON_RES = {
@@ -72,6 +68,7 @@ public class MainActivity extends BaseActivity {
             R.drawable.selector_bottom_bar_order,
             R.drawable.selector_bottom_bar_mine,
     };
+
     private static final int[] TAB_BUTTON_NAME_RES = {
             R.string.tab_main,
             R.string.tab_goods,

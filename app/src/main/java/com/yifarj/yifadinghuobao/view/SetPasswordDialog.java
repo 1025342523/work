@@ -62,14 +62,14 @@ public class SetPasswordDialog extends BaseDialog {
 
     @Override
     public void convertView(ViewHolder holder, BaseDialog dialog) {
-        holder.setOnClickListener(R.id.tv_cancel, new View.OnClickListener() {
+        holder.setOnClickListener(R.id.cancel, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
                 ToastUtils.showShort("您也可以去“我的”设置密码哦");
             }
         });
-        holder.setOnClickListener(R.id.tv_ok, new View.OnClickListener() {
+        holder.setOnClickListener(R.id.ok, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText et_pwd = holder.getView(R.id.et_pwd);
@@ -86,7 +86,7 @@ public class SetPasswordDialog extends BaseDialog {
                 }
                 setPassword(pwd2);
                 dialog.dismiss();
-                PreferencesUtil.putBoolean(ApiConstants.CPreference.SET_PASSWORD, true);
+                PreferencesUtil.putBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME), true);
                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd2);
                 Toast.makeText(getContext(), "设置密码成功，下次可以使用密码登陆哦", Toast.LENGTH_SHORT).show();
             }

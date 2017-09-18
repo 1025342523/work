@@ -47,6 +47,7 @@ public class PasswordSetActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else if (DataSaver.getPasswordCustomerInfo() != null) {
@@ -54,7 +55,8 @@ public class PasswordSetActivity extends BaseActivity {
         } else {
             traderId = PreferencesUtil.getInt("TraderId", 0);
         }
-        if(PreferencesUtil.getBoolean(ApiConstants.CPreference.SET_PASSWORD,false)){
+
+        if(PreferencesUtil.getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),false)){
             rl_setPassword.setVisibility(View.GONE);
         }
 

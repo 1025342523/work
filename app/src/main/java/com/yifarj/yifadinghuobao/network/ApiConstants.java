@@ -59,10 +59,6 @@ public class ApiConstants {
          */
         public static final String MODE_PAYMENT = "mode_payment";
 
-        /**
-         * 设置密码
-         */
-        public static final String SET_PASSWORD = "set_password";
     }
 
 

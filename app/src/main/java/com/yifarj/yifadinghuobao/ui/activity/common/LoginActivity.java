@@ -560,6 +560,7 @@ public class LoginActivity extends BaseActivity {
                                 }
                                 PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, phoneNumber);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
+                                PreferencesUtil.putBoolean(phoneNumber,true);
 
                                 LogUtils.e("登录 onComplete");
                                 LogUtils.e("traderId " + passwordLoginEntity.Value.Value.TraderId);
@@ -581,6 +582,7 @@ public class LoginActivity extends BaseActivity {
                                                     LogUtils.e("获取Trader onNext");
                                                     DataSaver.setPriceSystemId(traderEntity.Value.DefaultPriceSystemId);
                                                     DataSaver.setTraderInfo(traderEntity.Value);
+
                                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                                     finish();
                                                 } else {
