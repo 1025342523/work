@@ -187,7 +187,11 @@ public class TabMainFragment extends BaseFragment {
             return;
         }
         goodsList.clear();
-        pageInfo = new PageInfo();
+        if (pageInfo==null){
+            pageInfo = new PageInfo();
+        }
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "CreatedTime";
         initRefreshLayout();
         initRecyclerView();
         mRecyclerView.scrollToPosition(0);

@@ -150,7 +150,8 @@ public class NewProductActivity extends BaseActivity {
             traderId = PreferencesUtil.getInt("TraderId", 0);
         }
         pageInfo = new PageInfo();
-
+        searchPageInfo.SortOrder = 2;
+        searchPageInfo.SortedColumn = "CreatedTime";
         saleType = getIntent().getIntExtra("saleType", 0);
 
         lazyLoad();
@@ -336,7 +337,8 @@ public class NewProductActivity extends BaseActivity {
     public void lazyLoad() {
         goodsList = null;
         pageInfo.PageIndex = -1;
-        pageInfo.SortOrder = 1;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "CreatedTime";
         morePage = true;
         loadData();
     }

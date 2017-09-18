@@ -145,6 +145,8 @@ public class PromotionActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        searchPageInfo.SortOrder = 2;
+        searchPageInfo.SortedColumn = "CreatedTime";
         pageInfo = new PageInfo();
         priceSystemId = PreferencesUtil.getInt("PriceSystemId", -1);
         if (DataSaver.getMettingCustomerInfo() != null) {
@@ -1225,7 +1227,8 @@ public class PromotionActivity extends BaseActivity {
     public void lazyLoad() {
         goodsList = null;
         pageInfo.PageIndex = -1;
-        pageInfo.SortOrder = 1;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "CreatedTime";
         morePage = true;
         loadData();
     }

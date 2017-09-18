@@ -144,6 +144,8 @@ public class RecommendActivity extends BaseActivity {
     @Override
     public void initViews(Bundle savedInstanceState) {
         pageInfo = new PageInfo();
+        searchPageInfo.SortOrder = 2;
+        searchPageInfo.SortedColumn = "CreatedTime";
         priceSystemId = PreferencesUtil.getInt("PriceSystemId", -1);
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
@@ -1229,7 +1231,8 @@ public class RecommendActivity extends BaseActivity {
     public void lazyLoad() {
         goodsList = null;
         pageInfo.PageIndex = -1;
-        pageInfo.SortOrder = 1;
+        pageInfo.SortOrder = 2;
+        pageInfo.SortedColumn = "CreatedTime";
         morePage = true;
         loadData();
     }
