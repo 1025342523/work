@@ -54,6 +54,10 @@ public class PasswordSetActivity extends BaseActivity {
         } else {
             traderId = PreferencesUtil.getInt("TraderId", 0);
         }
+        if(PreferencesUtil.getBoolean(ApiConstants.CPreference.SET_PASSWORD,false)){
+            rl_setPassword.setVisibility(View.GONE);
+        }
+
         getOldPassword();
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override

@@ -12,7 +12,7 @@ public class ApiConstants {
 
     public static final String COMMON_UA_STR = "YiDingHuo Android Client (Czech.Yuan)";
 
-    public final class CPreference {
+    public static final class CPreference {
         /**
          * 登录名
          */
@@ -58,6 +58,11 @@ public class ApiConstants {
          * 支付方式
          */
         public static final String MODE_PAYMENT = "mode_payment";
+
+        /**
+         * 设置密码
+         */
+        public static final String SET_PASSWORD = "set_password";
     }
 
 
