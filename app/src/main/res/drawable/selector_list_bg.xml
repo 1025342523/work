@@ -22,7 +22,7 @@
     </item>
     <item >
         <shape>
-            <solid android:color="@color/white"/>
+            <solid android:color="@color/modify_set_pwd_bg"/>
         </shape>
     </item>
 </selector>

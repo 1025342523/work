@@ -28,4 +28,6 @@
     <color name="bangumi_badge_gary">#e58B8B8C</color>
     <color name="recycle_view_divider">#dfe1e5</color>
     <color name="common_gary">#8a8a8a</color>
+    <color name="password_set_bg">#FEFEFF</color>
+    <color name="modify_set_pwd_bg">#F9FAFA</color>
 </resources>

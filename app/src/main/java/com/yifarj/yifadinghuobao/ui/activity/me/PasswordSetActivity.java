@@ -145,6 +145,7 @@ public class PasswordSetActivity extends BaseActivity {
 
     /**
      * 传递服务器是否设置密码
+     *
      */
     public static class IsSetPwd{
         public IsSetPwd(boolean isSetPwd){
