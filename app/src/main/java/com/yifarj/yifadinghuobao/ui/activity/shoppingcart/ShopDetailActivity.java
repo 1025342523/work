@@ -482,8 +482,8 @@ public class ShopDetailActivity extends BaseActivity {
                                 public void onClick(View view) {
                                     CzechYuanEditDialog mDialog = new CzechYuanEditDialog(ShopDetailActivity.this, R.style.CzechYuanDialog);
                                     LogUtils.e(goodsBean.Name + "：数量为" + quantity);
-                                    mDialog.getEditText().setText(String.valueOf(quantity));
-                                    mDialog.getEditText().setSelection(0, String.valueOf(quantity).length());
+                                    mDialog.getEditText().setText(NumberUtil.formatDouble2String(quantity));
+                                    mDialog.getEditText().setSelection(0, NumberUtil.formatDouble2String(quantity).length());
                                     mDialog.setConfirmClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {

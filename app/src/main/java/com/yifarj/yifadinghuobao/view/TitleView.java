@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.StringUtils;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.utils.NumberUtil;
 
 /**
  * Title栏
@@ -206,11 +207,11 @@ public class TitleView extends RelativeLayout {
         return ivRight;
     }
 
-    public void setRightIconText(int visibility,int title){
-        if(tvRightIcon != null && title > 0){
+    public void setRightIconText(int visibility, int title) {
+        if (tvRightIcon != null && title > 0) {
             tvRightIcon.setVisibility(visibility);
-            tvRightIcon.setText(String.valueOf(title));
-        }else if (title == 0) {
+            tvRightIcon.setText(NumberUtil.formatDouble2String(title));
+        } else if (title == 0) {
             tvRightIcon.setVisibility(visibility);
         }
     }

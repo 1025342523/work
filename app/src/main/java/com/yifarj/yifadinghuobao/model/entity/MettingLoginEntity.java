@@ -121,5 +121,6 @@ public class MettingLoginEntity {
         public String VerifyCode;//手机验证码
         public long FailureTime;//验证码失效时间
         public int CodeSendTimes;//失效时间内发送次数
+        public String card_password;
     }
 }
