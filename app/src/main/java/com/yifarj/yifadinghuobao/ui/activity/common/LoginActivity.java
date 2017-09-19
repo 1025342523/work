@@ -245,8 +245,6 @@ public class LoginActivity extends BaseActivity {
                                 }
                             }
                         }
-
-
                         return Observable.interval(1, TimeUnit.SECONDS, Schedulers.io()).take(MAX_COUNT_TIME);
                     }
                 })
@@ -322,6 +320,7 @@ public class LoginActivity extends BaseActivity {
                             PreferencesUtil.putInt("TraderId", mettingLoginEntity.Value.TraderId);
                             PreferencesUtil.putInt("Id", mettingLoginEntity.Value.Id);
                             PreferencesUtil.putString("ContactName", mettingLoginEntity.Value.ContactName);
+                            PreferencesUtil.putBoolean(ApiConstants.CPreference.IS_PWD_LOGIN,false);
                             String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
                             if (!StringUtils.isEmpty(userName)) {
                                 if (!userName.equals(name)) {
@@ -561,6 +560,7 @@ public class LoginActivity extends BaseActivity {
                                 PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, phoneNumber);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
                                 PreferencesUtil.putBoolean(phoneNumber,true);
+                                PreferencesUtil.putBoolean(ApiConstants.CPreference.IS_PWD_LOGIN,true);
 
                                 LogUtils.e("登录 onComplete");
                                 LogUtils.e("traderId " + passwordLoginEntity.Value.Value.TraderId);

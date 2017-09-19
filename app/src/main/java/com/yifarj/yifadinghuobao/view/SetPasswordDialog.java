@@ -29,7 +29,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * Created by Administrator on 2017-09-16.
+ * Created by ZhangZeZhi on 2017-09-16.
  */
 
 public class SetPasswordDialog extends BaseDialog {
@@ -66,6 +66,7 @@ public class SetPasswordDialog extends BaseDialog {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+                PreferencesUtil.putBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),false);
                 ToastUtils.showShort("您也可以去“我的”设置密码哦");
             }
         });

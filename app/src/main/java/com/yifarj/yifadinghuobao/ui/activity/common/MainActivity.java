@@ -2,6 +2,7 @@ package com.yifarj.yifadinghuobao.ui.activity.common;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTabHost;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,9 +13,11 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.model.entity.LoginEntity;
+import com.yifarj.yifadinghuobao.model.helper.DataSaver;
 import com.yifarj.yifadinghuobao.network.ApiConstants;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
+import com.yifarj.yifadinghuobao.ui.activity.me.PasswordSetActivity;
 import com.yifarj.yifadinghuobao.ui.fragment.goods.TabGoodsFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.main.TabMainFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.mine.TabMineFragment;
@@ -38,6 +41,7 @@ public class MainActivity extends BaseActivity {
     @BindView(tabHost)
     FragmentTabHost mFragmentTabHost;
     private long exitTime;
+    private boolean result = false;
 
     @Override
     public int getLayoutId() {
@@ -56,9 +60,13 @@ public class MainActivity extends BaseActivity {
         assert mTabWidget != null;
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         mFragmentTabHost.setCurrentTab(0);
-        if(!PreferencesUtil.getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),false)){
-            SetPasswordDialog dialog = new SetPasswordDialog();
-            dialog.newInstance("1").setMargin(60).setOutCancel(false).show(getSupportFragmentManager());
+
+        if(!PreferencesUtil.getBoolean(ApiConstants.CPreference.IS_PWD_LOGIN)){
+            if(!checkIsSetPwd()){
+                SetPasswordDialog dialog = new SetPasswordDialog();
+                dialog.newInstance("1").setMargin(60).setOutCancel(false).show(getSupportFragmentManager());
+            }else if(PreferencesUtil.getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME))){
+            }
         }
     }
 
@@ -144,4 +152,16 @@ public class MainActivity extends BaseActivity {
                     }
                 });
     }
+
+    private boolean checkIsSetPwd(){
+        String password = DataSaver.getMettingCustomerInfo().card_password;
+        if(TextUtils.isEmpty(password)){
+            result = false;
+        }else{
+            result = true;
+        }
+        PasswordSetActivity.IsSetPwd isSetPwd = new PasswordSetActivity.IsSetPwd(result);
+        return result;
+    }
+
 }

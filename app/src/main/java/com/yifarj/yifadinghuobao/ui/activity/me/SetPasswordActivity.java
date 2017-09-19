@@ -160,6 +160,7 @@ public class SetPasswordActivity extends BaseActivity {
                                     PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
                                     PreferencesUtil.putBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),true);
                                     ToastUtils.showShortSafe("密码设置成功");
+                                    PasswordSetActivity.isSetPwd = true;
                                     LogUtils.e("密码设置成功:" + pwd);
                                     DataSaver.setTraderInfo(traderEntity.Value);
                                     hideInputMethod();

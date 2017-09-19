@@ -59,6 +59,11 @@ public class ApiConstants {
          */
         public static final String MODE_PAYMENT = "mode_payment";
 
+        /**
+         * 是否是密码登录
+         */
+        public static final String IS_PWD_LOGIN = "is_pwd_login";
+
     }
 
 
