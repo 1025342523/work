@@ -7,8 +7,6 @@ package com.yifarj.yifadinghuobao.model.entity;
  * @date 2017/5/19 19:54
  */
 public class MettingLoginEntity {
-
-
     /**
      * Value : {"Id":112,"TraderId":122,"ContactName":"15111311956","Phone":null,"Mobile":"15111311956","Email":null,"Address":null,"Fax":null,"ModifiedTime":1495183300,"modify_date":-2209017600,"oper_date":1495183300,"vip_start_date":-2209017600,"vip_end_date":-2209017600,"birthday":-2209017600,"CreatedTime":1495183300,"card_id":0,"card_flowno":null,"card_type":null,"vip_sex":0,"card_status":0,"oper_id":0,"acc_num":0,"dec_num":0,"res_num":0,"memo":null,"homeplace":null,"marriage":null,"photo_file":null,"nation":null,"height":0,"weight":0,"blood_type":null,"favor":null,"social_id":null,"use_num":0,"consum_amt":0,"degree":null,"CardSerialNumbe":null,"DepartmentId":0,"CreatedUserId":0,"CreatedDevice":null,"ModifiedUserId":0,"VerifyCode":null,"FailureTime":null,"CodeSendTimes":0}
      * HasError : false

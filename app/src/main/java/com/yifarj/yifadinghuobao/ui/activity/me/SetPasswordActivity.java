@@ -2,15 +2,12 @@ package com.yifarj.yifadinghuobao.ui.activity.me;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -50,8 +47,6 @@ public class SetPasswordActivity extends BaseActivity {
     EditText etNewPassword;
     @BindView(R.id.btnOk)
     Button btnOk;
-    @BindView(R.id.tvNewPwdError)
-    TextView tvNewPwdError;
     @BindView(R.id.ivShowPwd)
     ImageView ivShowPwd;
 
@@ -72,13 +67,15 @@ public class SetPasswordActivity extends BaseActivity {
             ivShowPwd.setEnabled(false);
             btnOk.setVisibility(View.GONE);
         }
+
         isOldPwd = getIntent().getBooleanExtra("isOldPwd", false);
         String oldPwd = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_PASSWORD);
+        //isOldPwd = true
         if (isOldPwd || (oldPwd != null)) {
-            etNewPassword.setText("******");
-            etNewPassword.setEnabled(false);
-            ivShowPwd.setEnabled(false);
-            btnOk.setVisibility(View.GONE);
+            etNewPassword.setHint("请输入密码！");
+            etNewPassword.setEnabled(true);
+            ivShowPwd.setEnabled(true);
+            btnOk.setVisibility(View.VISIBLE);
         }
 
         titleView.setLeftIconClickListener(new View.OnClickListener() {
@@ -89,35 +86,19 @@ public class SetPasswordActivity extends BaseActivity {
             }
         });
 
-        etNewPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int count, int after) {
-                tvNewPwdError.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
         ivShowPwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //
                 if (!isShowPwd || etNewPassword.getText().toString().isEmpty()) {
                     isShowPwd = true;
                     ivShowPwd.setImageResource(R.drawable.ic_show_pwd);
-                    etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    etNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                     etNewPassword.setSelection(etNewPassword.getText().toString().length());
                 } else {
                     isShowPwd = false;
                     ivShowPwd.setImageResource(R.drawable.ic_hide_pwd);
-                    etNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     etNewPassword.setSelection(etNewPassword.getText().toString().length());
                 }
             }
@@ -154,8 +135,7 @@ public class SetPasswordActivity extends BaseActivity {
             return;
         }
         if (pwd.isEmpty()) {
-            tvNewPwdError.setVisibility(View.VISIBLE);
-            tvNewPwdError.setText("密码不能为空");
+            ToastUtils.showShort("密码不能为空！");
             return;
         }
         String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
@@ -178,8 +158,9 @@ public class SetPasswordActivity extends BaseActivity {
                             public void onNext(@NonNull TraderEntity traderEntity) {
                                 if (!traderEntity.HasError) {
                                     PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
-                                    PreferencesUtil.putBoolean(ApiConstants.CPreference.SET_PASSWORD,true);
+                                    PreferencesUtil.putBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),true);
                                     ToastUtils.showShortSafe("密码设置成功");
+                                    PasswordSetActivity.isSetPwd = true;
                                     LogUtils.e("密码设置成功:" + pwd);
                                     DataSaver.setTraderInfo(traderEntity.Value);
                                     hideInputMethod();

@@ -2,6 +2,7 @@ package com.yifarj.yifadinghuobao.model.entity;
 
 /**
  * Created by zydx-pc on 2017/8/25.
+ *
  */
 
 public class PasswordLoginEntity {

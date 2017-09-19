@@ -39,6 +39,7 @@ public class PasswordSetActivity extends BaseActivity {
 
     private boolean isOldPwd = false;
     private int traderId = 0;
+    public static boolean isSetPwd = false;
 
     @Override
     public int getLayoutId() {
@@ -47,6 +48,7 @@ public class PasswordSetActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+
         if (DataSaver.getMettingCustomerInfo() != null) {
             traderId = DataSaver.getMettingCustomerInfo().TraderId;
         } else if (DataSaver.getPasswordCustomerInfo() != null) {
@@ -54,8 +56,15 @@ public class PasswordSetActivity extends BaseActivity {
         } else {
             traderId = PreferencesUtil.getInt("TraderId", 0);
         }
-        if(PreferencesUtil.getBoolean(ApiConstants.CPreference.SET_PASSWORD,false)){
+        //是否是密码登录
+        if(PreferencesUtil.getBoolean(ApiConstants.CPreference.IS_PWD_LOGIN,false)){
             rl_setPassword.setVisibility(View.GONE);
+        }else{
+            if(isSetPwd){
+               rl_setPassword.setVisibility(View.GONE);
+            }else if(PreferencesUtil.getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME),false)){
+                rl_setPassword.setVisibility(View.GONE);
+            }
         }
 
         getOldPassword();
@@ -74,6 +83,7 @@ public class PasswordSetActivity extends BaseActivity {
                         Intent intent = new Intent(PasswordSetActivity.this, SetPasswordActivity.class);
                         intent.putExtra("isOldPwd", isOldPwd);
                         startActivity(intent);
+                        finish();
                     }
                 });
         RxView.clicks(rl_modifyPassword)
@@ -132,4 +142,15 @@ public class PasswordSetActivity extends BaseActivity {
                     }
                 });
     }
+
+    /**
+     * 传递服务器是否设置密码
+     *
+     */
+    public static class IsSetPwd{
+        public IsSetPwd(boolean isSetPwd){
+            PasswordSetActivity.isSetPwd = isSetPwd;
+        }
+    }
+
 }
