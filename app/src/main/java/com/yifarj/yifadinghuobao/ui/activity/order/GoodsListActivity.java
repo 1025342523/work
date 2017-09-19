@@ -11,6 +11,8 @@ import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.ItemGoodsListAdapter;
+import com.yifarj.yifadinghuobao.database.model.GoodsPropertyModel;
+import com.yifarj.yifadinghuobao.database.model.GoodsPropertyModel_Table;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel;
 import com.yifarj.yifadinghuobao.database.model.GoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel;
@@ -18,6 +20,7 @@ import com.yifarj.yifadinghuobao.database.model.ReturnGoodsUnitModel_Table;
 import com.yifarj.yifadinghuobao.database.model.ReturnListItemModel;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.CreateOrderEntity;
+import com.yifarj.yifadinghuobao.model.entity.ProductPropertyListEntity;
 import com.yifarj.yifadinghuobao.model.entity.ProductUnitEntity;
 import com.yifarj.yifadinghuobao.model.entity.SaleGoodsItem;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
@@ -103,6 +106,10 @@ public class GoodsListActivity extends BaseActivity {
                                                 @Override
                                                 public void accept(@NonNull ReturnListItemModel returnListItemModel) throws Exception {
                                                     SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
+                                                    mItem.ProductProperyId1 = returnListItemModel.ParentProperyId1;
+                                                    mItem.ProductProperyId2 = returnListItemModel.ParentProperyId2;
+                                                    mItem.ProperyId1 = returnListItemModel.ProperyId1;
+                                                    mItem.ProperyId2 = returnListItemModel.ProperyId2;
                                                     mItem.PriceSystemId = returnListItemModel.PriceSystemId;
                                                     mItem.CurrentPrice = returnListItemModel.CurrentPrice;
                                                     mItem.TotalPrice = returnListItemModel.CurrentPrice;
@@ -143,7 +150,54 @@ public class GoodsListActivity extends BaseActivity {
                                                     mItem.Code = returnListItemModel.Code;
                                                     mItemData.add(mItem);
                                                     LogUtils.e("GoodsItem数量为：" + mItemData.size());
+                                                    if (returnListItemModel.ProperyId1 != 0 && returnListItemModel.ProperyId2 != 0) {
+                                                        RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class).where(GoodsPropertyModel_Table.ProductId.eq(mItem.ProductId), GoodsPropertyModel_Table.ParentId.eq(mItem.ProductProperyId1)))
+                                                                .queryList()
+                                                                .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                                                                    @Override
+                                                                    public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                                                                        if (goodsPropertyModels != null && goodsPropertyModels.size() > 0) {
+                                                                            for (GoodsPropertyModel mModel : goodsPropertyModels) {
+                                                                                ProductPropertyListEntity.ValueEntity mProductProperty = new ProductPropertyListEntity.ValueEntity();
+                                                                                mProductProperty.Id = mModel.Id;
+                                                                                mProductProperty.Name = mModel.Name;
+                                                                                mProductProperty.Ordinal = mModel.Ordinal;
+                                                                                mProductProperty.ParentId = mModel.ParentId;
+                                                                                mProductProperty.Level = mModel.Level;
+                                                                                mProductProperty.Path = mModel.Path;
+                                                                                mProductProperty.ProductCount = mModel.ProductCount;
+                                                                                mItem.ProperyList1.add(mProductProperty);
+                                                                            }
+                                                                        } else {
+                                                                            LogUtils.e("属性1List为空");
+                                                                        }
+                                                                    }
+                                                                });
 
+                                                        RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class).where(GoodsPropertyModel_Table.ProductId.eq(mItem.ProductId), GoodsPropertyModel_Table.ParentId.eq(mItem.ProductProperyId2)))
+                                                                .queryList()
+                                                                .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                                                                    @Override
+                                                                    public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                                                                        if (goodsPropertyModels != null && goodsPropertyModels.size() > 0) {
+                                                                            for (GoodsPropertyModel mModel : goodsPropertyModels) {
+                                                                                ProductPropertyListEntity.ValueEntity mProductProperty = new ProductPropertyListEntity.ValueEntity();
+                                                                                mProductProperty.Id = mModel.Id;
+                                                                                mProductProperty.Name = mModel.Name;
+                                                                                mProductProperty.Ordinal = mModel.Ordinal;
+                                                                                mProductProperty.ParentId = mModel.ParentId;
+                                                                                mProductProperty.Level = mModel.Level;
+                                                                                mProductProperty.Path = mModel.Path;
+                                                                                mProductProperty.ProductCount = mModel.ProductCount;
+                                                                                mItem.ProperyList2.add(mProductProperty);
+                                                                            }
+                                                                        } else {
+                                                                            LogUtils.e("属性2List为空");
+                                                                        }
+                                                                    }
+                                                                });
+
+                                                    }
                                                     RXSQLite.rx(SQLite.select().from(ReturnGoodsUnitModel.class).where(ReturnGoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
                                                             .queryList()
                                                             .subscribe(new Consumer<List<ReturnGoodsUnitModel>>() {
@@ -191,6 +245,10 @@ public class GoodsListActivity extends BaseActivity {
                                                 @Override
                                                 public void accept(@NonNull SaleGoodsItemModel saleGoodsItemModel) throws Exception {
                                                     SaleGoodsItem.ValueEntity mItem = new SaleGoodsItem.ValueEntity();
+                                                    mItem.ProductProperyId1 = saleGoodsItemModel.ParentProperyId1;
+                                                    mItem.ProductProperyId2 = saleGoodsItemModel.ParentProperyId2;
+                                                    mItem.ProperyId1 = saleGoodsItemModel.ProperyId1;
+                                                    mItem.ProperyId2 = saleGoodsItemModel.ProperyId2;
                                                     mItem.PriceSystemId = saleGoodsItemModel.PriceSystemId;
                                                     mItem.CurrentPrice = saleGoodsItemModel.CurrentPrice;
                                                     mItem.TotalPrice = saleGoodsItemModel.CurrentPrice;
@@ -231,7 +289,54 @@ public class GoodsListActivity extends BaseActivity {
                                                     mItem.Code = saleGoodsItemModel.Code;
                                                     mItemData.add(mItem);
                                                     LogUtils.e("GoodsItem数量为：" + mItemData.size());
+                                                    {
+                                                        RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class).where(GoodsPropertyModel_Table.ProductId.eq(mItem.ProductId), GoodsPropertyModel_Table.ParentId.eq(mItem.ProductProperyId1)))
+                                                                .queryList()
+                                                                .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                                                                    @Override
+                                                                    public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                                                                        if (goodsPropertyModels != null && goodsPropertyModels.size() > 0) {
+                                                                            for (GoodsPropertyModel mModel : goodsPropertyModels) {
+                                                                                ProductPropertyListEntity.ValueEntity mProductProperty = new ProductPropertyListEntity.ValueEntity();
+                                                                                mProductProperty.Id = mModel.Id;
+                                                                                mProductProperty.Name = mModel.Name;
+                                                                                mProductProperty.Ordinal = mModel.Ordinal;
+                                                                                mProductProperty.ParentId = mModel.ParentId;
+                                                                                mProductProperty.Level = mModel.Level;
+                                                                                mProductProperty.Path = mModel.Path;
+                                                                                mProductProperty.ProductCount = mModel.ProductCount;
+                                                                                mItem.ProperyList1.add(mProductProperty);
+                                                                            }
+                                                                        } else {
+                                                                            LogUtils.e("属性1List为空");
+                                                                        }
+                                                                    }
+                                                                });
 
+                                                        RXSQLite.rx(SQLite.select().from(GoodsPropertyModel.class).where(GoodsPropertyModel_Table.ProductId.eq(mItem.ProductId), GoodsPropertyModel_Table.ParentId.eq(mItem.ProductProperyId2)))
+                                                                .queryList()
+                                                                .subscribe(new Consumer<List<GoodsPropertyModel>>() {
+                                                                    @Override
+                                                                    public void accept(@NonNull List<GoodsPropertyModel> goodsPropertyModels) throws Exception {
+                                                                        if (goodsPropertyModels != null && goodsPropertyModels.size() > 0) {
+                                                                            for (GoodsPropertyModel mModel : goodsPropertyModels) {
+                                                                                ProductPropertyListEntity.ValueEntity mProductProperty = new ProductPropertyListEntity.ValueEntity();
+                                                                                mProductProperty.Id = mModel.Id;
+                                                                                mProductProperty.Name = mModel.Name;
+                                                                                mProductProperty.Ordinal = mModel.Ordinal;
+                                                                                mProductProperty.ParentId = mModel.ParentId;
+                                                                                mProductProperty.Level = mModel.Level;
+                                                                                mProductProperty.Path = mModel.Path;
+                                                                                mProductProperty.ProductCount = mModel.ProductCount;
+                                                                                mItem.ProperyList2.add(mProductProperty);
+                                                                            }
+                                                                        } else {
+                                                                            LogUtils.e("属性2List为空");
+                                                                        }
+                                                                    }
+                                                                });
+
+                                                    }
                                                     RXSQLite.rx(SQLite.select().from(GoodsUnitModel.class).where(GoodsUnitModel_Table.ProductId.eq(mItem.ProductId)))
                                                             .queryList()
                                                             .subscribe(new Consumer<List<GoodsUnitModel>>() {

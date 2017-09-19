@@ -165,8 +165,8 @@ public class ShoppingCartAdapter extends AbsRecyclerViewAdapter {
                 @Override
                 public void onClick(View view) {
                     CzechYuanEditDialog mDialog = new CzechYuanEditDialog(getContext(), R.style.CzechYuanDialog);
-                    mDialog.getEditText().setText(String.valueOf(goodsBean.Quantity));
-                    mDialog.getEditText().setSelection(0, String.valueOf(goodsBean.Quantity).length());
+                    mDialog.getEditText().setText(NumberUtil.formatDouble2String(goodsBean.Quantity));
+                    mDialog.getEditText().setSelection(0, NumberUtil.formatDouble2String(goodsBean.Quantity).length());
                     mDialog.setConfirmClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

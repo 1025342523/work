@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.utils.NumberUtil;
 
 /**
  * 带搜索框的标题栏
@@ -137,7 +138,7 @@ public class CzechYuanTitleView extends RelativeLayout {
     public void setRightIconText(int visibility, int title) {
         if (tvRightIcon != null && title > 0) {
             tvRightIcon.setVisibility(visibility);
-            tvRightIcon.setText(String.valueOf(title));
+            tvRightIcon.setText(NumberUtil.formatDouble2String(title));
         } else if (title == 0) {
             tvRightIcon.setVisibility(visibility);
         }

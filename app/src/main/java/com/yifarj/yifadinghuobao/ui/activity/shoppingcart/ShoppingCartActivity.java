@@ -382,7 +382,7 @@ public class ShoppingCartActivity extends BaseActivity {
     }
 
     private void showTotalCount(int goodsCount, int totalCount) {
-        tvGoodsTotal.setText("共" + String.valueOf(goodsCount) + "款，总数" + String.valueOf(totalCount));
+        tvGoodsTotal.setText("共" + NumberUtil.formatDouble2String(goodsCount) + "款，总数" + NumberUtil.formatDouble2String(totalCount));
     }
 
     private int getTotalCount(List<SaleGoodsItemModel> itemData) {
