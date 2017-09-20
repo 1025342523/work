@@ -179,7 +179,6 @@ public class TabMainFragment extends BaseFragment {
         lazyLoad();
     }
 
-
     @Override
     protected void lazyLoad() {
         if (!isPrepared && !isVisible) {
@@ -266,7 +265,6 @@ public class TabMainFragment extends BaseFragment {
             }
         });
     }
-
 
     private void showPopupWindow(GoodsListEntity.ValueEntity goodsEntity, int statusIcon, int saleType) {
         isExist = false;
@@ -428,6 +426,7 @@ public class TabMainFragment extends BaseFragment {
                 return tv;
             }
         };
+
         tagFlowLayoutUnit.setAdapter(tagAdapterUnit);
 
         tagFlowLayoutUnit.setOnSelectListener(new TagFlowLayout.OnSelectListener() {
@@ -448,6 +447,7 @@ public class TabMainFragment extends BaseFragment {
                 }
             }
         });
+
         setSelectedUnit(tagAdapterUnit, selectedUnitList, goodsEntity, tvTotalPrice);
 
         //商品多属性
@@ -1252,13 +1252,14 @@ public class TabMainFragment extends BaseFragment {
         tvNewProduct = (TextView) headView.findViewById(R.id.tvNewProduct);
         tvRecommend = (TextView) headView.findViewById(R.id.tvRecommend);
         rlPagerContainer.getLayoutParams().height = ScreenUtil.getScreenWidth(getContext()) * 200 / 750;
+
         viewPager.setCurrentItem(0);
         indicator.setCount(4);
         indicator.setCurrentItem(0);
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
-                return 4;
+                return Integer.MAX_VALUE;
             }
 
             @Override
@@ -1272,7 +1273,10 @@ public class TabMainFragment extends BaseFragment {
                 view.setScaleType(ImageView.ScaleType.FIT_XY);
                 ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 view.setLayoutParams(params);
-                switch (position) {
+
+                int newPosition = position % 4;
+
+                switch (newPosition) {
                     case 0:
                         view.setImageResource(R.drawable.banner_1);
                         break;
@@ -1318,6 +1322,11 @@ public class TabMainFragment extends BaseFragment {
                 container.removeView((View) object);
             }
         });
+
+        int pos = Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2 % 4);
+
+        viewPager.setCurrentItem(pos);
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -1326,8 +1335,10 @@ public class TabMainFragment extends BaseFragment {
 
             @Override
             public void onPageSelected(int position) {
+                int newPosition = position % 4;
+                // 把之前的禁用, 把最新的启用, 更新指示器
                 if (indicator != null) {
-                    indicator.setCurrentItem(position);
+                    indicator.setCurrentItem(newPosition);
                 }
             }
 
@@ -1345,6 +1356,7 @@ public class TabMainFragment extends BaseFragment {
                 startActivity(intent);
             }
         });
+
         tvCollection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
