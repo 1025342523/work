@@ -1300,7 +1300,7 @@ public class TabMainFragment extends BaseFragment {
                     public void onClick(View view) {
                         Intent intent = new Intent(getActivity(), WebActivity.class);
                         String url = "";
-                        switch (position) {
+                        switch (newPosition) {
                             case 0:
                                 url = "http://m.yifarj.com/index.php?m=wap";
                                 break;
@@ -1340,7 +1340,6 @@ public class TabMainFragment extends BaseFragment {
             @Override
             public void onPageSelected(int position) {
                 int newPosition = position % 4;
-                // 把之前的禁用, 把最新的启用, 更新指示器
                 if (indicator != null) {
                     indicator.setCurrentItem(newPosition);
                 }

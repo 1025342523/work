@@ -69,6 +69,7 @@
     <string name="return_order">退货订单</string>
     <string name="apply_return">申请退货</string>
     <string name="mine_address">收货地址</string>
+    <string name="order_summary">订单汇总</string>
     <string name="about">关于亿订货</string>
     <string name="search_view_product">搜索商品</string>
     <string name="shop_detail">商品详情</string>
