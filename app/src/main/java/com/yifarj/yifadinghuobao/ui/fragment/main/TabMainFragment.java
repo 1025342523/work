@@ -99,6 +99,7 @@ import io.reactivex.schedulers.Schedulers;
  *
  * @auther Czech.Yuan
  * @date 2017/5/12 15:07
+ *
  */
 public class TabMainFragment extends BaseFragment {
     private static final int REQUEST_ITEM = 11;
@@ -200,9 +201,11 @@ public class TabMainFragment extends BaseFragment {
 
     @Override
     protected void initRefreshLayout() {
+
         if (mSwipeRefreshLayout == null) {
             return;
         }
+
         mSwipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW);
         //        mSwipeRefreshLayout.setColorSchemeResources(R.color.light_blue);
         mSwipeRefreshLayout.post(() -> {
@@ -243,6 +246,7 @@ public class TabMainFragment extends BaseFragment {
                 loadData();
             }
         });
+
         mGoodsListAdapter.setOnItemClickListener(new AbsRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, AbsRecyclerViewAdapter.ClickableViewHolder holder) {
@@ -1253,7 +1257,7 @@ public class TabMainFragment extends BaseFragment {
         tvRecommend = (TextView) headView.findViewById(R.id.tvRecommend);
         rlPagerContainer.getLayoutParams().height = ScreenUtil.getScreenWidth(getContext()) * 200 / 750;
 
-        viewPager.setCurrentItem(0);
+       // viewPager.setCurrentItem(0);
         indicator.setCount(4);
         indicator.setCurrentItem(0);
         viewPager.setAdapter(new PagerAdapter() {
@@ -1353,6 +1357,7 @@ public class TabMainFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), PromotionActivity.class);
+                //  TODO
                 startActivity(intent);
             }
         });

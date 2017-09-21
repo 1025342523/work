@@ -206,6 +206,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         List<Integer> selectedProperty2List = new ArrayList<>(new HashSet<>());
         List<ProductPropertyListEntity.ValueEntity> productPropery1 = new ArrayList<>();
         List<ProductPropertyListEntity.ValueEntity> productPropery2 = new ArrayList<>();
+
         View view = View.inflate(getActivity(), R.layout.popwindow_add_shoppingcart_view, null);
         ImageView itemImg = view.findViewById(R.id.item_img);
         TextView tvIcon = view.findViewById(R.id.tv_icon);
@@ -920,6 +921,7 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         } else {
             createSaleGoodsItemModel(goodsBean, count, unitName, unitId, unitPrice, totalPrice, basicUnitPrice, 0, 0, null, null, false, null, null);
         }
+        // TODO
         searchSQlite(goodsBean.Id);
         if (isSearchList) {
             searchGoodsListAdapter.notifyDataSetChanged();
@@ -1111,12 +1113,20 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        int orderCount = 0;
+        if(data != null){
+            orderCount = data.getIntExtra("orderCount", 0);
+        }
         if (resultCode == RESULT_OK) {
             try {
                 if (requestCode == REQUEST_REFRESH) {
                     onTab1Click();
                 } else if (requestCode == REQUEST_ITEM) {
-                    searchSQlite(shopId);
+
+                    if(orderCount > 0){
+                        titleView.setRightIconText(View.VISIBLE,orderCount);
+                    }
+
                     if (isSearchList) {
                         if (itemPosition == 0) {
                             searchGoodsListAdapter.notifyDataSetChanged();
@@ -1501,7 +1511,6 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
             tvtvTotalPrice.setText(NumberUtil.formatDoubleToString(totalPrice) + "元");
         }
     }
-
 
     private void setSelectedUnit(final TagAdapter<ProductUnitEntity.ValueEntity> tagAdapter, List<Integer> selectedUnitList, GoodsListEntity.ValueEntity goodsBean, TextView tvTotalPrice) {
         selectedUnitList.clear();

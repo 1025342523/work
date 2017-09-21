@@ -284,9 +284,7 @@ public class ProductCategoryActivity extends BaseActivity {
                 }
             }
         });
-
     }
-
 
     public void showEmptyView() {
         mCustomEmptyView.setVisibility(View.VISIBLE);
@@ -302,6 +300,4 @@ public class ProductCategoryActivity extends BaseActivity {
         mCustomEmptyView.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
-
-
 }

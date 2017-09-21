@@ -470,10 +470,15 @@ public class ProductListActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        int orderCount = 0;
+        if(data != null){
+            orderCount = data.getIntExtra("orderCount",0);
+        }
+
         if (requestCode == REQUEST_REFRESH) {
             lazyLoad();
         } else if (requestCode == REQUEST_ITEM) {
-            searchSQlite(shopId, saleType);
+            titleView.setRightIconText(View.VISIBLE,orderCount);
             if (itemType == 0) {
                 searchGoodsListAdapter.updataView(itemPosition, shopQuantity, searchView.getListView());
             } else {

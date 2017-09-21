@@ -832,6 +832,7 @@ public class ShopDetailActivity extends BaseActivity {
             setResult(RESULT_OK);
             finish();
         });
+
         shopDetail_titleView.setRightIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -979,13 +980,18 @@ public class ShopDetailActivity extends BaseActivity {
                                                 }
                                             }
                                         });
+                                // TODO   加入购物车
                                 add(goodsBean, quantity, unitName, unitId, unitPrice, totalPrice, basicUnitPrice);
                                 if (!isExist) {
                                     orderCount = orderCount + 1;
                                     shopDetail_titleView.setRightIconText(View.VISIBLE, orderCount);
                                     LogUtils.e("购物车数量：" + orderCount);
                                 }
-                                setResult(RESULT_OK);
+                                //  TODO
+                                Intent intent = new Intent();
+                                intent.putExtra("orderCount",orderCount);
+                                setResult(RESULT_OK,intent);
+
                                 finish();
                             } else {
                                 Toast.makeText(ShopDetailActivity.this, "请输入订购数量", Toast.LENGTH_SHORT).show();
@@ -1058,6 +1064,7 @@ public class ShopDetailActivity extends BaseActivity {
         itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
         itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
         itemModel.OweRemark = goodsBean.Remark;
+
         itemModel.insert()
                 .subscribe(new Consumer<Long>() {
                     @Override
@@ -1066,6 +1073,7 @@ public class ShopDetailActivity extends BaseActivity {
                         LogUtils.e("Item插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
                     }
                 });
+
         itemModel.save().subscribe(new Consumer<Boolean>() {
             @Override
             public void accept(@NonNull Boolean aBoolean) throws Exception {

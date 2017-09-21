@@ -7,10 +7,10 @@
               android:orientation="vertical">
 
     <com.yifarj.yifadinghuobao.view.TitleView
-    android:id="@+id/title"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:title_name="亿订货首页"/>
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title_name="亿订货首页"/>
 
     <!--<RelativeLayout-->
     <!--android:id="@+id/rlPagerContainer"-->
