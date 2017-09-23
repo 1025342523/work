@@ -26,15 +26,27 @@ public class YifaResponseBodyConverter<T> implements Converter<ResponseBody, T> 
     public T convert(ResponseBody value) throws IOException {
         String responseBody = value.string();
         if (responseBody != null && responseBody.length() > 76) {
+            //去除xml的头和尾
             responseBody = responseBody.substring(76, responseBody.length() - 9);
             if (!responseBody.contains("{")) {
                 try {
+
                     responseBody = ZipUtil.ungzip(responseBody);
+                    if(responseBody.contains("\\")){
+
+                        responseBody = responseBody.replace("\\", "");
+                        responseBody = responseBody.replace("\"[","[");
+                        responseBody = responseBody.replace("]\"","]");
+
+//                        Log.e("responseBody",responseBody.toString());
+                    }
+
                 } catch (Exception e) {
-                    LogUtil.e("解压失败", "-------------");
+                    LogUtil.e("convert：解压失败", "-------------");
                 }
             }
         }
         return adapter.fromJson(responseBody);
     }
+
 }

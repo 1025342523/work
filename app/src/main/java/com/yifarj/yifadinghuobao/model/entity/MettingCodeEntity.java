@@ -8,7 +8,6 @@ package com.yifarj.yifadinghuobao.model.entity;
  */
 public class MettingCodeEntity {
 
-
     /**
      * Value : ff1970ba-be95-458b-b583-b07aed6aa540
      * HasError : false

@@ -13,6 +13,7 @@ import com.yifarj.yifadinghuobao.network.api.LogoutService;
 import com.yifarj.yifadinghuobao.network.api.MettingCodeService;
 import com.yifarj.yifadinghuobao.network.api.MettingLoginService;
 import com.yifarj.yifadinghuobao.network.api.OrderListService;
+import com.yifarj.yifadinghuobao.network.api.OrderSummaryService;
 import com.yifarj.yifadinghuobao.network.api.PasswordLoginService;
 import com.yifarj.yifadinghuobao.network.api.ProductCategoryListService;
 import com.yifarj.yifadinghuobao.network.api.ProductMemoryPriceService;
@@ -109,6 +110,10 @@ public class RetrofitHelper {
     public static AccountService getAccountAPI() {
 
         return createApi(AccountService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+    public static OrderSummaryService getOrderSummaryAPI(){
+        return createApi(OrderSummaryService.class,ApiConstants.CUrl.BASE_URL);
     }
 
 

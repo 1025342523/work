@@ -6,7 +6,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.ui.activity.common.AboutActivity;
@@ -116,7 +115,7 @@ public class TabMineFragment extends BaseFragment {
                 .subscribe(new Consumer<Object>() {
                     @Override
                     public void accept(@NonNull Object o) throws Exception {
-                        ToastUtils.showShort("订单汇总");
+                        //ToastUtils.showShort("订单汇总");
                         Intent intent = new Intent(getApplicationContext(),OrderSummaryActivity.class);
                         getActivity().startActivity(intent);
 
