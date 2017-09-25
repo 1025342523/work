@@ -629,6 +629,8 @@ public class TabMainFragment extends BaseFragment {
         itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
         itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
         itemModel.OweRemark = goodsBean.Remark;
+        itemModel.Supplier = goodsBean.DefaultTraderName;
+        itemModel.SupplierId = goodsBean.DefaultTraderId;
         itemModel.insert()
                 .subscribe(new Consumer<Long>() {
                     @Override

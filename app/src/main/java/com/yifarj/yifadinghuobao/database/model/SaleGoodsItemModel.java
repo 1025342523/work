@@ -50,6 +50,12 @@ public class SaleGoodsItemModel extends BaseRXModel {
     public double Quantity;
 
     @Column
+    public String Supplier;//供应商Name
+
+    @Column
+    public int SupplierId;//供应商Id
+
+    @Column
     public double BasicQuantity;
 
     @Column

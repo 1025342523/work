@@ -984,6 +984,8 @@ public class TabGoodsFragment extends BaseFragment implements View.OnClickListen
         itemModel.MaxPurchasePrice = goodsBean.MaxPurchasePrice;
         itemModel.DefaultLocationName = goodsBean.DefaultLocationName;
         itemModel.OweRemark = goodsBean.Remark;
+        itemModel.Supplier = goodsBean.DefaultTraderName;
+        itemModel.SupplierId = goodsBean.DefaultTraderId;
         itemModel.insert()
                 .subscribe(new Consumer<Long>() {
                     @Override
