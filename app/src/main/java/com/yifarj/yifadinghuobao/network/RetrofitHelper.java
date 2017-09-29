@@ -7,6 +7,7 @@ import com.yifarj.yifadinghuobao.network.api.CreateOrderService;
 import com.yifarj.yifadinghuobao.network.api.FetchOrderService;
 import com.yifarj.yifadinghuobao.network.api.FetchTraderContactService;
 import com.yifarj.yifadinghuobao.network.api.FetchTraderService;
+import com.yifarj.yifadinghuobao.network.api.GetInfoService;
 import com.yifarj.yifadinghuobao.network.api.GoodsListService;
 import com.yifarj.yifadinghuobao.network.api.LoginService;
 import com.yifarj.yifadinghuobao.network.api.LogoutService;
@@ -112,8 +113,8 @@ public class RetrofitHelper {
         return createApi(AccountService.class, ApiConstants.CUrl.BASE_URL);
     }
 
-    public static OrderSummaryService getOrderSummaryAPI(){
-        return createApi(OrderSummaryService.class,ApiConstants.CUrl.BASE_URL);
+    public static OrderSummaryService getOrderSummaryAPI() {
+        return createApi(OrderSummaryService.class, ApiConstants.CUrl.BASE_URL);
     }
 
 
@@ -166,6 +167,11 @@ public class RetrofitHelper {
     public static PropertyListService getPropertyListApi() {
 
         return createApi(PropertyListService.class, ApiConstants.CUrl.BASE_URL);
+    }
+
+    public static GetInfoService getInfoApi() {
+
+        return createApi(GetInfoService.class, ApiConstants.CUrl.GET_INFO_URL);
     }
 
     /**

@@ -109,4 +109,27 @@ public class CzechYuanEditDialog extends Dialog {
             tvTitle.setText(content);
         }
     }
+
+
+    public void setConfirmBtnName(String content) {
+        if (confirm != null) {
+            confirm.setText(content);
+        }
+    }
+
+    public void setCancelBtnName(String content) {
+        if (cancel != null) {
+            cancel.setText(content);
+        }
+    }
+
+    public void setHint(String content) {
+        if (etInput != null) {
+            etInput.setHint(content);
+        }
+    }
+
+    public EditText getInputEt() {
+        return etInput;
+    }
 }

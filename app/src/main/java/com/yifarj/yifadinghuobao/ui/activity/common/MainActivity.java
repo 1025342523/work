@@ -24,6 +24,7 @@ import com.yifarj.yifadinghuobao.ui.fragment.mine.TabMineFragment;
 import com.yifarj.yifadinghuobao.ui.fragment.order.TabOrderFragment;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
+import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 import com.yifarj.yifadinghuobao.view.LoadingDialog;
 import com.yifarj.yifadinghuobao.view.SetPasswordDialog;
 
@@ -35,6 +36,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.yifarj.yifadinghuobao.R.id.tabHost;
+import static com.yifarj.yifadinghuobao.utils.PreferencesUtil.getBoolean;
 
 public class MainActivity extends BaseActivity {
 
@@ -61,11 +63,11 @@ public class MainActivity extends BaseActivity {
         mTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);
         mFragmentTabHost.setCurrentTab(0);
 
-        if(!PreferencesUtil.getBoolean(ApiConstants.CPreference.IS_PWD_LOGIN)){
-            if(!checkIsSetPwd()){
+        if (!getBoolean(ApiConstants.CPreference.IS_PWD_LOGIN)) {
+            if (!checkIsSetPwd()) {
                 SetPasswordDialog dialog = new SetPasswordDialog();
                 dialog.newInstance("1").setMargin(60).setOutCancel(false).show(getSupportFragmentManager());
-            }else if(PreferencesUtil.getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME))){
+            } else if (getBoolean(PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME))) {
             }
         }
     }
@@ -153,15 +155,29 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
-    private boolean checkIsSetPwd(){
+    private boolean checkIsSetPwd() {
         String password = DataSaver.getMettingCustomerInfo().card_password;
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             result = false;
-        }else{
+        } else {
             result = true;
         }
         PasswordSetActivity.IsSetPwd isSetPwd = new PasswordSetActivity.IsSetPwd(result);
         return result;
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean oldType = PreferencesUtil.getBoolean("LoginType", false);
+        boolean type = DataSaver.getCurrentLoginType();
+        if (!oldType == type) {
+            CzechYuanDialog mDialog = new CzechYuanDialog(MainActivity.this, R.style.CzechYuanDialog);
+            String str1 = "是否将验证码登录设为默认登录方式？";
+            String str2 = "是否将密码登录设为默认登录方式？";
+            mDialog.setContent(type ? str2 : str1);
+            mDialog.setConfirmClickListener(view1 -> PreferencesUtil.putBoolean("LoginType", type));
+        }
+    }
 }

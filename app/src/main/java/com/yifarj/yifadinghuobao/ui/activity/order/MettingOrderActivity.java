@@ -895,8 +895,9 @@ public class MettingOrderActivity extends BaseActivity {
                 orderInfo.TraderName = customerEntity.ContactName;
                 setContact(customerEntity);
 
-                orderInfo.DepartmentId = customerEntity.DepartmentId;
-
+                orderInfo.DepartmentId = 100;
+                orderInfo.EmployeeId = 1;
+                orderInfo.EmployeeName = "管理员";
                 orderInfo.DeliveryAddress = customerEntity.Address;
                 orderInfo.BillDate = System.currentTimeMillis() / 1000;
                 orderInfo.DeliveryDate = orderInfo.BillDate;

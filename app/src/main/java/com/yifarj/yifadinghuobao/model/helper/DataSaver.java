@@ -17,6 +17,7 @@ public class DataSaver {
     private static TraderEntity.ValueEntity traderInfo;
     private static int mPriceSystemId;
     private static PasswordLoginEntity.ValueBeanX.ValueEntity passwordCustomerInfo;
+    private static boolean currentLoginType;// false：验证码登录  true：密码登录
 
     public static void setMettingCustomerInfo(MettingLoginEntity.ValueEntity customerInfo) {
         mettingCustomerInfo = customerInfo;
@@ -54,4 +55,11 @@ public class DataSaver {
         return passwordCustomerInfo;
     }
 
+    public static void setCurrentLoginType(boolean type) {
+        currentLoginType = type;
+    }
+
+    public static boolean getCurrentLoginType() {
+        return currentLoginType;
+    }
 }

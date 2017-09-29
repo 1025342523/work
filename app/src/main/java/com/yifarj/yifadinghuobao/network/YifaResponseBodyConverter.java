@@ -1,5 +1,7 @@
 package com.yifarj.yifadinghuobao.network;
 
+import android.util.Log;
+
 import com.facebook.stetho.common.LogUtil;
 import com.google.gson.TypeAdapter;
 import com.yifarj.yifadinghuobao.utils.ZipUtil;
@@ -38,9 +40,9 @@ public class YifaResponseBodyConverter<T> implements Converter<ResponseBody, T> 
                         responseBody = responseBody.replace("\"[","[");
                         responseBody = responseBody.replace("]\"","]");
 
-//                        Log.e("responseBody",responseBody.toString());
-                    }
 
+                    }
+                    Log.e("responseBody",responseBody);
                 } catch (Exception e) {
                     LogUtil.e("convert：解压失败", "-------------");
                 }

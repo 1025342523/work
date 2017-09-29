@@ -74,6 +74,7 @@ public class ApiConstants {
         public static String BASE_URL = PreferencesUtil.getString(ApiConstants.CPreference.LOGIN_DOMAIN, "");
         public static final String EXPERIENCE_URL = "http://14.215.120.120:8884/yifa.asmx";
         public static final String PHONE_USER_INFO_URL = "http://duokaile.6655.la:6666/yifa.asmx";
+        public static final String GET_INFO_URL = "http://aly.yifarj.com:9999/yidinghuoinfo.asmx";
         /**
          * 获取验证码
          */
@@ -91,6 +92,11 @@ public class ApiConstants {
         public static final String EXIT = "Exit";
 
         public static final String GET_ACCOUNT_LIST = "GetAccountList";
+
+        /**
+         * 获取服务器配置
+         */
+        public static final String GET_INFO = "GetInfo";
 
         /**
          * 获取列表接口,包括客户列表等列表,与传过去的字段有关

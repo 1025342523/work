@@ -1,9 +1,14 @@
 package com.yifarj.yifadinghuobao.ui.activity.common;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,8 +21,13 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
+import com.yifarj.yifadinghuobao.database.model.ServerConfigInfoModel;
+import com.yifarj.yifadinghuobao.database.model.ServerConfigInfoModel_Table;
+import com.yifarj.yifadinghuobao.model.entity.GetInfoEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingCodeEntity;
 import com.yifarj.yifadinghuobao.model.entity.MettingLoginEntity;
 import com.yifarj.yifadinghuobao.model.entity.PasswordLoginEntity;
@@ -29,10 +39,13 @@ import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.ui.activity.me.ForgetPasswordActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.CommonUtil;
+import com.yifarj.yifadinghuobao.utils.DateUtil;
 import com.yifarj.yifadinghuobao.utils.PhoneFormatCheckUtils;
 import com.yifarj.yifadinghuobao.utils.PreferencesUtil;
+import com.yifarj.yifadinghuobao.view.CzechYuanDialog;
 import com.yifarj.yifadinghuobao.view.LoadingDialog;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -76,6 +89,10 @@ public class LoginActivity extends BaseActivity {
     TextView tvCode;
     @BindView(R.id.llPassword)
     LinearLayout llPassword;
+    @BindView(R.id.etGetInfo)
+    EditText etGetInfo;
+    @BindView(R.id.ivGetMore)
+    ImageView ivGetMore;
 
     private final int MAX_COUNT_TIME = 60;
     private String mettingCode;
@@ -83,39 +100,74 @@ public class LoginActivity extends BaseActivity {
     private Observable<Long> mObservableCountTime;
     private Consumer<Long> mConsumerCountTime;
     private boolean isPwdLogin = false;
-    private String loginPwd = null;
+    private List<ServerConfigInfoModel> mServerConfigInfoModels;
+
 
     @Override
     public int getLayoutId() {
         return R.layout.activity_login;
     }
 
+
     @Override
     public void initViews(Bundle savedInstanceState) {
+        RXSQLite.rx(SQLite.select().from(ServerConfigInfoModel.class))
+                .queryList()
+                .subscribe(new Consumer<List<ServerConfigInfoModel>>() {
+                    @Override
+                    public void accept(@NonNull List<ServerConfigInfoModel> serverConfigInfoModels) throws Exception {
+                        if (serverConfigInfoModels != null && serverConfigInfoModels.size() > 0) {
+                            mServerConfigInfoModels = serverConfigInfoModels;
+                        }
+                    }
+                });
+
+        isPwdLogin = PreferencesUtil.getBoolean("LoginType", false);
+        initLoginUi();
         String name = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
-        //        FlowManager.getDatabase(AppDatabase.class).reset(LoginActivity.this);
         if (name != null) {
             etName.setText(name);
             etName.setSelection(0, name.length());
+        }
+        etGetInfo.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    hideInputMethod();
+                    getServerConfig();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        if (mServerConfigInfoModels != null && mServerConfigInfoModels.size() > 0) {
+            if (mServerConfigInfoModels.size() == 1) {
+                etGetInfo.setText(mServerConfigInfoModels.get(0).CompanyKey);
+                etGetInfo.setSelection(mServerConfigInfoModels.get(0).CompanyKey.length());
+            } else {
+
+            }
         }
 
         tvLoginCutover.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isPwdLogin) {
-                    isPwdLogin = true;
-                    llPwd.setVisibility(View.GONE);
-                    llPassword.setVisibility(View.VISIBLE);
-                    tvLoginCutover.setText(R.string.verification_code_login);
-                } else {
-                    isPwdLogin = false;
-                    llPwd.setVisibility(View.VISIBLE);
-                    llPassword.setVisibility(View.GONE);
-                    tvLoginCutover.setText(R.string.password_login);
-                }
+                refreshLoginUi();
             }
         });
 
+        clicks(ivGetMore)
+                .compose(bindToLifecycle())
+                .subscribe(new Consumer<Object>() {
+
+                    @Override
+                    public void accept(@NonNull Object o) throws Exception {
+                        ToastUtils.showShortSafe("Hello");
+
+
+                    }
+                });
         clicks(btnLogin)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
@@ -277,10 +329,113 @@ public class LoginActivity extends BaseActivity {
 
     }
 
+    private void refreshLoginUi() {
+        if (!isPwdLogin) {
+            llPwd.setVisibility(View.GONE);
+            llPassword.setVisibility(View.VISIBLE);
+            tvLoginCutover.setText(R.string.verification_code_login);
+            isPwdLogin = true;
+        } else {
+            llPwd.setVisibility(View.VISIBLE);
+            llPassword.setVisibility(View.GONE);
+            tvLoginCutover.setText(R.string.password_login);
+            isPwdLogin = false;
+        }
+    }
+
+    private void initLoginUi() {
+        if (isPwdLogin) {
+            llPwd.setVisibility(View.GONE);
+            llPassword.setVisibility(View.VISIBLE);
+            tvLoginCutover.setText(R.string.verification_code_login);
+        } else {
+            llPwd.setVisibility(View.VISIBLE);
+            llPassword.setVisibility(View.GONE);
+            tvLoginCutover.setText(R.string.password_login);
+        }
+    }
+
+
+    public void hideInputMethod() {
+        if (getCurrentFocus() != null) {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(
+                            getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    private void getServerConfig() {
+        String key = etGetInfo.getText().toString().trim();
+        if (!TextUtils.isEmpty(key)) {
+            RetrofitHelper.getInfoApi()
+                    .getInfo(key)
+                    .compose(bindToLifecycle())
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<GetInfoEntity>() {
+                        @Override
+                        public void onSubscribe(@NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@NonNull GetInfoEntity entity) {
+                            if (!entity.HasError) {
+                                PreferencesUtil.putString(ApiConstants.CPreference.ACCOUNT_ID, entity.Value.AccsetId == null ? "" : entity.Value.AccsetId);
+                                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, entity.Value.Port == null ? "" : entity.Value.Port);
+                                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, entity.Value.Address == null ? "" : entity.Value.Address);
+                                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, entity.Value.Url == null ? "" : entity.Value.Url);
+                                PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_KEY_CODE, entity.Value.KeyCode == null ? "" : entity.Value.KeyCode);
+                                ToastUtils.showShortSafe("获取服务器信息成功，可以登录啦！");
+
+                                if (!TextUtils.isEmpty(etName.getText().toString())) {
+                                    if (!isPwdLogin) {
+                                        etPwd.requestFocus();
+                                        showKeyboard(LoginActivity.this, etPwd);
+                                    } else {
+                                        etPassword.requestFocus();
+                                        showKeyboard(LoginActivity.this, etPassword);
+                                    }
+                                } else {
+                                    etName.requestFocus();
+                                    showKeyboard(LoginActivity.this, etName);
+                                }
+                            } else {
+                                ToastUtils.showShortSafe(entity.Information == null ? "" : entity.Information);
+                            }
+                            if (!TextUtils.isEmpty(entity.Value.CompanyKey) && !TextUtils.isEmpty(entity.Value.Company)) {
+                                saveServerConfigInfo(entity.Value.CompanyKey, entity.Value.Company);
+                            }
+                        }
+
+                        @Override
+                        public void onError(@NonNull Throwable e) {
+                            CzechYuanDialog mDialog = new CzechYuanDialog(LoginActivity.this, R.style.CzechYuanDialog);
+                            mDialog.setContent("获取服务器信息失败，是否重新获取？");
+                            mDialog.setConfirmClickListener(view1 -> getServerConfig());
+                        }
+
+                        @Override
+                        public void onComplete() {
+                        }
+                    });
+        }
+
+    }
+
+    private void showKeyboard(Activity activity, EditText et) {
+        if (activity.getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(et, 0);
+        }
+    }
+
     /**
-     * 登录
+     * 验证码登录
      */
     private void login() {
+        DataSaver.setCurrentLoginType(false);
         final String name = etName.getText().toString().trim();
         final String pwd = etPwd.getText().toString().trim();
 
@@ -320,7 +475,7 @@ public class LoginActivity extends BaseActivity {
                             PreferencesUtil.putInt("TraderId", mettingLoginEntity.Value.TraderId);
                             PreferencesUtil.putInt("Id", mettingLoginEntity.Value.Id);
                             PreferencesUtil.putString("ContactName", mettingLoginEntity.Value.ContactName);
-                            PreferencesUtil.putBoolean(ApiConstants.CPreference.IS_PWD_LOGIN,false);
+                            PreferencesUtil.putBoolean(ApiConstants.CPreference.IS_PWD_LOGIN, false);
                             String userName = PreferencesUtil.getString(ApiConstants.CPreference.USER_NAME, "");
                             if (!StringUtils.isEmpty(userName)) {
                                 if (!userName.equals(name)) {
@@ -445,15 +600,17 @@ public class LoginActivity extends BaseActivity {
 
     private void onConfigureClicked() {
         ToastUtils.showShortSafe("请先获取服务器信息");
-        Intent intent = new Intent(this, ConnectServerActivity.class);
-        startActivity(intent);
+        etGetInfo.requestFocus();
+        showKeyboard(LoginActivity.this, etGetInfo);
+//        Intent intent = new Intent(this, ConnectServerActivity.class);
+//        startActivity(intent);
     }
 
     /**
      * 密码登录
      */
     private void onPwdLogin() {
-
+        DataSaver.setCurrentLoginType(true);
         String phoneNumber = etName.getText().toString().trim();
         String pwd = etPassword.getText().toString();
 
@@ -559,8 +716,8 @@ public class LoginActivity extends BaseActivity {
                                 }
                                 PreferencesUtil.putString(ApiConstants.CPreference.USER_NAME, phoneNumber);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PASSWORD, pwd);
-                                PreferencesUtil.putBoolean(phoneNumber,true);
-                                PreferencesUtil.putBoolean(ApiConstants.CPreference.IS_PWD_LOGIN,true);
+                                PreferencesUtil.putBoolean(phoneNumber, true);
+                                PreferencesUtil.putBoolean(ApiConstants.CPreference.IS_PWD_LOGIN, true);
 
                                 LogUtils.e("登录 onComplete");
                                 LogUtils.e("traderId " + passwordLoginEntity.Value.Value.TraderId);
@@ -624,6 +781,28 @@ public class LoginActivity extends BaseActivity {
                     });
         }
 
+    }
+
+    private void saveServerConfigInfo(String mCompanyKey, String mCompany) {
+        RXSQLite.rx(SQLite.select().from(ServerConfigInfoModel.class)
+                .where(ServerConfigInfoModel_Table.CompanyKey.eq(mCompanyKey)))
+                .queryList()
+                .subscribe(new Consumer<List<ServerConfigInfoModel>>() {
+                    @Override
+                    public void accept(@NonNull List<ServerConfigInfoModel> models) throws Exception {
+                        if (models == null || models.size() == 0) {
+                            ServerConfigInfoModel serverConfigInfoModel = new ServerConfigInfoModel();
+                            serverConfigInfoModel.Company = mCompany;
+                            serverConfigInfoModel.CompanyKey = mCompanyKey;
+                            serverConfigInfoModel.insert().subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(@NonNull Long aLong) throws Exception {
+                                    LogUtils.e("商户编号插入数据成功\n用时：" + DateUtil.getFormatTime(aLong));
+                                }
+                            });
+                        }
+                    }
+                });
     }
 
 }
