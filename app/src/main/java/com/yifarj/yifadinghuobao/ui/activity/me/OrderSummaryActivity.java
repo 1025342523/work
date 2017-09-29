@@ -3,18 +3,15 @@ package com.yifarj.yifadinghuobao.ui.activity.me;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.OrderSummaryAdapter;
-import com.yifarj.yifadinghuobao.adapter.OrderSummaryHeadAdapter;
-import com.yifarj.yifadinghuobao.adapter.helper.HeaderViewRecyclerAdapter;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.OrderSummaryEntity;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
@@ -25,6 +22,7 @@ import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.utils.DividerItemDecoration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,7 +37,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by ZhangZeZhi on 2017-09-21.
  */
 
-public class OrderSummaryActivity extends BaseActivity{
+public class OrderSummaryActivity extends BaseActivity {
 
     @BindView(R.id.titleView)
     TitleView titleView;
@@ -51,18 +49,26 @@ public class OrderSummaryActivity extends BaseActivity{
     CustomEmptyView emptyView;
 
     private List<OrderSummaryEntity.ValueEntity.Product> mList;
+
     private LinearLayoutManager mManager;
     private OrderSummaryAdapter mAdapter;
-    private HeaderViewRecyclerAdapter mHeaderAdapter;
-    private TextView mTvNoOrder;
-    private RecyclerView mRecyclerHeadView;
-    private TextView mTvOrder;
-    private List<SaleGoodsItemModel> mHeadList;
-    private OrderSummaryHeadAdapter mHeadAdapter;
+    private boolean isLoad;
+//    private HeaderViewRecyclerAdapter mHeaderAdapter;
+//    private TextView mTvNoOrder;
+//    private RecyclerView mRecyclerHeadView;
+//    private TextView mTvOrder;
+//    private OrderSummaryHeadAdapter mHeadAdapter;
+//    private View mHeaderView;
+//    private LinearLayoutManager mLayoutManager;
+//    private static List<SaleGoodsItemModel> mHeadlist;
+
+    private List<OrderSummaryEntity.ValueEntity.Product> mProductList;
+
+    /*public OrderSummaryActivity() {
+    }*/
 
     @Override
     public int getLayoutId() {
-
         return R.layout.activity_order_summary;
     }
 
@@ -72,10 +78,11 @@ public class OrderSummaryActivity extends BaseActivity{
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mAdapter = null;
                 finish();
             }
         });
-        loadData();
+        loadHeadData();
     }
 
     private void init() {
@@ -84,30 +91,17 @@ public class OrderSummaryActivity extends BaseActivity{
         recycleView.setNestedScrollingEnabled(true);
         recycleView.setLayoutManager(mManager);
         //添加分割线
-        recycleView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
+        recycleView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         Log.e("init", String.valueOf(mList.size()));
-        mAdapter = new OrderSummaryAdapter(mList,this);
+        //
+        //mHeaderAdapter = new HeaderViewRecyclerAdapter(mAdapter);
+        if (!mProductList.isEmpty()) {
+            mAdapter = new OrderSummaryAdapter(mList, this);
+            recycleView.setAdapter(mAdapter);
 
-        mHeaderAdapter = new HeaderViewRecyclerAdapter(mAdapter);
-        recycleView.setAdapter(mHeaderAdapter);
-        createHeaderView();
+        } else {
 
-    }
-
-    private void createHeaderView() {
-        View headerView = LayoutInflater.from(this).inflate(R.layout.item_order_summary_head, recycleView, false);
-        mTvNoOrder = headerView.findViewById(R.id.tv_no_order);
-        mRecyclerHeadView = headerView.findViewById(R.id.recycle_head);
-        mTvOrder = headerView.findViewById(R.id.tv_order);
-        loadHeadData();
-        mHeadAdapter = new OrderSummaryHeadAdapter(mHeadList, this);
-        //添加分割线
-        DividerItemDecoration decoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
-        mRecyclerHeadView.addItemDecoration(decoration);
-        mRecyclerHeadView.setAdapter(mHeadAdapter);
-
-        mHeaderAdapter.addHeaderView(headerView);
-
+        }
     }
 
     private void loadHeadData() {
@@ -117,46 +111,62 @@ public class OrderSummaryActivity extends BaseActivity{
                 .subscribe(new Consumer<List<SaleGoodsItemModel>>() {
                     @Override
                     public void accept(@NonNull List<SaleGoodsItemModel> saleGoodsItemModels) throws Exception {
+                        if (!saleGoodsItemModels.isEmpty()) {
+                            mProductList = new ArrayList<OrderSummaryEntity.ValueEntity.Product>();
+                            for (int i = 0; i < saleGoodsItemModels.size(); i++) {
+                                OrderSummaryEntity.ValueEntity.Product product = new OrderSummaryEntity.ValueEntity.Product();
+                                SaleGoodsItemModel model = saleGoodsItemModels.get(i);
+                                if (TextUtils.isEmpty(model.Supplier)) {
+                                    model.Supplier = "无供应商";
+                                }
+                                product.Name = model.Supplier;
+                                product.TotalPrice = model.CurrentPrice;
+                                product.ProductName = model.ProductName;
+                                product.Code = model.Code;
+                                product.Quantity = model.Quantity;
+                                product.UnitName = model.BasicUnitName;
+                                mProductList.add(product);
+                            }
+                        }
                         LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
-                        mHeadList = saleGoodsItemModels;
-                        Log.e("mHeadList", String.valueOf(mHeadList.size()));
-                        /*if (orderCount > 0) {
-                            titleView.setRightIconText(View.VISIBLE, orderCount);
-                            LogUtils.e("orderCount：" + orderCount);
-                        } else if (orderCount == 0) {
-                            titleView.setRightIconText(View.GONE, 0);
-                            LogUtils.e("orderCount：" + orderCount);
-                        }*/
+
+                        loadData();
+
+                        Log.e("mHeadList", String.valueOf(saleGoodsItemModels.size()));
                     }
                 });
     }
 
     @Override
     public void loadData() {
-        Log.e("loadData:","loadData");
+        Log.e("loadData:", "loadData");
         String body = "{\"SqlStr\":\"select vsd.ProductName,vsd.Quantity,vsd.UnitName,vsd.TotalPrice,vsd.SalesTypeName,vsd.Code,tt.Name from VS_SalesOutBillDetails vsd " +
                 "left join TB_Product tp on vsd.ProductId = tp.Id " +
                 "left join TB_Trader tt on tt.Id = tp.DefaultTraderId " +
                 "where vsd.SalesTypeName = '售' and tt.Name != '' and vsd.Code != ''\",\"SummaryResult\":\"\"}";
-        body = body.replace("\\","");
+        body = body.replace("\\", "");
         body = ZipUtil.gzip(body);
         RetrofitHelper.getOrderSummaryAPI()
-                .getOrderSummary(AppInfoUtil.getToken(),"SummaryView",body,"")
+                .getOrderSummary(AppInfoUtil.getToken(), "SummaryView", body, "")
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<OrderSummaryEntity>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        Log.e("onSubscribe","onSubscribe");
+                        Log.e("onSubscribe", "onSubscribe");
                     }
+
                     @Override
                     public void onNext(@NonNull OrderSummaryEntity entity) {
 
                         Log.e("onNext", String.valueOf(entity.HasError));
-                        if(!entity.HasError){
-                            if(entity.Value != null){
+                        if (!entity.HasError) {
+                            if (entity.Value != null) {
                                 mList = entity.Value.SummaryResult;
+                                if (mProductList != null) {
+                                    mList.addAll(0, mProductList);
+                                }
                                 init();
                                 Log.e("list", String.valueOf(mList.size()));
                             }
@@ -175,4 +185,10 @@ public class OrderSummaryActivity extends BaseActivity{
                 });
     }
 
+    @Override
+    protected void onDestroy() {
+        mAdapter = null;
+        super.onDestroy();
+
+    }
 }

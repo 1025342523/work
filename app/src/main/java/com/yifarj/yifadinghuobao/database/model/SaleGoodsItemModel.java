@@ -20,7 +20,7 @@ public class SaleGoodsItemModel extends BaseRXModel {
     public int Id;
 
     @Column
-    public double CurrentPrice;
+    public double CurrentPrice;//
 
     @Column
     public String Path;
