@@ -114,6 +114,7 @@ public class TabOrderFragment extends BaseFragment {
                 hideEmptyView();
             }
         }
+
         loadMoreView.setVisibility(View.GONE);
         if (mRecyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || !mRecyclerView.isComputingLayout()) { // RecyclerView滑动过程中刷新数据导致的Crash(Android官方的一个Bug)
             mOrderListAdapter.notifyDataSetChanged();
@@ -231,7 +232,6 @@ public class TabOrderFragment extends BaseFragment {
                     public void onSubscribe(@NonNull Disposable d) {
 
                     }
-
                     @Override
                     public void onNext(@NonNull SaleOrderListEntity saleOrderListEntity) {
                         if (!saleOrderListEntity.HasError) {

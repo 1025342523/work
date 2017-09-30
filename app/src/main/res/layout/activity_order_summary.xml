@@ -12,11 +12,46 @@
         app:icon_left="@drawable/ic_title_back"
         app:title_name="订单汇总"/>
 
-    <com.yifarj.yifadinghuobao.view.CustomEmptyView
+    <!--<android.support.v7.widget.RecyclerView
+        android:id="@+id/recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:overScrollMode="never"
+        android:scrollbars="horizontal"
+        />-->
+
+    <!--<com.yifarj.yifadinghuobao.view.CustomEmptyView
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/titleView"
         android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:visibility="gone"/>-->
+    <!--<android.support.v4.widget.SwipeRefreshLayout-->
+        <!--android:id="@+id/swipe_refresh_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@color/white">-->
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycleView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:scrollbars="none"/>
+
+            <com.yifarj.yifadinghuobao.view.CustomEmptyView
+                android:id="@+id/empty_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_gravity="center"/>
+
+        </FrameLayout>
+    <!--</android.support.v4.widget.SwipeRefreshLayout>-->
 </LinearLayout>

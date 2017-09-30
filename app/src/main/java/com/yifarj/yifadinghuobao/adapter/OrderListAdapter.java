@@ -57,7 +57,6 @@ public class OrderListAdapter extends AbsRecyclerViewAdapter {
                 itemViewHolder.tvOrderStatus.setTextColor(getContext().getResources().getColor(R.color.main_red));
             }
         }
-
         super.onBindViewHolder(holder, position);
     }
 

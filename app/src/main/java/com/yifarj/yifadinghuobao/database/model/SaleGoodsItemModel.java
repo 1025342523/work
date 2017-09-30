@@ -20,7 +20,7 @@ public class SaleGoodsItemModel extends BaseRXModel {
     public int Id;
 
     @Column
-    public double CurrentPrice;
+    public double CurrentPrice;//当前价格
 
     @Column
     public String Path;
@@ -48,6 +48,12 @@ public class SaleGoodsItemModel extends BaseRXModel {
 
     @Column
     public double Quantity;
+
+    @Column
+    public String Supplier;//供应商Name
+
+    @Column
+    public int SupplierId;//供应商Id
 
     @Column
     public double BasicQuantity;

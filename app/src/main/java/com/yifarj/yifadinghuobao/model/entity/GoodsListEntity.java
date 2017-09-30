@@ -37,7 +37,7 @@ public class GoodsListEntity {
         public int TypeId;
         public int DefaultWarehouseId;
         public int DefaultLocationId;
-        public int DefaultTraderId;
+        public int DefaultTraderId;//供应商Id
         public int PurchaserId;
         public int ManagerId;
         public double Cost;
@@ -119,7 +119,7 @@ public class GoodsListEntity {
         public String BrandName;
         public String DefaultWarehouseName;
         public String DefaultLocationName;
-        public String DefaultTraderName;
+        public String DefaultTraderName;//供应商Name
         public String PurchaserName;
         public String ManagerName;
         public String BarcodeStrings;

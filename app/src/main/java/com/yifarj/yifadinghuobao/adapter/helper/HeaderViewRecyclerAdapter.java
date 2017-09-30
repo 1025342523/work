@@ -55,7 +55,7 @@ public class HeaderViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
     @Override
     public int getItemViewType(int position) {
 
-        int hCount = getHeaderCount();
+        int hCount = getHeaderCount();//1
         if (position < hCount) {
             return HEADERS_START + position;
         } else {
@@ -127,7 +127,6 @@ public class HeaderViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
         return mWrappedAdapter.getItemCount();
     }
 
-
     private int getHeaderCount() {
 
         return mHeaderViews.size();
@@ -170,7 +169,6 @@ public class HeaderViewRecyclerAdapter extends RecyclerView.Adapter<RecyclerView
             super.onChanged();
             notifyDataSetChanged();
         }
-
 
         @Override
         public void onItemRangeChanged(int positionStart, int itemCount) {
