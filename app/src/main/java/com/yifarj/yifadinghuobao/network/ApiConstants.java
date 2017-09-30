@@ -63,7 +63,10 @@ public class ApiConstants {
          * 是否是密码登录
          */
         public static final String IS_PWD_LOGIN = "is_pwd_login";
-
+        /**
+         * CompanyKey
+         */
+        public static final String COMPANY_KEY = "company_key";
     }
 
 

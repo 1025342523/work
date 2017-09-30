@@ -54,7 +54,6 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/size_16"
                 android:src="@drawable/selector_drop_down"/>
-
         </LinearLayout>
 
         <EditText

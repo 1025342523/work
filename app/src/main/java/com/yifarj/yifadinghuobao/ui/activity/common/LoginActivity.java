@@ -9,10 +9,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -24,6 +26,7 @@ import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
+import com.yifarj.yifadinghuobao.adapter.CompanyKeyAdapter;
 import com.yifarj.yifadinghuobao.database.AppDatabase;
 import com.yifarj.yifadinghuobao.database.model.ServerConfigInfoModel;
 import com.yifarj.yifadinghuobao.database.model.ServerConfigInfoModel_Table;
@@ -101,6 +104,7 @@ public class LoginActivity extends BaseActivity {
     private Consumer<Long> mConsumerCountTime;
     private boolean isPwdLogin = false;
     private List<ServerConfigInfoModel> mServerConfigInfoModels;
+    private ListPopupWindow mListPopupWindow;
 
 
     @Override
@@ -140,15 +144,55 @@ public class LoginActivity extends BaseActivity {
                 return false;
             }
         });
-
         if (mServerConfigInfoModels != null && mServerConfigInfoModels.size() > 0) {
-            if (mServerConfigInfoModels.size() == 1) {
-                etGetInfo.setText(mServerConfigInfoModels.get(0).CompanyKey);
-                etGetInfo.setSelection(mServerConfigInfoModels.get(0).CompanyKey.length());
-            } else {
-
+            String companyKey = PreferencesUtil.getString(ApiConstants.CPreference.COMPANY_KEY);
+            if (!TextUtils.isEmpty(companyKey)) {
+                etGetInfo.setText(companyKey);
+                etGetInfo.setSelection(companyKey.length());
             }
+            if (mServerConfigInfoModels.size() == 1) {
+                if (TextUtils.isEmpty(companyKey)) {
+                    etGetInfo.setText(mServerConfigInfoModels.get(0).CompanyKey);
+                    etGetInfo.setSelection(mServerConfigInfoModels.get(0).CompanyKey.length());
+                }
+                ivGetMore.setVisibility(View.GONE);
+            } else {
+                if (TextUtils.isEmpty(companyKey)) {
+                    etGetInfo.setText(mServerConfigInfoModels.get(mServerConfigInfoModels.size() - 1).CompanyKey);
+                    etGetInfo.setSelection(mServerConfigInfoModels.get(mServerConfigInfoModels.size() - 1).CompanyKey.length());
+                }
+                mListPopupWindow = new ListPopupWindow(LoginActivity.this);
+                mListPopupWindow.setAdapter(new CompanyKeyAdapter(LoginActivity.this, mServerConfigInfoModels));
+                mListPopupWindow.setAnchorView(etGetInfo);
+                mListPopupWindow.setModal(true);
+                mListPopupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        etGetInfo.setText(mServerConfigInfoModels.get(i).CompanyKey);
+                        etGetInfo.setSelection(mServerConfigInfoModels.get(i).CompanyKey.length());
+                        mListPopupWindow.dismiss();
+                        hideInputMethod();
+                        getServerConfig();
+                    }
+                });
+                clicks(ivGetMore)
+                        .compose(bindToLifecycle())
+                        .subscribe(new Consumer<Object>() {
+
+                            @Override
+                            public void accept(@NonNull Object o) throws Exception {
+                                if (mListPopupWindow.isShowing()) {
+                                    mListPopupWindow.dismiss();
+                                } else {
+                                    mListPopupWindow.show();
+                                }
+                            }
+                        });
+            }
+        } else {
+            ivGetMore.setVisibility(View.GONE);
         }
+
 
         tvLoginCutover.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,17 +201,7 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        clicks(ivGetMore)
-                .compose(bindToLifecycle())
-                .subscribe(new Consumer<Object>() {
 
-                    @Override
-                    public void accept(@NonNull Object o) throws Exception {
-                        ToastUtils.showShortSafe("Hello");
-
-
-                    }
-                });
         clicks(btnLogin)
                 .compose(bindToLifecycle())
                 .throttleFirst(2, TimeUnit.SECONDS)
@@ -381,12 +415,14 @@ public class LoginActivity extends BaseActivity {
 
                         @Override
                         public void onNext(@NonNull GetInfoEntity entity) {
-                            if (!entity.HasError) {
+                            if (!entity.HasError && entity.Value != null) {
                                 PreferencesUtil.putString(ApiConstants.CPreference.ACCOUNT_ID, entity.Value.AccsetId == null ? "" : entity.Value.AccsetId);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, entity.Value.Port == null ? "" : entity.Value.Port);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, entity.Value.Address == null ? "" : entity.Value.Address);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_DOMAIN, entity.Value.Url == null ? "" : entity.Value.Url);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_KEY_CODE, entity.Value.KeyCode == null ? "" : entity.Value.KeyCode);
+                                PreferencesUtil.putString(ApiConstants.CPreference.COMPANY_KEY, key);
+
                                 ToastUtils.showShortSafe("获取服务器信息成功，可以登录啦！");
 
                                 if (!TextUtils.isEmpty(etName.getText().toString())) {
@@ -401,12 +437,13 @@ public class LoginActivity extends BaseActivity {
                                     etName.requestFocus();
                                     showKeyboard(LoginActivity.this, etName);
                                 }
+                                if (!TextUtils.isEmpty(entity.Value.CompanyKey) && !TextUtils.isEmpty(entity.Value.Company)) {
+                                    saveServerConfigInfo(entity.Value.CompanyKey, entity.Value.Company);
+                                }
                             } else {
                                 ToastUtils.showShortSafe(entity.Information == null ? "" : entity.Information);
                             }
-                            if (!TextUtils.isEmpty(entity.Value.CompanyKey) && !TextUtils.isEmpty(entity.Value.Company)) {
-                                saveServerConfigInfo(entity.Value.CompanyKey, entity.Value.Company);
-                            }
+
                         }
 
                         @Override
