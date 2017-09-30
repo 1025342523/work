@@ -12,6 +12,7 @@ import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
 import com.yifarj.yifadinghuobao.adapter.OrderSummaryAdapter;
+import com.yifarj.yifadinghuobao.adapter.OrderSummaryHeadAdapter;
 import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel;
 import com.yifarj.yifadinghuobao.model.entity.OrderSummaryEntity;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
@@ -35,6 +36,7 @@ import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by ZhangZeZhi on 2017-09-21.
+ *
  */
 
 public class OrderSummaryActivity extends BaseActivity {
@@ -52,20 +54,10 @@ public class OrderSummaryActivity extends BaseActivity {
 
     private LinearLayoutManager mManager;
     private OrderSummaryAdapter mAdapter;
-    private boolean isLoad;
-//    private HeaderViewRecyclerAdapter mHeaderAdapter;
-//    private TextView mTvNoOrder;
-//    private RecyclerView mRecyclerHeadView;
-//    private TextView mTvOrder;
-//    private OrderSummaryHeadAdapter mHeadAdapter;
-//    private View mHeaderView;
-//    private LinearLayoutManager mLayoutManager;
-//    private static List<SaleGoodsItemModel> mHeadlist;
 
     private List<OrderSummaryEntity.ValueEntity.Product> mProductList;
+    private OrderSummaryHeadAdapter mHeadAdapter;
 
-    /*public OrderSummaryActivity() {
-    }*/
 
     @Override
     public int getLayoutId() {
@@ -94,14 +86,25 @@ public class OrderSummaryActivity extends BaseActivity {
         recycleView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         Log.e("init", String.valueOf(mList.size()));
         //
-        //mHeaderAdapter = new HeaderViewRecyclerAdapter(mAdapter);
-        if (!mProductList.isEmpty()) {
+        if (mProductList != null&&mProductList.size() > 0&&mList != null && mList.size() > 0) {
+
+            mHeadAdapter = new OrderSummaryHeadAdapter(mList, this, mProductList);
+            recycleView.setAdapter(mHeadAdapter);
+
+        } else if(mList != null && mList.size() > 0){
+
             mAdapter = new OrderSummaryAdapter(mList, this);
             recycleView.setAdapter(mAdapter);
 
-        } else {
+        }else{
+
+            emptyView.setVisibility(View.VISIBLE);
+            recycleView.setVisibility(View.GONE);
+            emptyView.setEmptyImage(R.drawable.ic_data_empty);
+            emptyView.setEmptyText("暂无数据");
 
         }
+
     }
 
     private void loadHeadData() {
@@ -124,7 +127,7 @@ public class OrderSummaryActivity extends BaseActivity {
                                 product.ProductName = model.ProductName;
                                 product.Code = model.Code;
                                 product.Quantity = model.Quantity;
-                                product.UnitName = model.BasicUnitName;
+                                product.UnitName = model.ProductUnitName;
                                 mProductList.add(product);
                             }
                         }
@@ -164,9 +167,6 @@ public class OrderSummaryActivity extends BaseActivity {
                         if (!entity.HasError) {
                             if (entity.Value != null) {
                                 mList = entity.Value.SummaryResult;
-                                if (mProductList != null) {
-                                    mList.addAll(0, mProductList);
-                                }
                                 init();
                                 Log.e("list", String.valueOf(mList.size()));
                             }
