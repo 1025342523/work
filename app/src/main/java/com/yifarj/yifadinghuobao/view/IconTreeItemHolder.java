@@ -45,7 +45,6 @@ public class IconTreeItemHolder extends TreeNode.BaseNodeViewHolder<IconTreeItem
     public static class IconTreeItem{
         public String text;
 
-
         public IconTreeItem(String text) {
             this.text = text;
         }
