@@ -29,6 +29,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
+ * 设置密码dialog
+ *
  * Created by ZhangZeZhi on 2017-09-16.
  */
 

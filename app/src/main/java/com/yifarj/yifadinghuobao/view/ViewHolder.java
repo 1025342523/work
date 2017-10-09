@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Created by Administrator on 2017-09-16.
+ * Created by ZhangZeZhi on 2017-09-16.
  */
 
 public class ViewHolder {
