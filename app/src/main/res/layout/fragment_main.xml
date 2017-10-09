@@ -117,7 +117,6 @@
                 android:overScrollMode="never"
                 android:scrollbars="none"/>
 
-
             <com.yifarj.yifadinghuobao.view.CustomEmptyView
                 android:id="@+id/empty_view"
                 android:layout_width="wrap_content"

@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.chen.treeview.TreeRecyclerView;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.unnamed.b.atv.model.TreeNode;
@@ -21,6 +20,7 @@ import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.ZipUtil;
 import com.yifarj.yifadinghuobao.view.HeaderHolder;
 import com.yifarj.yifadinghuobao.view.IconTreeItemHolder;
+import com.yifarj.yifadinghuobao.view.LoadingDialog;
 import com.yifarj.yifadinghuobao.view.PlaceHolderHolder;
 import com.yifarj.yifadinghuobao.view.ProfileHolder;
 import com.yifarj.yifadinghuobao.view.TitleView;
@@ -45,9 +45,6 @@ public class OrderSummaryActivity extends BaseActivity {
     @BindView(R.id.titleView)
     TitleView titleView;
 
-    @BindView(R.id.treeView)
-    TreeRecyclerView treeView;
-
     @BindView(R.id.rl_container)
     RelativeLayout container;
 
@@ -59,6 +56,7 @@ public class OrderSummaryActivity extends BaseActivity {
     private TreeNode mNoOrderTreeNode;
     private TreeNode mOrderTreeNode;
     private AndroidTreeView mTView;
+    private LoadingDialog mDialog;
 
     @Override
     public int getLayoutId() {
@@ -67,7 +65,6 @@ public class OrderSummaryActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
-
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,6 +72,9 @@ public class OrderSummaryActivity extends BaseActivity {
             }
         });
         mRoot = TreeNode.root();
+
+        mDialog = new LoadingDialog(this,"加载数据中...");
+
         loadHeadData();
     }
 
@@ -175,6 +175,7 @@ public class OrderSummaryActivity extends BaseActivity {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         Log.e("onSubscribe", "onSubscribe");
+                        mDialog.show();
                     }
 
                     @Override
@@ -203,17 +204,19 @@ public class OrderSummaryActivity extends BaseActivity {
 //                            mTView.setDefaultAnimation(true);
                             mTView.setDefaultContainerStyle(R.style.TreeNodeStyleDivided, true);
                             container.addView(mTView.getView());
+                            mDialog.dismiss();
                         }
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
                         e.printStackTrace();
+                        mDialog.dismiss();
                     }
 
                     @Override
                     public void onComplete() {
-
+                        mDialog.dismiss();
                     }
                 });
     }

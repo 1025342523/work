@@ -259,8 +259,8 @@ public class TabMainFragment extends BaseFragment {
                 }
             }
         });
-        mGoodsListAdapter.setAddShoppingCartClickListener(new GoodsListAdapter.AddShoppingCartClickListener() {
 
+        mGoodsListAdapter.setAddShoppingCartClickListener(new GoodsListAdapter.AddShoppingCartClickListener() {
             @Override
             public void onAddShoppingCartClickListener(View view, GoodsListEntity.ValueEntity goodsEntity, int statusIcon, int saleType) {
                 if (goodsEntity != null) {
@@ -577,7 +577,6 @@ public class TabMainFragment extends BaseFragment {
             mPopupWindow.dismiss();
         }
     }
-
 
     private void createSaleGoodsItemModel(GoodsListEntity.ValueEntity goodsBean, double count, String unitName, int unitId, double unitPrice, double totalPrice, double basicUnitPrice, int property1Id, int property2Id, String property1IdName, String property2IdName, boolean isProperty, List<ProductPropertyListEntity.ValueEntity> productPropery1, List<ProductPropertyListEntity.ValueEntity> productPropery2) {
         SaleGoodsItemModel itemModel = new SaleGoodsItemModel();
@@ -1062,7 +1061,6 @@ public class TabMainFragment extends BaseFragment {
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
     }
-
 
     public void deleteCollection(GoodsListEntity.ValueEntity goodsBean) {
         RXSQLite.rx(SQLite.select().from(CollectionItemModel.class)

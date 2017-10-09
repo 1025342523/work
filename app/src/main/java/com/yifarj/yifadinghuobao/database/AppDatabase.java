@@ -19,11 +19,7 @@ import com.yifarj.yifadinghuobao.database.model.SaleGoodsItemModel_Table;
 public class AppDatabase {
     public static final String NAME = "YiDingHuoDatabase";
 
-<<<<<<< HEAD
-    public static final int VERSION = 7; //2017/9/13 15:24 add Property VERSION=5
-=======
     public static final int VERSION = 7; //2017/9/25 17:00 add Property
->>>>>>> cb9657d8803e568c6f434fb52e7f32d5db675e37
 
     //
     @Migration(version = 6, database = AppDatabase.class)
