@@ -5,6 +5,10 @@
               android:layout_height="match_parent"
               android:background="@color/whitesmoke"
               android:orientation="vertical">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/top_line"/>
 
     <com.yifarj.yifadinghuobao.view.TitleView
         android:id="@+id/title"

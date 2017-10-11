@@ -49,6 +49,7 @@ import com.yifarj.yifadinghuobao.utils.ZipUtil;
 import com.yifarj.yifadinghuobao.view.CustomEditItem;
 import com.yifarj.yifadinghuobao.view.CustomEditItemUnderline;
 import com.yifarj.yifadinghuobao.view.CustomEmptyView;
+import com.yifarj.yifadinghuobao.view.LoadingDialog;
 import com.yifarj.yifadinghuobao.view.TitleView;
 import com.yifarj.yifadinghuobao.view.WheelViewBottomDialog;
 import com.yifarj.yifadinghuobao.view.listener.SimpleTextWatcher;
@@ -673,6 +674,7 @@ public class MettingOrderActivity extends BaseActivity {
         LogUtils.e(JsonUtils.serialize(orderInfo));
 
         if (saleType == 1) {
+            LoadingDialog loadingDialog = new LoadingDialog(MettingOrderActivity.this, getString(R.string.submit_order));
             RetrofitHelper
                     .getSaveOrderApi()
                     .saveOrderInfo("SalesOutBill", "", ZipUtil.gzip(JsonUtils.serialize(orderInfo)), AppInfoUtil.getToken())
@@ -682,7 +684,7 @@ public class MettingOrderActivity extends BaseActivity {
                     .subscribe(new Observer<CreateOrderEntity>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
-
+                            loadingDialog.show();
                         }
 
                         @Override
@@ -712,16 +714,18 @@ public class MettingOrderActivity extends BaseActivity {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            ToastUtils.showShortSafe(e.getMessage());
+                            ToastUtils.showShortSafe("创建退货单失败,请重新提交！");
                             LogUtils.e("创建退货单失败！onError");
+                            loadingDialog.dismiss();
                         }
 
                         @Override
                         public void onComplete() {
-
+                            loadingDialog.dismiss();
                         }
                     });
         } else {
+            LoadingDialog loadingDialog = new LoadingDialog(MettingOrderActivity.this, getString(R.string.submit_order));
             RetrofitHelper
                     .getSaveOrderApi()
                     .saveOrderInfo("SalesOutBill", "", ZipUtil.gzip(JsonUtils.serialize(orderInfo)), AppInfoUtil.getToken())
@@ -731,7 +735,7 @@ public class MettingOrderActivity extends BaseActivity {
                     .subscribe(new Observer<CreateOrderEntity>() {
                         @Override
                         public void onSubscribe(@NonNull Disposable d) {
-
+                            loadingDialog.show();
                         }
 
                         @Override
@@ -762,13 +766,14 @@ public class MettingOrderActivity extends BaseActivity {
 
                         @Override
                         public void onError(@NonNull Throwable e) {
-                            ToastUtils.showShortSafe(e.getMessage());
+                            loadingDialog.dismiss();
+                            ToastUtils.showShortSafe("创建订单失败，请重新提交！");
                             LogUtils.e("创建订单失败！onError");
                         }
 
                         @Override
                         public void onComplete() {
-
+                            loadingDialog.dismiss();
                         }
                     });
         }
