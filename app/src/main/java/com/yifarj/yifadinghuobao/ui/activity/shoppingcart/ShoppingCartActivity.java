@@ -47,7 +47,7 @@ import io.reactivex.functions.Consumer;
 
 
 /**
- * ShoppingCartActivity
+ * 购物车
  *
  * @auther Czech.Yuan
  * @date 2017/5/17 14:32
