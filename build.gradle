@@ -12,6 +12,7 @@ buildscript {
 }
 
 allprojects {
+
     repositories {
         jcenter()
         //DBFlow
@@ -24,3 +25,4 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+

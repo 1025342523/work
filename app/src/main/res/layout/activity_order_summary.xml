@@ -15,9 +15,67 @@
         app:icon_left="@drawable/ic_title_back"
         app:title_name="订单汇总"/>
 
-    <RelativeLayout
-        android:id="@+id/rl_container"
+    <TextView
+        android:id="@+id/tv_no_order"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></RelativeLayout>
+        android:layout_height="46dp"
+        android:layout_marginLeft="5dp"
+        android:drawablePadding="5dp"
+        android:textColor="#1296DB"
+        android:textSize="16sp"
+        android:drawableLeft="@drawable/ic_right_triangle"
+        android:text="未下单"
+        android:visibility="gone"
+        android:padding="5dp"
+        android:gravity="center_vertical"
+        />
+    <View
+        android:id="@+id/view_line1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        android:background="#cccccc"
+        />
+    <ExpandableListView
+        android:id="@+id/no_order_listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:groupIndicator="@null"
+        android:visibility="gone"
+        />
+    <View
+        android:id="@+id/view_line3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:visibility="gone"
+        android:background="#cccccc"
+        />
+    <TextView
+        android:id="@+id/tv_order"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginLeft="5dp"
+        android:drawablePadding="5dp"
+        android:textColor="#1296DB"
+        android:textSize="16sp"
+        android:drawableLeft="@drawable/ic_right_triangle"
+        android:text="已下单"
+        android:padding="5dp"
+        android:gravity="center_vertical"
+        />
+    <View
+        android:id="@+id/view_line2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#cccccc"
+        />
+    <!--android:groupIndicator="@null"  去掉左箭头-->
+    <ExpandableListView
+        android:id="@+id/order_listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:groupIndicator="@null"
+        android:visibility="gone"
+        />
 
 </LinearLayout>
