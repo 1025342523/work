@@ -61,6 +61,7 @@
         android:drawableLeft="@drawable/ic_right_triangle"
         android:text="已下单"
         android:padding="5dp"
+        android:visibility="gone"
         android:gravity="center_vertical"
         />
     <View
@@ -78,4 +79,10 @@
         android:visibility="gone"
         />
 
+    <com.yifarj.yifadinghuobao.view.CustomEmptyView
+        android:id="@+id/empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center"/>
 </LinearLayout>

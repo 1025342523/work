@@ -24,6 +24,7 @@ import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
 import com.yifarj.yifadinghuobao.utils.ZipUtil;
+import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.LoadingDialog;
 import com.yifarj.yifadinghuobao.view.TitleView;
 
@@ -68,6 +69,9 @@ public class OrderSummaryActivity extends BaseActivity {
     @BindView(R.id.view_line3)
     View viewLine3;
 
+    @BindView(R.id.empty_view)
+    CustomEmptyView emptyView;
+
     private List<OrderSummaryEntity.ValueEntity.Product> mOrderlist = new ArrayList<>();
     private List<OrderSummaryEntity.ValueEntity.Product> mProductList;
     private List<String> titleList = new ArrayList<>();
@@ -97,6 +101,7 @@ public class OrderSummaryActivity extends BaseActivity {
         loadHeadData();
 
         initView();
+
     }
 
     private void initView() {
@@ -185,8 +190,6 @@ public class OrderSummaryActivity extends BaseActivity {
                                 }
                             }
                         }
-
-
                         LogUtils.e("saleGoodsItemModels：" + saleGoodsItemModels.size());
 
                         loadData();
@@ -225,6 +228,14 @@ public class OrderSummaryActivity extends BaseActivity {
                             if (entity.Value != null) {
                                 Log.e("size", String.valueOf(entity.Value.SummaryResult.size()));
                                 int size = entity.Value.SummaryResult.size();
+                                if(size > 0 ){
+                                    tvOrder.setVisibility(View.VISIBLE);
+                                }else{
+                                    //TODO
+                                    emptyView.setEmptyImage(R.drawable.ic_data_empty);
+                                    emptyView.setEmptyText("暂无数据");
+                                    emptyView.setVisibility(View.VISIBLE);
+                                }
                                 for (int i = 0; i < size; i++) {
 
                                     if(orderMap.get(entity.Value.SummaryResult.get(i).Name) != null){
@@ -242,6 +253,7 @@ public class OrderSummaryActivity extends BaseActivity {
                                     }
                                 }
                             }
+
                             mDialog.dismiss();
                         }
                     }
