@@ -469,8 +469,13 @@ public class OrderSummaryActivity extends BaseActivity {
                 holder.viewLine5.setVisibility(View.VISIBLE);
             }
 
-            if(i == noOrderMap.size() - 1 && !b && noOrderMap.size() > 1){
+            /*if(i == noOrderMap.size() - 1 && !b && noOrderMap.size() > 1){
                 viewLine3.setVisibility(View.GONE);
+            }*/
+            if(b){
+                viewLine3.setVisibility(View.GONE);
+            }else{
+                viewLine3.setVisibility(View.VISIBLE);
             }
 
             return view;
@@ -495,9 +500,9 @@ public class OrderSummaryActivity extends BaseActivity {
             childHolder.tvTotalPrice.setTextColor(Color.RED);
             childHolder.tvUnitname.setText("单位: " + product.UnitName);
 
-            if(noOrderMap.get(titleList.get(titleList.size() -1)).size() - 1 == i1){
+            /*if(noOrderMap.get(titleList.get(titleList.size() -1)).size() - 1 == i1){
                 childHolder.viewLine4.setVisibility(View.GONE);
-            }
+            }*/
 
             return view;
         }
