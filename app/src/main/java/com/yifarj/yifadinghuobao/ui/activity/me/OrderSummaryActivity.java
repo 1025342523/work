@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.raizlabs.android.dbflow.rx2.language.RXSQLite;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.yifarj.yifadinghuobao.R;
@@ -23,8 +24,8 @@ import com.yifarj.yifadinghuobao.model.entity.OrderSummaryEntity;
 import com.yifarj.yifadinghuobao.network.RetrofitHelper;
 import com.yifarj.yifadinghuobao.ui.activity.base.BaseActivity;
 import com.yifarj.yifadinghuobao.utils.AppInfoUtil;
+import com.yifarj.yifadinghuobao.utils.ScreenUtil;
 import com.yifarj.yifadinghuobao.utils.ZipUtil;
-import com.yifarj.yifadinghuobao.view.CustomEmptyView;
 import com.yifarj.yifadinghuobao.view.LoadingDialog;
 import com.yifarj.yifadinghuobao.view.TitleView;
 
@@ -66,11 +67,8 @@ public class OrderSummaryActivity extends BaseActivity {
     @BindView(R.id.view_line1)
     View viewLine;
 
-    @BindView(R.id.view_line3)
+    @BindView(R.id.view_line_3)
     View viewLine3;
-
-    @BindView(R.id.empty_view)
-    CustomEmptyView emptyView;
 
     private List<OrderSummaryEntity.ValueEntity.Product> mOrderlist = new ArrayList<>();
     private List<OrderSummaryEntity.ValueEntity.Product> mProductList;
@@ -89,39 +87,40 @@ public class OrderSummaryActivity extends BaseActivity {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        ScreenUtil.init(this);
         titleView.setLeftIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
-
         mDialog = new LoadingDialog(this, "加载数据中...");
-
         loadHeadData();
-
         initView();
-
     }
 
     private void initView() {
         tvOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isOrderOpen) {//打开
-                    Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle,null);
-                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                    tvOrder.setCompoundDrawables(drawable, null, null, null);
-                    isOrderOpen = true;
-                    orderListView.setVisibility(View.VISIBLE);
-                    orderListView.setAdapter(new OrderExpandableListViewAdapter(orderMap,
-                            titleList,OrderSummaryActivity.this));
-                }else {//关闭
-                    Drawable drawable = getResources().getDrawable(R.drawable.ic_right_triangle,null);
-                    drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-                    tvOrder.setCompoundDrawables(drawable, null, null, null);
-                    isOrderOpen = false;
-                    orderListView.setVisibility(View.GONE);
+                if(titleList.size() > 0){
+                    if (!isOrderOpen) {//打开
+                        Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle,null);
+                        drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                        tvOrder.setCompoundDrawables(drawable, null, null, null);
+                        isOrderOpen = true;
+                        orderListView.setVisibility(View.VISIBLE);
+                        orderListView.setAdapter(new OrderExpandableListViewAdapter(orderMap,
+                                titleList,OrderSummaryActivity.this));
+                    }else {//关闭
+                        Drawable drawable = getResources().getDrawable(R.drawable.ic_right_triangle,null);
+                        drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+                        tvOrder.setCompoundDrawables(drawable, null, null, null);
+                        isOrderOpen = false;
+                        orderListView.setVisibility(View.GONE);
+                    }
+                }else{
+                    ToastUtils.showLong("没有数据哦！");
                 }
             }
         });
@@ -129,13 +128,12 @@ public class OrderSummaryActivity extends BaseActivity {
         tvNoOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 if (!isNoOrderOpen) {//打开
                     Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle,null);
                     drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                     tvNoOrder.setCompoundDrawables(drawable, null, null, null);
-                    viewLine3.setVisibility(View.VISIBLE);
                     isNoOrderOpen = true;
+                    viewLine3.setVisibility(View.VISIBLE);
                     noOrderListView.setVisibility(View.VISIBLE);
                     noOrderListView.setAdapter(new NoOrderExpandableListViewAdapter(OrderSummaryActivity.this,noOrdertitleList,noOrderMap,viewLine3));
                 }else {//关闭
@@ -148,7 +146,6 @@ public class OrderSummaryActivity extends BaseActivity {
                 }
             }
         });
-
     }
 
     private void loadHeadData() {
@@ -228,14 +225,7 @@ public class OrderSummaryActivity extends BaseActivity {
                             if (entity.Value != null) {
                                 Log.e("size", String.valueOf(entity.Value.SummaryResult.size()));
                                 int size = entity.Value.SummaryResult.size();
-                                if(size > 0 ){
-                                    tvOrder.setVisibility(View.VISIBLE);
-                                }else{
-                                    //TODO
-                                    emptyView.setEmptyImage(R.drawable.ic_data_empty);
-                                    emptyView.setEmptyText("暂无数据");
-                                    emptyView.setVisibility(View.VISIBLE);
-                                }
+
                                 for (int i = 0; i < size; i++) {
 
                                     if(orderMap.get(entity.Value.SummaryResult.get(i).Name) != null){
@@ -253,7 +243,6 @@ public class OrderSummaryActivity extends BaseActivity {
                                     }
                                 }
                             }
-
                             mDialog.dismiss();
                         }
                     }
@@ -469,7 +458,9 @@ public class OrderSummaryActivity extends BaseActivity {
             }else{
                 holder = (NoOrderGroupViewHolder) view.getTag();
             }
+
             holder.tvTitle.setText(titleList.get(i));
+
             if(!b){
                 holder.ivOrderArrow.setImageResource(R.drawable.ic_right_triangle);
                 holder.viewLine5.setVisibility(View.GONE);
@@ -477,10 +468,11 @@ public class OrderSummaryActivity extends BaseActivity {
                 holder.ivOrderArrow.setImageResource(R.drawable.ic_bottom_triangle);
                 holder.viewLine5.setVisibility(View.VISIBLE);
             }
-//            Log.e("GroupView", String.valueOf(i));
-            if(i == noOrderMap.size() - 1 && !b){
+
+            if(i == noOrderMap.size() - 1 && !b && noOrderMap.size() > 1){
                 viewLine3.setVisibility(View.GONE);
             }
+
             return view;
         }
 
@@ -502,10 +494,10 @@ public class OrderSummaryActivity extends BaseActivity {
             childHolder.tvTotalPrice.setText("金额: " + (int) product.TotalPrice);
             childHolder.tvTotalPrice.setTextColor(Color.RED);
             childHolder.tvUnitname.setText("单位: " + product.UnitName);
-            /*if(b){
-                childHolder.viewLine4.setVisibility(View.GONE);
-            }*/
 
+            if(noOrderMap.get(titleList.get(titleList.size() -1)).size() - 1 == i1){
+                childHolder.viewLine4.setVisibility(View.GONE);
+            }
 
             return view;
         }

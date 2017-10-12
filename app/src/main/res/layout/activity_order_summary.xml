@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:visibility="gone"
-        android:background="#cccccc"
+        android:background="#ECEDEF"
         />
     <ExpandableListView
         android:id="@+id/no_order_listView"
@@ -44,11 +44,11 @@
         android:visibility="gone"
         />
     <View
-        android:id="@+id/view_line3"
+        android:id="@+id/view_line_3"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:visibility="gone"
-        android:background="#cccccc"
+        android:background="#ECEDEF"
         />
     <TextView
         android:id="@+id/tv_order"
@@ -61,14 +61,14 @@
         android:drawableLeft="@drawable/ic_right_triangle"
         android:text="已下单"
         android:padding="5dp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:gravity="center_vertical"
         />
     <View
         android:id="@+id/view_line2"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#cccccc"
+        android:background="#ECEDEF"
         />
     <!--android:groupIndicator="@null"  去掉左箭头-->
     <ExpandableListView
@@ -79,10 +79,4 @@
         android:visibility="gone"
         />
 
-    <com.yifarj.yifadinghuobao.view.CustomEmptyView
-        android:id="@+id/empty_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_gravity="center"/>
 </LinearLayout>

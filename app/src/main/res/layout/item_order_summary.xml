@@ -9,7 +9,7 @@
         android:id="@+id/view_line3"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#cccccc"
+        android:background="#ECEDEF"
         android:visibility="gone"
         />
 
@@ -111,7 +111,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
-        android:background="#cccccc"
+        android:background="#ECEDEF"
         android:visibility="visible"
         />
 </RelativeLayout>
