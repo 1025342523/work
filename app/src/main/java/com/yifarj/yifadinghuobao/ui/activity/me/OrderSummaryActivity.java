@@ -105,7 +105,7 @@ public class OrderSummaryActivity extends BaseActivity {
             public void onClick(View view) {
                 if(titleList.size() > 0){
                     if (!isOrderOpen) {//打开
-                        Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle,null);
+                        Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle);
                         drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                         tvOrder.setCompoundDrawables(drawable, null, null, null);
                         isOrderOpen = true;
@@ -113,7 +113,7 @@ public class OrderSummaryActivity extends BaseActivity {
                         orderListView.setAdapter(new OrderExpandableListViewAdapter(orderMap,
                                 titleList,OrderSummaryActivity.this));
                     }else {//关闭
-                        Drawable drawable = getResources().getDrawable(R.drawable.ic_right_triangle,null);
+                        Drawable drawable = getResources().getDrawable(R.drawable.ic_right_triangle);
                         drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                         tvOrder.setCompoundDrawables(drawable, null, null, null);
                         isOrderOpen = false;
@@ -129,7 +129,7 @@ public class OrderSummaryActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 if (!isNoOrderOpen) {//打开
-                    Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle,null);
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_bottom_triangle);
                     drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                     tvNoOrder.setCompoundDrawables(drawable, null, null, null);
                     isNoOrderOpen = true;
@@ -137,7 +137,7 @@ public class OrderSummaryActivity extends BaseActivity {
                     noOrderListView.setVisibility(View.VISIBLE);
                     noOrderListView.setAdapter(new NoOrderExpandableListViewAdapter(OrderSummaryActivity.this,noOrdertitleList,noOrderMap,viewLine3));
                 }else {//关闭
-                    Drawable drawable = getResources().getDrawable(R.drawable.ic_right_triangle,null);
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_right_triangle);
                     drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
                     tvNoOrder.setCompoundDrawables(drawable, null, null, null);
                     isNoOrderOpen = false;
