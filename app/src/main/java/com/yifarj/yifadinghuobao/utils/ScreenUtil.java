@@ -80,4 +80,14 @@ public class ScreenUtil {
 		return context.getResources().getDisplayMetrics().widthPixels;
 	}
 
+	/**
+	 * get scree height pixels
+	 *
+	 * @param context
+	 * @return
+	 */
+	public static int getScreeHeight(Context context){
+		return context.getResources().getDisplayMetrics().heightPixels;
+	}
+
 }

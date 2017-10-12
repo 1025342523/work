@@ -128,8 +128,6 @@ dependencies {
     //banner
     compile 'com.youth.banner:banner:1.4.9'
     compile project(':imagepicker')
-    compile 'org.chen.treeview:treeview:1.0.3'
-    compile 'com.github.bmelnychuk:atv:1.2.+'
 }
 
 configurations.all {
