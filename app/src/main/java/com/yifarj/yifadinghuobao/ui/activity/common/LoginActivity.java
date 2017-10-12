@@ -105,6 +105,8 @@ public class LoginActivity extends BaseActivity {
     private boolean isPwdLogin = false;
     private List<ServerConfigInfoModel> mServerConfigInfoModels;
     private ListPopupWindow mListPopupWindow;
+    private boolean isGettingServer;
+    private String companyKey;
 
 
     @Override
@@ -361,6 +363,50 @@ public class LoginActivity extends BaseActivity {
 
         mDisposable = mObservableCountTime.subscribe(mConsumerCountTime);
 
+        etName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (TextUtils.isEmpty(companyKey)) {
+                    if (b && !isGettingServer) {
+                        getServerConfig();
+                    }
+                } else {
+                    if (b && !isGettingServer && !companyKey.equals(etGetInfo.getText().toString().trim())) {
+                        getServerConfig();
+                    }
+                }
+            }
+        });
+
+        etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (TextUtils.isEmpty(companyKey)) {
+                    if (b && !isGettingServer) {
+                        getServerConfig();
+                    }
+                } else {
+                    if (b && !isGettingServer && !companyKey.equals(etGetInfo.getText().toString().trim())) {
+                        getServerConfig();
+                    }
+                }
+            }
+        });
+        etPwd.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (TextUtils.isEmpty(companyKey)) {
+                    if (b && !isGettingServer) {
+                        getServerConfig();
+                    }
+                } else {
+                    if (b && !isGettingServer && !companyKey.equals(etGetInfo.getText().toString().trim())) {
+                        getServerConfig();
+                    }
+                }
+            }
+        });
+
     }
 
     private void refreshLoginUi() {
@@ -400,6 +446,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void getServerConfig() {
+        isGettingServer = true;
         String key = etGetInfo.getText().toString().trim();
         if (!TextUtils.isEmpty(key)) {
             RetrofitHelper.getInfoApi()
@@ -416,6 +463,7 @@ public class LoginActivity extends BaseActivity {
                         @Override
                         public void onNext(@NonNull GetInfoEntity entity) {
                             if (!entity.HasError && entity.Value != null) {
+                                companyKey = etGetInfo.getText().toString().trim();
                                 PreferencesUtil.putString(ApiConstants.CPreference.ACCOUNT_ID, entity.Value.AccsetId == null ? "" : entity.Value.AccsetId);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_PORT, entity.Value.Port == null ? "" : entity.Value.Port);
                                 PreferencesUtil.putString(ApiConstants.CPreference.LOGIN_IP, entity.Value.Address == null ? "" : entity.Value.Address);
@@ -458,7 +506,7 @@ public class LoginActivity extends BaseActivity {
                         }
                     });
         }
-
+        isGettingServer = false;
     }
 
     private void showKeyboard(Activity activity, EditText et) {

@@ -189,6 +189,7 @@ public class TabMainFragment extends BaseFragment {
         if (pageInfo == null) {
             pageInfo = new PageInfo();
         }
+        pageInfo.PageIndex = -1;
         pageInfo.SortOrder = 2;
         pageInfo.SortedColumn = "CreatedTime";
         initRefreshLayout();
